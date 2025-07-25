@@ -1,0 +1,225 @@
+/* Основной контейнер */
+.container {
+  background: #EDEDEA; /* Цвет фона как в start-here */
+  min-height: 100vh;
+  padding: 0;
+  /* Safe Area отступ снизу для навигации */
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  color: var(--text-main);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Заголовок */
+.title {
+  font-family: Cormorant;
+  font-style: normal;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #2C3F48;
+  text-align: left;
+  margin: calc(20px + var(--safe-area-inset-top, 0px)) 0 24px 0; /* Динамический отступ сверху */
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Основной текст */
+.mainText {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0 0 32px 0;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Синяя плашка */
+.highlightBlock {
+  background: #2C3F48;
+  border-radius: 0; /* Убрал закругления */
+  padding: 16px 20px; /* Уменьшил отступы */
+  margin: 0 16px 32px 16px;
+  text-align: center;
+  /* Safe Area отступы по бокам */
+  margin-left: calc(16px + var(--safe-area-inset-left, 0px));
+  margin-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+.highlightText {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 22px; /* Увеличил размер шрифта */
+  font-weight: 400; /* Сделал обычным вместо жирного */
+  line-height: 1.4;
+  color: white;
+  text-transform: uppercase;
+}
+
+/* Вторичный текст */
+.secondaryText {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0 0 40px 0;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Блок для видео - заглушка */
+.videoPlaceholder {
+  margin: 0 16px 40px 16px;
+  /* Safe Area отступы по бокам */
+  margin-left: calc(16px + var(--safe-area-inset-left, 0px));
+  margin-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+.videoContainer {
+  background: #f0f0f0;
+  border: 2px dashed #2C3F48;
+  border-radius: 16px;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.videoText {
+  font-family: Montserrat;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2C3F48;
+  opacity: 0.7;
+}
+
+/* Финальный текст */
+.finalText {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0 0 40px 0;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .title {
+    margin: calc(40px + var(--safe-area-inset-top, 0px)) 0 20px 0; /* Динамический отступ на мобильных */
+    font-size: 24px;
+    padding: 0 12px;
+  }
+  
+  .title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    padding: 0 12px;
+  }
+  
+  .mainText,
+  .secondaryText,
+  .finalText {
+    font-size: 16px;
+    padding: 0 12px;
+  }
+  
+  .highlightBlock {
+    margin: 0 12px 24px 12px;
+    padding: 12px 16px; /* Еще меньше отступы на мобильных */
+  }
+  
+  .highlightText {
+    font-size: 18px; /* Крупнее на мобильных */
+  }
+  
+  .videoPlaceholder {
+    margin: 0 12px 32px 12px;
+  }
+  
+  .videoContainer {
+    padding: 40px 16px;
+    min-height: 200px;
+  }
+  
+  .videoText {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .title {
+    font-size: 32px;
+    margin-bottom: 28px;
+  }
+  
+  .mainText,
+  .secondaryText,
+  .finalText {
+    font-size: 20px;
+  }
+  
+  .highlightText {
+    font-size: 24px; /* Крупнее на планшетах */
+  }
+  
+  .highlightBlock {
+    padding: 18px 24px; /* Меньше отступы */
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+  }
+  
+  .title {
+    font-size: 36px;
+    margin-bottom: 32px;
+  }
+  
+  .mainText,
+  .secondaryText,
+  .finalText {
+    font-size: 22px;
+  }
+  
+  .highlightText {
+    font-size: 26px; /* Крупнее на десктопе */
+  }
+  
+  .highlightBlock {
+    padding: 20px 32px; /* Меньше отступы */
+  }
+  
+  .videoContainer {
+    min-height: 300px;
+    padding: 80px 40px;
+  }
+} 

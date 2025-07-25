@@ -1,0 +1,58 @@
+:root {
+  --shadow-glow: 0 0 24px #bfcad1;
+  --gradient-primary: linear-gradient(135deg, #EDEDEA, #DEE6E9 80%, #344A54 100%);
+  --bg-primary: #EDEDEA; /* Светлый фон для всего приложения */
+  --bg-card: #DEE6E9;    /* Светлый фон для карточек и внутренних страниц */
+  --accent-blue: #344A54; /* Новый акцентный цвет */
+  --accent-purple: #344A54;
+  --text-main: #354A54;
+  --text-secondary: #5a6a6f; /* Более светлый текст для описаний */
+  --icon-color: #344A54; /* Цвет иконок */
+  --border-light: rgba(52, 74, 84, 0.1); /* Светлые границы */
+  --border-medium: rgba(52, 74, 84, 0.2); /* Средние границы */
+  --border-strong: rgba(52, 74, 84, 0.4); /* Темные границы */
+  --shadow-light: 0 0 8px rgba(52, 74, 84, 0.2); /* Светлые тени */
+  --shadow-medium: 0 0 4px rgba(52, 74, 84, 0.3); /* Средние тени */
+  
+  /* Шрифты */
+  --font-body: var(--font-montserrat), 'Montserrat', sans-serif;
+  --font-heading: var(--font-cormorant), 'Cormorant', serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-main);
+  padding: 0;
+  margin: 0;
+  font-family: var(--font-body);
+}
+
+/* Заголовки используют Cormorant */
+h1, h2, h3, h4, h5, h6 {
+  font-family: Cormorant;
+  font-style: normal;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* Скрытие скроллбара для всех браузеров, но сохранение функциональности */
+::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+* {
+  scrollbar-width: none;
+}
+
+body {
+  -ms-overflow-style: none;
+}

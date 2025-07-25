@@ -1,0 +1,304 @@
+/* Основной контейнер */
+.container {
+  background: #EDEDEA; /* Цвет фона как указано */
+  min-height: 100vh;
+  padding: 0;
+  /* Safe Area отступ снизу для навигации как на главной */
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  color: var(--text-main);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Главное изображение */
+.heroImg {
+  width: 100%;
+  height: auto;
+  margin-top: 20px; /* Отступ сверху для больших экранов */
+  margin-bottom: 20px; /* Отступ снизу меньше */
+  display: block;
+}
+
+/* Контейнер для блоков */
+.blocksContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+  margin-bottom: 40px;
+}
+
+/* Базовые стили для блоков */
+.blockTransparent,
+.blockFilled {
+  display: flex;
+  align-items: stretch; /* Растягиваем по высоте */
+  justify-content: space-between;
+  padding: 16px 12px; /* Уменьшил padding для больших изображений */
+  border-radius: 16px;
+  min-height: 180px; /* Увеличил высоту блока */
+  border: 2px solid #2C3F48;
+}
+
+/* Прозрачный блок */
+.blockTransparent {
+  background: transparent;
+}
+
+/* Блок с заливкой */
+.blockFilled {
+  background: #2C3F48;
+  color: white;
+}
+
+/* Контент блока */
+.blockContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Прижимаем к верху */
+  align-items: flex-start;
+  gap: 50px; /* Увеличил отступ между цифрой и текстом */
+  padding-top: 8px; /* Небольшой отступ сверху */
+  padding-left: 12px; /* Больше отступ слева */
+}
+
+/* Номер блока */
+.blockNumber {
+  font-family: Cormorant;
+  font-style: normal;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Прозрачные блоки - темный номер */
+.blockTransparent .blockNumber {
+  color: #2C3F48;
+}
+
+/* Заливные блоки - белый номер */
+.blockFilled .blockNumber {
+  color: white;
+}
+
+/* Текст блока */
+.blockText {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 18px;
+  font-weight: 400; /* Сделал обычным весом */
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+/* Прозрачные блоки - цвет текста #537382 */
+.blockTransparent .blockText {
+  color: #537382;
+}
+
+/* Заливные блоки - цвет текста #EDEDEA */
+.blockFilled .blockText {
+  color: #EDEDEA;
+}
+
+/* Контейнер изображения блока */
+.blockImageContainer {
+  position: relative;
+  width: 180px; /* Увеличил размер еще больше */
+  height: 180px; /* Увеличил размер еще больше */
+  border-radius: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+  margin: 6px; /* Равномерные отступы со всех сторон */
+}
+
+/* Изображение в блоке */
+.blockImage {
+  object-fit: cover;
+}
+
+/* Контейнер кнопки */
+.welcomeButtonContainer {
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+  margin-bottom: 40px; /* Обычный отступ - основной отступ теперь в контейнере */
+}
+
+/* Кнопка добро пожаловать */
+.welcomeButton {
+  display: block;
+  width: 100%;
+  background: #2C3F48;
+  color: white;
+  padding: 24px 32px; /* Увеличил высоту */
+  border-radius: 16px;
+  text-decoration: none;
+  text-align: center;
+  font-family: Cormorant; /* Изменил на Cormorant */
+  font-style: normal;
+  font-size: 28px; /* Увеличил размер шрифта */
+  font-weight: 700; /* Более жирный */
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  letter-spacing: 1px; /* Добавил небольшой трекинг */
+}
+
+.welcomeButton:hover {
+  background: #374951;
+  transform: translateY(-2px);
+}
+
+.welcomeButton:active {
+  transform: translateY(0);
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .blocksContainer {
+    padding: 0 12px;
+    gap: 16px;
+  }
+  
+  .heroImg {
+    margin-top: 60px; /* Большой отступ сверху на мобильных */
+    margin-bottom: 16px; /* Отступ снизу меньше */
+  }
+  
+  .blockTransparent,
+  .blockFilled {
+    padding: 12px; /* Увеличил общий padding */
+    min-height: 160px; /* Увеличил высоту */
+    flex-direction: row;
+    align-items: flex-start; /* Выравниваем по верху */
+    justify-content: space-between;
+    gap: 16px; /* Больше отступ между контентом и фото */
+  }
+  
+  .blockContent {
+    gap: 24px; /* Большой отступ между цифрой и текстом */
+    align-items: flex-start;
+    text-align: left;
+    padding-top: 8px; /* Отступ сверху для контента */
+    padding-left: 4px;
+    flex: 1;
+  }
+  
+  .blockNumber {
+    font-size: 32px; /* Увеличил размер цифры */
+  }
+  
+  .blockText {
+    font-size: 14px;
+    line-height: 1.2;
+  }
+  
+  .blockImageContainer {
+    width: 150px; /* Увеличил размер фото */
+    height: 150px;
+    margin: 4px; /* Равномерные отступы от краев блока */
+    align-self: center; /* Центрируем фото по вертикали */
+  }
+  
+  .welcomeButtonContainer {
+    padding: 0 12px;
+  }
+  
+  .welcomeButton {
+    padding: 20px 24px; /* Увеличил высоту на мобильных */
+    font-size: 20px; /* Увеличил размер шрифта на мобильных */
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .heroImg {
+    margin-top: 20px; /* Отступ сверху на планшетах */
+    margin-bottom: 24px; /* Отступ снизу меньше */
+  }
+  
+  .blocksContainer {
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+  
+  .blockTransparent,
+  .blockFilled {
+    padding: 20px 16px;
+    min-height: 200px;
+  }
+  
+  .blockContent {
+    padding-top: 12px;
+    padding-left: 16px; /* Отступ слева на планшетах */
+  }
+  
+  .blockNumber {
+    font-size: 56px;
+  }
+  
+  .blockText {
+    font-size: 20px;
+  }
+  
+  .blockImageContainer {
+    width: 200px; /* Увеличил на планшетах */
+    height: 200px;
+    margin: 8px; /* Равномерные отступы на планшетах */
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+  }
+  
+  .heroImg {
+    margin-top: 20px; /* Отступ сверху на десктопе */
+    margin-bottom: 28px; /* Отступ снизу меньше */
+  }
+  
+  .blocksContainer {
+    gap: 28px;
+    margin-bottom: 56px;
+  }
+  
+  .blockTransparent,
+  .blockFilled {
+    padding: 24px 20px;
+    min-height: 220px;
+  }
+  
+  .blockContent {
+    padding-top: 16px;
+    padding-left: 20px; /* Отступ слева на десктопе */
+  }
+  
+  .blockNumber {
+    font-size: 64px;
+  }
+  
+  .blockText {
+    font-size: 22px;
+  }
+  
+  .blockImageContainer {
+    width: 220px; /* Увеличил на десктопе */
+    height: 220px;
+    margin: 8px; /* Равномерные отступы на десктопе */
+  }
+  
+  .welcomeButton {
+    padding: 28px 40px; /* Увеличил высоту на десктопе */
+    font-size: 32px; /* Увеличил размер шрифта на десктопе */
+  }
+} 

@@ -1,0 +1,38 @@
+.root__loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Mobile sticky mode styles according to working example */
+.mobile-body {
+  overflow: hidden;
+  height: 100vh;
+}
+
+.mobile-wrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  /* Скрытие скроллбара специально для мобильного контейнера */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE */
+}
+
+.mobile-wrap::-webkit-scrollbar {
+  width: 0px;
+  background: transparent;
+}
+
+.mobile-content {
+  height: calc(100% + 1px);
+}

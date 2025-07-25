@@ -1,0 +1,599 @@
+/* Основной контейнер */
+.container {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  padding: 16px;
+  /* Safe Area отступы - автоматически учитывают notch, панели Telegram и системные зоны */
+  padding-top: calc(16px + var(--safe-area-inset-top, 0px));
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+  color: var(--text-main);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Хайлайты */
+.highlightsSection {
+  margin-bottom: 24px;
+  overflow: visible;
+  position: relative;
+  width: calc(100% + 60px); /* Увеличиваем ширину секции на 60px (по 30px с каждой стороны) */
+  margin-left: -30px; /* Смещаем секцию влево на 30px */
+  /* Дополнительный отступ сверху для Safe Area */
+  margin-top: var(--safe-area-inset-top, 0px);
+}
+
+.highlightsContainer {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: visible;
+  scroll-snap-type: x mandatory;
+  gap: 12px;
+  padding: 20px 30px 20px 30px; /* Горизонтальный padding по 30px с каждой стороны */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  margin: -20px 0; /* Негативный margin для компенсации вертикального padding */
+  scroll-padding: 0 30px; /* Для корректной работы scroll-snap с отступами */
+}
+
+.highlightsContainer::-webkit-scrollbar {
+  display: none;
+}
+
+.highlightCard {
+  flex: 0 0 120px;
+  scroll-snap-align: start;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  overflow: visible; /* Позволяет неону выходить за пределы карточки */
+  position: relative;
+}
+
+.highlightCard:first-child {
+  margin-left: 0; /* Убираем margin у первого элемента, так как у нас уже есть padding */
+}
+
+.highlightCard:last-child {
+  margin-right: 0; /* Убираем margin у последнего элемента */
+  position: relative;
+}
+
+.highlightCard:last-child::after {
+  content: '';
+  display: block;
+  width: 30px; /* Добавляем невидимый элемент после последнего хайлайта для отступа при скролле */
+  height: 1px;
+  flex-shrink: 0;
+}
+
+.highlightCard:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-glow);
+  z-index: 2; /* Поднимаем над другими карточками при наведении */
+}
+
+.highlightCard:active {
+  transform: scale(0.95);
+}
+
+.highlightContent {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 16px;
+  height: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border: 1px solid var(--border-light);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Убираем градиентное наложение для изображений */
+.highlightContent::before {
+  display: none;
+}
+
+/* Изображения в хайлайтах */
+.highlightImage {
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Точечная навигация */
+.highlightsDots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background: #B9B4AE;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot:hover {
+  background: #A39892;
+  transform: scale(1.2);
+}
+
+.activeDot {
+  background: var(--accent-blue);
+  transform: scale(1.3);
+  box-shadow: var(--shadow-light);
+}
+
+/* Поисковая строка */
+.searchContainer {
+  margin-bottom: 24px;
+}
+
+.searchBox {
+  position: relative;
+  background: var(--bg-card);
+  border-radius: 8px;
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--border-medium);
+  overflow: hidden;
+  box-shadow: var(--shadow-glow);
+  transition: all 0.3s ease;
+}
+
+.searchBox:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-glow);
+}
+
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--accent-blue);
+  z-index: 2;
+  font-size: 16px;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 15px;
+  outline: none;
+  font-weight: 500;
+  height: 44px;
+}
+
+.searchInput::placeholder {
+  color: #B9B4AE;
+}
+
+/* Курсы */
+.coursesSection {
+  margin-bottom: 24px;
+}
+
+/* Полноширинный курс */
+.courseCardFullWidth {
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.courseCardFullWidth:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-glow);
+}
+
+.courseCardFullWidth:active {
+  transform: scale(0.98);
+}
+
+/* Сетка для остальных курсов */
+.coursesGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rightColumn {
+  display: flex;
+}
+
+/* Квадратные курсы */
+.courseCardSquare {
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+  display: block;
+}
+
+.courseCardSquare:hover {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-glow);
+}
+
+.courseCardSquare:active {
+  transform: scale(0.95);
+}
+
+/* Высокий курс (автор программы) */
+.courseCardTall {
+  text-decoration: none;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  overflow: hidden;
+  display: block;
+  width: 100%;
+}
+
+.courseCardTall:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-glow);
+}
+
+.courseCardTall:active {
+  transform: scale(0.98);
+}
+
+/* Общий контент для всех курсов */
+.courseContent {
+  position: relative;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: var(--bg-card);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  backdrop-filter: blur(20px);
+  overflow: hidden;
+  height: 100%;
+  min-height: 120px;
+}
+
+/* Для полноширинного курса - увеличиваем высоту как у квадратных */
+.courseCardFullWidth .courseContent {
+  aspect-ratio: 2.4/1;
+  min-height: 160px;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Для квадратных курсов */
+.courseCardSquare .courseContent {
+  aspect-ratio: 1;
+  justify-content: space-between;
+}
+
+/* Для высокого курса */
+.courseCardTall .courseContent {
+  height: 100%;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
+
+/* Убираем градиентное наложение для изображений */
+.courseContent::before {
+  display: none;
+}
+
+/* Изображения в курсах */
+.courseImage {
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Убираю старые стили для текста и иконок */
+.highlightIcon {
+  display: none;
+}
+
+.highlightText {
+  display: none;
+}
+
+.highlightTitle {
+  display: none;
+}
+
+.highlightSubtitle {
+  display: none;
+}
+
+.courseIcon {
+  display: none;
+}
+
+.courseTitle {
+  display: none;
+}
+
+/* Для полноширинного курса увеличиваем размер текста */
+.courseCardFullWidth .courseTitle {
+  font-size: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Для высокого курса тоже увеличиваем */
+.courseCardTall .courseTitle {
+  font-size: 15px;
+}
+
+
+
+/* Snake Border Animation для кнопки чата */
+@property --snake-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes snake-move {
+  from {
+    --snake-angle: 0deg;
+  }
+  to {
+    --snake-angle: 360deg;
+  }
+}
+
+@keyframes snake-pulse {
+  0%, 100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Чат клуба с Snake Border эффектом */
+.clubChatSection {
+  margin-bottom: calc(18px + var(--safe-area-inset-bottom, 0px));
+  width: 100%;
+  /* Дополнительный отступ снизу для защиты от навигации Telegram */
+  padding-bottom: var(--safe-area-inset-bottom, 0px);
+}
+
+.clubChatCard {
+  text-decoration: none;
+  transition: transform 0.3s ease;
+  border-radius: 8px;
+  display: block;
+  width: 100%;
+  position: relative;
+  /* Возвращаем обычный фон без анимированной границы */
+  background: transparent;
+  /* Инициализируем переменную для анимации */
+  --snake-angle: 0deg;
+}
+
+.clubChatCard::before {
+  content: '';
+  position: absolute;
+  display: none;
+}
+
+/* Убираем анимированную тень для чата */
+.clubChatCard::after {
+  display: none;
+}
+
+.clubChatCard:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Убираем неоновые hover эффекты */
+
+.clubChatCard:active {
+  transform: scale(0.98);
+}
+
+.clubChatContent {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 16px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  /* Убираем старую границу, так как теперь используем snake border */
+  border: none;
+  /* Убеждаемся, что контент выше анимации */
+  z-index: 1;
+}
+
+/* Убираем градиентное наложение для изображений */
+.clubChatContent::before {
+  display: none;
+}
+
+/* Изображение в чате клуба */
+.clubChatImage {
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Убираю старые стили для текста и иконок */
+.clubChatIcon {
+  display: none;
+}
+
+.clubChatTitle {
+  display: none;
+}
+
+.clubChatSubtitle {
+  display: none;
+}
+
+/* Нижнее навигационное меню - убран неон, сделано компактнее */
+.navigationMenu {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-primary);
+  backdrop-filter: blur(30px);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-around;
+  padding: 12px calc(var(--safe-area-inset-left, 0px)) calc(24px + var(--safe-area-inset-bottom, 0px)) calc(var(--safe-area-inset-right, 0px));
+  z-index: 1000;
+}
+
+.navItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+  flex: 1;
+  padding: 6px;
+  border-radius: 8px;
+  position: relative;
+}
+
+.navItem:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.navItem.active {
+  color: var(--text-main);
+}
+
+.navItem.active::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 2px;
+  background: var(--accent-blue);
+  border-radius: 1px;
+}
+
+.navIcon {
+  margin-bottom: 2px; /* Уменьшен отступ между иконкой и текстом */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--icon-color);
+}
+
+.navText {
+  font-size: 10px;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  color: var(--text-main);
+}
+
+/* Опция для пользователей с prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+  .clubChatCard::before {
+    animation: none;
+  }
+  
+  .clubChatCard::after {
+    animation: none;
+  }
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+    padding-bottom: 80px;
+  }
+  
+  .highlightCard {
+    flex: 0 0 120px; /* Сохраняем размер как на десктопе */
+  }
+  
+  .highlightContent {
+    padding: 12px; /* Немного уменьшаем padding */
+    height: 160px; /* Сохраняем высоту */
+  }
+  
+  .categoriesGrid {
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  
+  .categoryContent {
+    padding: 16px;
+  }
+  
+  .categoryIcon {
+    font-size: 24px;
+  }
+  
+  .categoryTitle {
+    font-size: 12px;
+  }
+  
+  
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .categoriesGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+    padding: 24px;
+    padding-bottom: 100px;
+  }
+  
+  .categoriesGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+  
+  .navigationMenu {
+    max-width: 800px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 20px 20px 0 0;
+  }
+} 

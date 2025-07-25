@@ -1,0 +1,100 @@
+/* Карточка FAQ */
+.card {
+  background: var(--bg-card);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  margin-bottom: 16px;
+  box-shadow: none;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-glow);
+  border-color: var(--border-medium);
+}
+
+.header {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+  cursor: pointer;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  font-family: var(--font-heading) !important;
+  text-align: left;
+  transition: background 0.2s;
+}
+
+.header:active {
+  background: rgba(255,255,255,0.03);
+}
+
+.question {
+  flex: 1;
+  text-align: left;
+  color: var(--text-main) !important;
+  font-size: 18px !important;
+  font-weight: 500 !important;
+  font-family: var(--font-heading) !important;
+  text-transform: uppercase;
+}
+
+.chevron {
+  width: 26px; /* Увеличил иконку */
+  height: 26px;
+  color: #2C3F48; /* Фирменный цвет */
+  transition: transform 0.3s cubic-bezier(.4,2,.6,1), color 0.2s;
+}
+
+.open {
+  transform: rotate(180deg);
+  color: #2C3F48; /* Фирменный цвет вместо желтого */
+}
+
+.answerWrapper {
+  overflow: hidden;
+  transition: max-height 0.35s cubic-bezier(.4,2,.6,1);
+  background: none;
+}
+
+.answer {
+  padding: 0 20px 18px 20px;
+  color: var(--text-secondary) !important;
+  font-size: 16px !important;
+  font-weight: 300 !important;
+  font-family: 'Montserrat', sans-serif !important;
+  line-height: 1.5;
+  text-align: left;
+}
+
+@media (max-width: 480px) {
+  .header {
+    padding: 18px;
+    font-size: 16px !important;
+    font-family: var(--font-heading) !important;
+  }
+  
+  .question {
+    font-size: 16px !important;
+    font-family: var(--font-heading) !important;
+    font-weight: 500 !important;
+  }
+  
+  .answer {
+    padding: 0 18px 18px 18px;
+    font-size: 14px !important;
+    font-family: 'Montserrat', sans-serif !important;
+    font-weight: 300 !important;
+  }
+  
+  .chevron {
+    width: 22px;
+    height: 22px;
+  }
+} 

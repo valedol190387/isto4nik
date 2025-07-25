@@ -1,0 +1,295 @@
+/* Основной контейнер */
+.container {
+  background: #DEE6E9; /* Цвет фона как указано */
+  min-height: 100vh;
+  padding: 0; /* Убираем padding для полноэкранного изображения */
+  /* Safe Area отступы только снизу */
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  color: var(--text-main);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Главное изображение */
+.heroImage {
+  position: relative;
+  width: 100%;
+  height: 400px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.heroImg {
+  object-fit: cover;
+}
+
+/* Контентная область с отступами */
+.content {
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Заголовок */
+.title {
+  font-family: Cormorant;
+  font-size: 28px;
+  color: var(--accent-blue);
+  font-weight: 600;
+  font-style: normal;
+  text-transform: uppercase;
+  margin: 0 0 20px 0;
+  line-height: 1.2;
+}
+
+/* Описание */
+.description {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 16px;
+  color: var(--text-secondary);
+  text-transform: lowercase;
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+/* Подзаголовок */
+.subtitle {
+  font-family: Cormorant;
+  font-size: 28px;
+  color: var(--accent-blue);
+  font-weight: 600;
+  font-style: normal;
+  text-transform: uppercase;
+  margin: 0 0 24px 0;
+  line-height: 1.2;
+}
+
+/* Секция с блоками */
+.blocksSection {
+  margin-bottom: 40px;
+}
+
+/* Сетка блоков */
+.blocksGrid {
+  display: grid;
+  grid-template-columns: 1.45fr 1.85fr; /* Ширина пропорциональна соотношениям */
+  grid-template-rows: 1fr 1fr; /* Два ряда одинаковой высоты */
+  gap: 16px;
+  width: 100%;
+  aspect-ratio: 3.35 / 2; /* Общее соотношение сетки (сумма ширин / количество рядов) */
+}
+
+/* Все блоки заполняют свои ячейки */
+.blockNarrow,
+.blockWide {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* Изображения в блоках */
+.blockImage {
+  object-fit: cover;
+}
+
+/* Секция уникальности клуба */
+.uniqueSection {
+  margin-bottom: 40px;
+}
+
+/* Заголовок уникальности (маленький) */
+.uniqueTitle {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 16px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  margin: 0 0 16px 0;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+
+/* Описание уникальности */
+.uniqueDescription {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 16px;
+  color: var(--text-secondary);
+  text-transform: lowercase;
+  margin: 0 0 32px 0;
+  line-height: 1.5;
+}
+
+/* Список подходов */
+.approachList {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+/* Элемент списка подходов */
+.approachItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Иконка чекбокса */
+.checkIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/* Текст элемента списка */
+.approachItem span {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 16px;
+  color: var(--text-secondary);
+  text-transform: lowercase;
+}
+
+/* Изображение девушки в конце */
+.girlImage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 12 / 9; /* Фиксированное соотношение сторон */
+  margin-top: 40px;
+  overflow: hidden;
+}
+
+.girlImg {
+  object-fit: cover;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .content {
+    padding: 0 12px;
+  }
+  
+  .heroImage {
+    height: 300px;
+    margin-bottom: 20px;
+  }
+  
+  .title {
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .subtitle {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .description {
+    font-size: 15px;
+    margin-bottom: 28px;
+  }
+  
+  .blocksGrid {
+    gap: 12px;
+  }
+  
+  .uniqueTitle {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+  
+  .uniqueDescription {
+    font-size: 15px;
+    margin-bottom: 24px;
+  }
+  
+  .approachList {
+    gap: 16px;
+  }
+  
+  .approachItem span {
+    font-size: 14px;
+  }
+  
+  .girlImage {
+    margin-top: 32px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .heroImage {
+    height: 450px;
+    margin-bottom: 32px;
+  }
+  
+  .title {
+    font-size: 32px;
+    margin-bottom: 24px;
+  }
+  
+  .subtitle {
+    font-size: 32px;
+    margin-bottom: 28px;
+  }
+  
+  .description {
+    font-size: 18px;
+    margin-bottom: 40px;
+  }
+  
+  .blocksGrid {
+    gap: 20px;
+  }
+  
+  .girlImage {
+    margin-top: 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+    padding-bottom: 100px;
+  }
+  
+  .content {
+    padding: 0 24px;
+  }
+  
+  .heroImage {
+    height: 500px;
+    margin-bottom: 40px;
+  }
+  
+  .title {
+    font-size: 36px;
+    margin-bottom: 28px;
+  }
+  
+  .subtitle {
+    font-size: 36px;
+    margin-bottom: 32px;
+  }
+  
+  .description {
+    font-size: 20px;
+    margin-bottom: 48px;
+  }
+  
+  .blocksGrid {
+    gap: 24px;
+  }
+  
+  .girlImage {
+    margin-top: 56px;
+  }
+} 

@@ -1,0 +1,431 @@
+/* Основной контейнер - точно как на главной */
+.container {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  padding: 16px;
+  /* Safe Area отступы - автоматически учитывают notch, панели Telegram и системные зоны */
+  padding-top: calc(16px + var(--safe-area-inset-top, 0px));
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+  color: var(--text-main);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Заголовок страницы */
+.header {
+  margin-bottom: 24px;
+  margin-top: var(--safe-area-inset-top, 0px);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.headerIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--accent-blue);
+  filter: drop-shadow(var(--shadow-medium));
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.headerStats {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 36px; /* Выравниваем с заголовком */
+}
+
+.starIcon {
+  width: 22px;
+  height: 22px;
+  color: #2C3F48;
+  fill: #2C3F48;
+  filter: drop-shadow(0 0 4px rgba(44, 63, 72, 0.5));
+}
+
+.statsText {
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  font-family: Montserrat !important;
+  color: #2C3F48 !important;
+}
+
+/* Контент */
+.content {
+  position: relative;
+}
+
+/* Состояние загрузки */
+.loadingState {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+}
+
+.loadingContent {
+  text-align: center;
+}
+
+.loadingIcon {
+  width: 32px;
+  height: 32px;
+  color: var(--accent-blue);
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+  filter: drop-shadow(var(--shadow-medium));
+}
+
+.loadingText {
+  font-size: 16px;
+  color: var(--text-secondary);
+  font-weight: 500;
+  margin: 0;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Состояние ошибки */
+.errorState {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+  border: 1px solid hsl(0 80% 50% / 0.2);
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+}
+
+.errorState::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, hsl(0 80% 50% / 0.1), hsl(0 80% 40% / 0.1));
+  z-index: 0;
+}
+
+.errorContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  z-index: 1;
+  position: relative;
+}
+
+.errorIconContainer {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, hsl(0 80% 50%), hsl(0 80% 40%));
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.errorIcon {
+  width: 24px;
+  height: 24px;
+  color: white;
+}
+
+.errorTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 8px 0;
+}
+
+.errorDescription {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Пустое состояние */
+.emptyState {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.emptyIconContainer {
+  width: 64px;
+  height: 64px;
+  background: var(--bg-card);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  border: 1px solid var(--border-light);
+  backdrop-filter: blur(20px);
+}
+
+.emptyIcon {
+  width: 32px;
+  height: 32px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 8px 0;
+}
+
+.emptyDescription {
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+  margin: 0;
+}
+
+/* Список отзывов */
+.reviewsList {
+  /* Дополнительный отступ снизу для защиты от навигации */
+  padding-bottom: var(--safe-area-inset-bottom, 0px);
+}
+
+/* Кнопка "Показать еще" */
+.loadMoreContainer {
+  margin-top: 24px;
+  margin-bottom: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.loadMoreButton {
+  background: var(--bg-card);
+  border: 1px solid var(--border-medium);
+  border-radius: 16px;
+  padding: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  min-width: 200px;
+}
+
+.loadMoreButton:hover:not(:disabled) {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-glow);
+  border-color: var(--border-strong);
+}
+
+.loadMoreButton:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.loadMoreButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.loadMoreButton::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--gradient-primary);
+  opacity: 0.1;
+  z-index: 0;
+}
+
+.loadMoreContent {
+  position: relative;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  z-index: 1;
+}
+
+.loadMoreIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--accent-blue);
+  filter: drop-shadow(var(--shadow-medium));
+}
+
+.loadMoreIcon.loading {
+  animation: spin 1s linear infinite;
+}
+
+.loadMoreText {
+  font-size: 18px;
+  font-weight: 600;
+  font-family: Montserrat;
+  color: var(--text-main);
+}
+
+/* Счетчик отзывов */
+.reviewsCounter {
+  margin-top: 20px;
+  text-align: center;
+  padding: 12px;
+}
+
+.counterText {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Убираю ненужное правило - теперь цвета правильно настроены через переменные */
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+    padding-top: calc(12px + var(--safe-area-inset-top, 0px));
+    padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  }
+  
+  .header {
+    margin-top: 0; /* Убираем большой отступ сверху на мобильных */
+    margin-bottom: 20px;
+  }
+  
+  .headerTitle {
+    font-size: 18px;
+  }
+  
+  .headerStats {
+    margin-left: 32px;
+  }
+  
+  .loadingIcon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .loadingText {
+    font-size: 14px;
+  }
+  
+  .errorState {
+    padding: 16px;
+  }
+  
+  .errorContent {
+    gap: 12px;
+  }
+  
+  .errorIconContainer {
+    width: 44px;
+    height: 44px;
+  }
+  
+  .errorIcon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .emptyState {
+    padding: 40px 16px;
+  }
+  
+  .emptyIconContainer {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 16px;
+  }
+  
+  .emptyIcon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .loadMoreContainer {
+    margin-top: 20px;
+  }
+  
+  .loadMoreButton {
+    min-width: 180px;
+  }
+  
+  .loadMoreContent {
+    padding: 16px 24px;
+  }
+  
+  .loadMoreIcon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .loadMoreText {
+    font-size: 16px;
+  }
+  
+  .reviewsCounter {
+    margin-top: 16px;
+    padding: 8px;
+  }
+  
+  .counterText {
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+    padding: 24px;
+    padding-top: calc(24px + var(--safe-area-inset-top, 0px));
+    padding-bottom: calc(100px + var(--safe-area-inset-bottom, 0px));
+  }
+  
+  .header {
+    margin-bottom: 32px;
+  }
+  
+  .headerTitle {
+    font-size: 24px;
+  }
+  
+  .loadMoreContainer {
+    margin-top: 32px;
+  }
+  
+  .loadMoreButton {
+    min-width: 220px;
+  }
+  
+  .loadMoreContent {
+    padding: 24px 36px;
+  }
+} 

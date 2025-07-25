@@ -1,0 +1,47 @@
+{
+  "mcpServers": {
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@latest"]
+    },
+    "selfhosted-supabase": {
+      "command": "node",
+      "args": [
+        "/Users/valentin/.mcp-servers/selfhosted-supabase-mcp/dist/index.js",
+        "--url",
+        "https://supabase.ayunabackoffice.ru",
+        "--anon-key",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc1MzA5MzAyMCwiZXhwIjo0OTA4NzY2NjIwLCJyb2xlIjoiYW5vbiJ9.eYGnezoHGSZAfNI3xUr_wMeRjbTlyG9wbd3aGRarNaY",
+        "--service-key",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc1MzA5MzAyMCwiZXhwIjo0OTA4NzY2NjIwLCJyb2xlIjoic2VydmljZV9yb2xlIn0.l616HtP-TvBn1mvcRfMOmm6410uHIJmoRyAyWPw873A",
+        "--db-url",
+        "postgresql://postgres:IgQ4XFyCUWmmdq471014wBvUfKIhjSXe@185.207.0.55:5432/postgres",
+        "--jwt-secret",
+        "5M9EgWiWNvOPjA7gK3gsRrfztpwKdSG4"
+      ]
+    },
+    "Figma": {
+      "url": "http://127.0.0.1:3845/sse"
+    }
+  },
+  "tools": {
+    "context7": {
+      "type": "MCPClient",
+      "implementation": "context7",
+      "name": "Context7",
+      "description": "AI-powered code search"
+    },
+    "supabase": {
+      "type": "MCPClient",
+      "implementation": "selfhosted-supabase",
+      "name": "Supabase",
+      "description": "Connect to self-hosted Supabase database"
+    },
+    "figma": {
+      "type": "MCPClient",
+      "implementation": "Figma",
+      "name": "Figma Dev Mode",
+      "description": "Connect to Figma designs via Dev Mode MCP Server"
+    }
+  }
+} 

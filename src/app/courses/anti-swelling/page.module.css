@@ -1,0 +1,532 @@
+/* Основной контейнер */
+.container {
+  background: #DEE6E9; /* Голубой фон */
+  min-height: 100vh;
+  padding: 0;
+  /* Safe Area отступ снизу для навигации */
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  color: var(--text-main);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Псевдоэлемент для заливки фона до самого верха */
+.container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: calc(200px + var(--safe-area-inset-top, 0px));
+  background: #DEE6E9;
+  z-index: -1;
+}
+
+/* Ограничения ширины псевдоэлемента под разные экраны */
+@media (min-width: 768px) {
+  .container::before {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container::before {
+    max-width: 800px;
+  }
+}
+
+/* Заголовок */
+.title {
+  font-family: Cormorant;
+  font-style: normal;
+  font-size: 28px; /* Как в intro-training */
+  font-weight: 700;
+  line-height: 1.3;
+  color: #2C3F48;
+  text-align: left;
+  margin: calc(20px + var(--safe-area-inset-top, 0px)) 0 16px 0; /* Отступ сверху как в intro-training */
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Описание */
+.description {
+  font-family: Montserrat;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 1.4;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0 0 32px 0;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Верхняя синяя плашка - как в intro-training */
+.topHighlightBlock {
+  background: #2C3F48;
+  border-radius: 0; /* Без закруглений */
+  padding: 16px 20px; /* Как в intro-training */
+  margin: 0 16px 32px 16px;
+  text-align: center;
+  /* Safe Area отступы по бокам */
+  margin-left: calc(16px + var(--safe-area-inset-left, 0px));
+  margin-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Текст в верхней плашке - уменьшенный */
+.topHighlightText {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 18px; /* Уменьшенный размер */
+  font-weight: 400;
+  line-height: 1.4;
+  color: white;
+  text-transform: uppercase;
+}
+
+/* Главное изображение */
+.heroImg {
+  width: 100%;
+  height: auto;
+  margin-bottom: 32px;
+  display: block;
+}
+
+/* Подзаголовок */
+.subtitle {
+  font-family: Montserrat;
+  font-size: 20px;
+  font-weight: 400; /* Обычный шрифт */
+  line-height: 1.3;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0 0 24px 0;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Список пунктов */
+.pointsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 0 16px 32px 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(0px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(0px + var(--safe-area-inset-right, 0px));
+}
+
+/* Блок с часами */
+.timeBlock {
+  border: 2px solid #2C3F48;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 0 16px 40px 16px;
+  text-align: center;
+  /* Safe Area отступы по бокам */
+  margin-left: calc(16px + var(--safe-area-inset-left, 0px));
+  margin-right: calc(16px + var(--safe-area-inset-right, 0px));
+  position: relative;
+}
+
+.timeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.timeIcon {
+  flex-shrink: 0;
+}
+
+.timeTitle {
+  font-family: Montserrat, sans-serif;
+  font-size: 20px; /* Уменьшен размер шрифта */
+  font-weight: 600;
+  line-height: 1.3;
+  color: #2C3F48;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.timeText {
+  font-family: Montserrat, sans-serif;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #2C3F48;
+  margin: 0;
+  max-width: 90%;
+  display: inline-block;
+}
+
+/* Изображение девушки */
+.bellGirlImg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: -120px 0 0 0; /* Увеличенный отрицательный отступ сверху (-25px) */
+  position: relative; /* Для правильного наложения */
+  z-index: 1; /* Чтобы изображение было поверх блока */
+}
+
+.pointItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.numberIcon {
+  width: 52px; /* Увеличено на 30% с 40px */
+  height: 52px; /* Увеличено на 30% с 40px */
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.pointText {
+  font-family: Montserrat;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0;
+}
+
+/* Раздел с результатами - цветная вставка */
+.resultsSection {
+  background: #2C3F48;
+  padding: 24px 16px; /* Добавляем отступы по бокам */
+  margin: 0 0 32px 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Заголовок результатов */
+.resultsTitle {
+  font-family: Montserrat;
+  font-size: 20px;
+  font-weight: 300; /* Делаем шрифт тонким */
+  line-height: 1.3;
+  color: #FFFFFF;
+  text-align: left;
+  margin: 0 0 24px 0;
+  padding: 0;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(0px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(0px + var(--safe-area-inset-right, 0px));
+  text-transform: uppercase;
+  letter-spacing: 0.02em; /* Немного разрядим буквы для лучшей читаемости */
+}
+
+/* Сетка результатов в два столбца */
+.resultsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 30px; /* Увеличиваем отступы между элементами */
+  margin: 0;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(0px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(0px + var(--safe-area-inset-right, 0px));
+}
+
+.resultItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.checkIcon {
+  width: 24px;
+  height: 24px;
+  flex-shrink: 0;
+  margin-top: 4px;
+  /* Убираем фильтр, чтобы видеть оригинальную галочку */
+}
+
+.resultText {
+  font-family: Montserrat;
+  font-size: 16px;
+  font-weight: 300; /* Делаем шрифт тонким */
+  line-height: 1.4;
+  color: #FFFFFF;
+  text-align: left;
+  margin: 0;
+}
+
+/* Адаптивность */
+@media (max-width: 480px) {
+  .title {
+    font-size: 24px; /* Как в intro-training */
+    margin: calc(40px + var(--safe-area-inset-top, 0px)) 0 16px 0; /* Как в intro-training */
+    padding: 0 12px;
+  }
+  
+  .description {
+    font-size: 16px;
+    padding: 0 12px;
+    margin-bottom: 24px;
+  }
+  
+  .topHighlightBlock {
+    margin: 0 12px 24px 12px;
+    padding: 12px 16px; /* Как в intro-training */
+  }
+  
+  .topHighlightText {
+    font-size: 16px; /* Уменьшенный размер */
+  }
+  
+  .heroImg {
+    margin-bottom: 24px;
+  }
+  
+  .subtitle {
+    font-size: 18px;
+    padding: 0 12px;
+    margin-bottom: 20px;
+  }
+  
+  .pointsList {
+    gap: 12px;
+    margin: 0 12px 24px 12px;
+  }
+  
+  .pointItem {
+    gap: 12px;
+  }
+  
+  .numberIcon {
+    width: 42px; /* Увеличено на 30% с 32px */
+    height: 42px; /* Увеличено на 30% с 32px */
+  }
+  
+  .pointText {
+    font-size: 14px;
+  }
+  
+  .timeBlock {
+    padding: 16px;
+    margin-bottom: 32px;
+  }
+  
+  .timeTitle {
+    font-size: 18px;
+  }
+  
+  .timeText {
+    font-size: 16px;
+  }
+  
+  .resultsSection {
+    padding: 20px 12px; /* Добавляем отступы по бокам */
+  }
+  
+  .resultsTitle {
+    font-size: 18px;
+    padding: 0 12px;
+    margin-bottom: 20px;
+  }
+  
+  .resultsGrid {
+    grid-template-columns: 1fr; /* Один столбец на мобильных */
+    gap: 16px;
+    margin: 0;
+  }
+  
+  .resultItem {
+    gap: 10px;
+  }
+  
+  .checkIcon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .resultText {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .title {
+    font-size: 32px; /* Как в intro-training */
+    margin-bottom: 16px;
+  }
+  
+  .description {
+    font-size: 20px;
+    margin-bottom: 40px;
+  }
+  
+  .topHighlightBlock {
+    padding: 18px 24px; /* Как в intro-training */
+    margin-bottom: 40px;
+  }
+  
+  .topHighlightText {
+    font-size: 20px; /* Уменьшенный размер */
+  }
+  
+  .heroImg {
+    margin-bottom: 40px;
+  }
+  
+  .subtitle {
+    font-size: 22px;
+    margin-bottom: 28px;
+  }
+  
+  .pointsList {
+    gap: 20px;
+  }
+  
+  .pointItem {
+    gap: 20px;
+  }
+  
+  .numberIcon {
+    width: 57px; /* Увеличено на 30% с 44px */
+    height: 57px; /* Увеличено на 30% с 44px */
+  }
+  
+  .pointText {
+    font-size: 18px;
+  }
+  
+  .timeBlock {
+    padding: 24px;
+    margin-bottom: 48px;
+  }
+  
+  .timeTitle {
+    font-size: 22px;
+  }
+  
+  .timeText {
+    font-size: 20px;
+  }
+  
+  .resultsSection {
+    padding: 28px 20px; /* Добавляем отступы по бокам */
+  }
+  
+  .resultsTitle {
+    font-size: 22px;
+    margin-bottom: 28px;
+  }
+  
+  .resultsGrid {
+    gap: 20px 24px;
+  }
+  
+  .checkIcon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .resultText {
+    font-size: 18px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+  }
+  
+  .title {
+    font-size: 36px; /* Как в intro-training */
+    margin-bottom: 16px;
+  }
+  
+  .description {
+    font-size: 22px;
+    margin-bottom: 48px;
+  }
+  
+  .topHighlightBlock {
+    padding: 20px 32px; /* Как в intro-training */
+    margin-bottom: 48px;
+  }
+  
+  .topHighlightText {
+    font-size: 22px; /* Уменьшенный размер */
+  }
+  
+  .heroImg {
+    margin-bottom: 48px;
+  }
+  
+  .subtitle {
+    font-size: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .pointsList {
+    gap: 24px;
+  }
+  
+  .pointItem {
+    gap: 24px;
+  }
+  
+  .numberIcon {
+    width: 62px; /* Увеличено на 30% с 48px */
+    height: 62px; /* Увеличено на 30% с 48px */
+  }
+  
+  .pointText {
+    font-size: 20px;
+  }
+  
+  .timeBlock {
+    padding: 30px;
+    margin-bottom: 56px;
+  }
+  
+  .timeTitle {
+    font-size: 24px;
+  }
+  
+  .timeText {
+    font-size: 22px;
+  }
+  
+  .resultsSection {
+    padding: 32px 24px; /* Добавляем отступы по бокам */
+  }
+  
+  .resultsTitle {
+    font-size: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .resultsGrid {
+    gap: 24px 32px;
+  }
+  
+  .checkIcon {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .resultText {
+    font-size: 20px;
+  }
+} 

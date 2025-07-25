@@ -1,0 +1,557 @@
+/* Calendar Page Styles - Ayuna Beauty Theme */
+
+.container {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  padding: 16px;
+  padding-top: calc(16px + var(--safe-area-inset-top, 0px));
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+  color: var(--text-main);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+.loading {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingContent {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.loadingIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--accent-blue);
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Заголовок страницы */
+.header {
+  margin-bottom: 24px;
+  margin-top: var(--safe-area-inset-top, 0px);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.headerIcon {
+  width: 24px;
+  height: 24px;
+  color: var(--accent-blue);
+  filter: drop-shadow(var(--shadow-medium));
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+}
+
+/* Content */
+.content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Month Card */
+.monthCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--border-light);
+}
+
+.monthHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.monthButton {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.monthButton:hover {
+  background: var(--border-light);
+}
+
+.monthIcon {
+  width: 20px;
+  height: 20px;
+  color: var(--accent-blue);
+}
+
+.monthTitle {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+}
+
+.monthDescription {
+  color: var(--text-secondary);
+  font-size: 16px;
+  margin: 0 0 16px 0;
+  line-height: 1.5;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
+
+.showAllButton {
+  background: none;
+  border: none;
+  color: var(--accent-blue);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  font-family: var(--font-body);
+}
+
+.showAllButton:hover {
+  opacity: 0.8;
+}
+
+/* Filters */
+.filtersCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--border-light);
+}
+
+.filtersTitle {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 16px 0;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+}
+
+.filterButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filterButton {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  text-transform: lowercase;
+}
+
+.filterButton:hover {
+  background: var(--border-light);
+}
+
+.filterButtonActive {
+  background: var(--accent-blue);
+  color: white;
+  border-color: var(--accent-blue);
+}
+
+.filterButtonActive:hover {
+  background: var(--accent-blue);
+  opacity: 0.9;
+}
+
+/* Calendar Grid */
+.calendarCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--border-light);
+  position: relative;
+}
+
+.calendarGrid {
+  transition: all 0.3s ease;
+}
+
+.calendarDisabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.weekDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.weekDay {
+  text-align: center;
+  font-weight: 300;
+  color: var(--text-secondary);
+  font-size: 14px;
+  padding: 8px;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.calendarDays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+}
+
+.calendarDay {
+  height: 40px;
+  width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  margin: 0 auto;
+}
+
+.currentMonth {
+  color: var(--text-main);
+}
+
+.otherMonth {
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.today {
+  background: var(--accent-blue);
+  color: white;
+  font-weight: 600;
+}
+
+.selected {
+  background: #ff6b8a;
+  color: white;
+}
+
+.hasEvent {
+  background: #ffd700;
+  color: var(--accent-blue);
+  font-weight: 500;
+}
+
+.calendarDay:hover:not(.disabled):not(.today):not(.selected) {
+  background: var(--border-light);
+}
+
+.disabled {
+  cursor: not-allowed;
+}
+
+.calendarOverlay {
+  position: absolute;
+  inset: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.calendarOverlay p {
+  color: var(--text-secondary);
+  font-weight: 300;
+  text-align: center;
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+}
+
+/* Events Section */
+.eventsSection {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eventsTitle {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+  padding: 0 8px;
+}
+
+.eventsList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.eventCard {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--border-light);
+  transition: all 0.2s ease;
+}
+
+.eventCard:hover {
+  box-shadow: var(--shadow-medium);
+  transform: translateY(-2px);
+}
+
+.eventContent {
+  display: flex;
+  gap: 16px;
+}
+
+.eventIcon {
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.eventIconSvg {
+  width: 20px;
+  height: 20px;
+}
+
+.eventDetails {
+  flex: 1;
+  min-width: 0;
+}
+
+.eventHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+
+.eventTitle {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--accent-blue);
+  text-transform: uppercase;
+}
+
+.eventCategory {
+  background: var(--border-light);
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 300;
+  text-transform: lowercase;
+  font-family: 'Montserrat', sans-serif;
+}
+
+.eventMeta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
+
+.eventTime {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.eventTimeIcon {
+  width: 12px;
+  height: 12px;
+}
+
+.eventDescription {
+  color: var(--text-secondary);
+  font-size: 16px;
+  line-height: 1.5;
+  margin: 0 0 12px 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
+
+.eventLink {
+  margin-top: 8px;
+}
+
+.eventLinkButton {
+  color: var(--accent-blue);
+  font-size: 14px;
+  text-decoration: underline;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+}
+
+.eventLinkButton:hover {
+  opacity: 0.8;
+}
+
+.emptyState {
+  background: var(--bg-card);
+  border-radius: 16px;
+  padding: 48px 24px;
+  text-align: center;
+  border: 1px solid var(--border-light);
+}
+
+.emptyState p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+}
+
+.bottomSpacing {
+  height: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+    padding-top: calc(12px + var(--safe-area-inset-top, 0px));
+    padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  }
+  
+  .header {
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
+  
+  .headerTitle {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .content {
+    gap: 16px;
+  }
+  
+  .monthCard,
+  .filtersCard,
+  .calendarCard,
+  .eventCard {
+    padding: 16px;
+  }
+  
+  .eventContent {
+    gap: 12px;
+  }
+  
+  .eventHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .filterButtons {
+    gap: 6px;
+  }
+  
+  .filterButton {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .calendarDay {
+    height: 36px;
+    width: 36px;
+    font-size: 13px;
+  }
+  
+  .weekDay {
+    font-size: 13px;
+    padding: 6px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+    padding: 24px;
+    padding-top: calc(24px + var(--safe-area-inset-top, 0px));
+    padding-bottom: calc(100px + var(--safe-area-inset-bottom, 0px));
+  }
+  
+  .header {
+    margin-bottom: 32px;
+  }
+  
+  .headerTitle {
+    font-size: 24px;
+  }
+} 
