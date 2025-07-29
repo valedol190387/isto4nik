@@ -35,19 +35,28 @@ export function Navigation() {
     return '123456789';
   };
 
-  // Загрузка данных пользователя
+  // Функция для загрузки данных пользователя из базы данных (как на главной)
   const loadUserData = async () => {
+    setLoadingUserData(true);
     try {
-      setLoadingUserData(true);
       const telegramId = user?.id?.toString() || getTelegramId();
       
-      const response = await fetch(`/api/users?telegram_id=${telegramId}`);
-      if (response.ok) {
-        const data = await response.json();
+      const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Пользователь не найден в базе
+          setUserData(null);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } else {
+        const data: DbUser = await response.json();
         setUserData(data);
       }
     } catch (error) {
-      console.error('Error loading user data:', error);
+      console.error('Ошибка при загрузке данных пользователя:', error);
+      setUserData(null);
     } finally {
       setLoadingUserData(false);
     }
