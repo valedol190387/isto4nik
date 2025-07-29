@@ -452,7 +452,7 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
           <h3 className={styles.sectionTitle}>СТАТУС ПОДПИСКИ</h3>
           <div className={styles.subscriptionStatus}>
             <span className={styles.statusBadge} style={{ 
-              background: isSubscriptionActive ? 'var(--success-green)' : 'var(--accent-red)'
+              background: isSubscriptionActive ? '#22c55e' : '#ef4444'
             }}>
               {isSubscriptionActive ? 'Активна' : 'Неактивна'}
             </span>
@@ -467,16 +467,9 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
           </div>
           <div className={styles.subscriptionContent}>
             {isSubscriptionActive ? (
-              <div className={styles.activeSubscriptionInfo}>
-                <p className={styles.subscriptionText}>
-                  Ваша подписка активна. Вы имеете доступ ко всем материалам.
-                </p>
-                {userData?.end_sub_club && (
-                  <p className={styles.subscriptionExpiry}>
-                    Подписка действует до <strong>{formatDateOnly(userData.end_sub_club)}</strong>
-                  </p>
-                )}
-              </div>
+              <p className={styles.subscriptionText}>
+                Ваша подписка активна. Вы имеете доступ ко всем материалам.
+              </p>
             ) : (
               <>
                 <p className={styles.subscriptionText}>
