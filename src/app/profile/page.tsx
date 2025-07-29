@@ -134,6 +134,7 @@ export default function ProfilePage() {
         },
         body: JSON.stringify({
           message: supportMessage,
+          raw_message: supportMessage,
           telegram_id: telegramId,
           user_name: userInfo,
           timestamp: new Date().toISOString()
