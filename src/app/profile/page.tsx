@@ -123,6 +123,17 @@ export default function ProfilePage() {
     });
   };
 
+  // Форматирование даты только для дат (без времени)
+  const formatDateOnly = (dateString: string | undefined) => {
+    if (!dateString) return 'Неизвестно';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+  };
+
   // Форматирование суммы
   const formatAmount = (amount: string | undefined, currency: string | undefined) => {
     if (!amount) return 'Неизвестно';
@@ -445,12 +456,27 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
             }}>
               {isSubscriptionActive ? 'Активна' : 'Неактивна'}
             </span>
+            {isSubscriptionActive && userData?.end_sub_club && (
+              <div className={styles.subscriptionEndDate}>
+                <Clock className={styles.clockIcon} />
+                <span className={styles.endDateText}>
+                  до {formatDateOnly(userData.end_sub_club)}
+                </span>
+              </div>
+            )}
           </div>
           <div className={styles.subscriptionContent}>
             {isSubscriptionActive ? (
-              <p className={styles.subscriptionText}>
-                Ваша подписка активна. Вы имеете доступ ко всем материалам.
-              </p>
+              <div className={styles.activeSubscriptionInfo}>
+                <p className={styles.subscriptionText}>
+                  Ваша подписка активна. Вы имеете доступ ко всем материалам.
+                </p>
+                {userData?.end_sub_club && (
+                  <p className={styles.subscriptionExpiry}>
+                    Подписка действует до <strong>{formatDateOnly(userData.end_sub_club)}</strong>
+                  </p>
+                )}
+              </div>
             ) : (
               <>
                 <p className={styles.subscriptionText}>
