@@ -20,7 +20,7 @@ export function Navigation() {
   const pathname = usePathname();
   const user = useSignal(initData.user);
   const [userData, setUserData] = useState<DbUser | null>(null);
-  const [loadingUserData, setLoadingUserData] = useState(true);
+  const [loadingUserData, setLoadingUserData] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   // Получение telegram_id с приоритетом реального ID
@@ -54,18 +54,9 @@ export function Navigation() {
   };
 
   useEffect(() => {
-    loadUserData();
-  }, [user?.id]);
-
-  // Перезагружаем данные каждые 30 секунд для актуальности
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (user?.id) {
-        loadUserData();
-      }
-    }, 30000);
-
-    return () => clearInterval(interval);
+    if (user?.id) {
+      loadUserData();
+    }
   }, [user?.id]);
 
   const isSubscriptionActive = userData?.status === 'Активна';
