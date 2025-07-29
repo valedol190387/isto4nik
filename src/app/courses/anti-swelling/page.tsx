@@ -67,6 +67,22 @@ export default function AntiSwellingPage() {
   // Проверяем статус подписки
   const isSubscriptionActive = userData?.status === 'Активна';
 
+  // Универсальная функция для открытия ссылок (работает на мобиле и десктопе)
+  const openSecureLink = (url: string) => {
+    if (typeof window !== 'undefined') {
+      // Проверяем есть ли Telegram WebApp API
+      const tg = (window as any).Telegram?.WebApp;
+      
+      if (tg && tg.openLink) {
+        // Используем Telegram WebApp API для мобилки
+        tg.openLink(url);
+      } else {
+        // Fallback для десктопа или обычного браузера
+        window.open(url, '_blank');
+      }
+    }
+  };
+
   // Обработчик клика по кнопке курса
   const handleCourseClick = async () => {
     if (isSubscriptionActive) {
@@ -76,7 +92,7 @@ export default function AntiSwellingPage() {
         
         if (response.ok) {
           const data = await response.json();
-          window.open(data.link, '_blank');
+          openSecureLink(data.link);
         } else {
           setShowSubscriptionModal(true);
         }

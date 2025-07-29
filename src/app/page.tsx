@@ -64,6 +64,7 @@ export default function Home() {
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [chatLink, setChatLink] = useState<string | null>(null);
 
   // Получаем пользователя из Telegram
   const user = useSignal(initData.user);
@@ -115,26 +116,10 @@ export default function Home() {
   // Проверяем статус подписки
   const isSubscriptionActive = userData?.status === 'Активна';
 
-  // Обработчик клика по кнопке чата
-  const handleChatClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (isSubscriptionActive) {
-      try {
-        const telegramId = user?.id?.toString() || getTelegramId();
-        const response = await fetch(`/api/secure-links?telegram_id=${telegramId}&type=chat`);
-        
-        if (response.ok) {
-          const data = await response.json();
-          window.open(data.link, '_blank');
-        } else {
-          // Если API вернул ошибку, показываем модальное окно
-          setShowSubscriptionModal(true);
-        }
-      } catch (error) {
-        console.error('Error getting secure link:', error);
-        setShowSubscriptionModal(true);
-      }
-    } else {
+  // Обработчик клика по кнопке чата (только для заблокированных)
+  const handleChatClick = (e: React.MouseEvent) => {
+    if (!isSubscriptionActive) {
+      e.preventDefault();
       setShowSubscriptionModal(true);
     }
   };
@@ -153,12 +138,37 @@ export default function Home() {
     }
   }, []);
 
+  // Функция для загрузки защищенной ссылки на чат
+  const loadChatLink = async () => {
+    if (isSubscriptionActive) {
+      try {
+        const telegramId = user?.id?.toString() || getTelegramId();
+        const response = await fetch(`/api/secure-links?telegram_id=${telegramId}&type=chat`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          setChatLink(data.link);
+        }
+      } catch (error) {
+        console.error('Error loading chat link:', error);
+        setChatLink(null);
+      }
+    } else {
+      setChatLink(null);
+    }
+  };
+
   // Вызываем загрузку данных пользователя при монтировании
   useEffect(() => {
     if (user?.id) {
       loadUserData();
     }
   }, [user?.id]);
+
+  // Загружаем ссылку на чат когда статус подписки меняется
+  useEffect(() => {
+    loadChatLink();
+  }, [isSubscriptionActive, user?.id]);
   
   const scrollToPosition = (dotIndex: number) => {
     setCurrentDot(dotIndex);
@@ -293,7 +303,13 @@ export default function Home() {
 
         {/* Чат клуба */}
         <div className={styles.clubChatSection}>
-          <div className={styles.clubChatCard} onClick={handleChatClick}>
+          <a 
+            href={isSubscriptionActive && chatLink ? chatLink : "#"}
+            target={isSubscriptionActive && chatLink ? "_blank" : "_self"}
+            rel={isSubscriptionActive && chatLink ? "noopener noreferrer" : ""}
+            className={styles.clubChatCard}
+            onClick={handleChatClick}
+          >
             <div className={styles.clubChatContent}>
               <Image
                 src="/images/chat.webp"
@@ -314,7 +330,7 @@ export default function Home() {
                 </div>
               )}
             </div>
-          </div>
+          </a>
         </div>
       </div>
 
