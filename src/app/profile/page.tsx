@@ -49,7 +49,7 @@ export default function ProfilePage() {
     
     setLoadingPayments(true);
     try {
-      const telegramId = getTelegramId();
+      const telegramId = user?.id?.toString() || getTelegramId();
 
       const response = await fetch(`/api/payments?telegramId=${telegramId}&limit=10`);
       
@@ -123,7 +123,7 @@ export default function ProfilePage() {
     
     setIsSending(true);
     try {
-      const telegramId = getTelegramId();
+      const telegramId = user?.id?.toString() || getTelegramId();
       const userInfo = user ? `${user.first_name} ${user.last_name || ''}`.trim() : 'Неизвестный пользователь';
       
       // Отправляем сообщение на webhook

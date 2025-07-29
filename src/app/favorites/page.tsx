@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Page } from '@/components/Page';
 import { Heart, Play, ExternalLink, Loader2, Star } from 'lucide-react';
 import { Material } from '@/types/database';
+import { initData, useSignal } from '@telegram-apps/sdk-react';
 import styles from './page.module.css';
 
 export default function FavoritesPage() {
@@ -11,19 +12,28 @@ export default function FavoritesPage() {
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
 
+  // Получаем реального пользователя из Telegram
+  const user = useSignal(initData.user);
+
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
-    // В реальном приложении здесь будет Telegram WebApp API
-    // window.Telegram.WebApp.initDataUnsafe.user.id
-    // Пока используем тестовый ID
-    return 123456789;
+    // Пробуем получить из Telegram WebApp API
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg?.initDataUnsafe?.user?.id) {
+        return tg.initDataUnsafe.user.id.toString();
+      }
+    }
+    
+    // Fallback - только для разработки
+    return '123456789';
   };
 
   // Загрузка избранных материалов
   useEffect(() => {
     const fetchFavorites = async () => {
       try {
-        const telegramId = getTelegramId();
+        const telegramId = user?.id?.toString() || getTelegramId();
         const response = await fetch(`/api/favorites?telegramId=${telegramId}`);
         const data: Material[] = await response.json();
         
@@ -43,7 +53,7 @@ export default function FavoritesPage() {
   }, []);
 
   const toggleFavorite = async (materialId: number) => {
-    const telegramId = getTelegramId();
+    const telegramId = user?.id?.toString() || getTelegramId();
     const isFavorite = favorites.has(materialId);
 
     try {

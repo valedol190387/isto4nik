@@ -6,6 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FileText, Heart, Play, ExternalLink, Dumbbell, BookOpen, Sparkles, UtensilsCrossed, Video, Loader2 } from 'lucide-react';
 import { Material } from '@/types/database';
+import { initData, useSignal } from '@telegram-apps/sdk-react';
 import styles from './page.module.css';
 
 // Интерфейс для разделов (локальные данные)
@@ -64,12 +65,21 @@ export default function MaterialsPage() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [currentDot, setCurrentDot] = useState(0);
 
+  // Получаем реального пользователя из Telegram
+  const user = useSignal(initData.user);
+
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
-    // В реальном приложении здесь будет Telegram WebApp API
-    // window.Telegram.WebApp.initDataUnsafe.user.id
-    // Пока используем тестовый ID
-    return 123456789;
+    // Пробуем получить из Telegram WebApp API
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg?.initDataUnsafe?.user?.id) {
+        return tg.initDataUnsafe.user.id.toString();
+      }
+    }
+    
+    // Fallback - только для разработки
+    return '123456789';
   };
 
   // 3 точки для навигации как на главной
@@ -99,7 +109,7 @@ export default function MaterialsPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const telegramId = getTelegramId();
+        const telegramId = user?.id?.toString() || getTelegramId();
         
         // Загружаем материалы
         const materialsResponse = await fetch('/api/materials');
@@ -135,7 +145,7 @@ export default function MaterialsPage() {
     : sectionMaterials;
 
   const toggleFavorite = async (materialId: number) => {
-    const telegramId = getTelegramId();
+    const telegramId = user?.id?.toString() || getTelegramId();
     const isFavorite = favorites.has(materialId);
 
     try {
