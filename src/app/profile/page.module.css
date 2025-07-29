@@ -180,6 +180,26 @@
   color: #22c55e;
 }
 
+.subscriptionLoading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px 0;
+  justify-content: center;
+}
+
+.loadingSpinner {
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+  color: #666;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Карточка подписки */
 .subscriptionCard {
   background: var(--bg-card);

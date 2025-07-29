@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Page } from '@/components/Page';
 import Image from 'next/image';
-import { Lock, LockOpen, X } from 'lucide-react';
+import { Lock, LockOpen, X, Play } from 'lucide-react';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser } from '@/types/database';
 import styles from './page.module.css';
@@ -246,7 +246,7 @@ export default function FlatBellyPage() {
             <span className={styles.buttonContent}>
               <span className={styles.lockIcon}>
                 {isSubscriptionActive ? (
-                  <LockOpen size={24} />
+                  <Play size={24} />
                 ) : (
                   <Lock size={24} className={styles.pulsingLock} />
                 )}

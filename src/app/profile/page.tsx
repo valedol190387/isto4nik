@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check } from 'lucide-react';
+import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check, Loader2 } from 'lucide-react';
 import { Page } from '@/components/Page';
 import { Payment, User as DbUser } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
@@ -450,21 +450,28 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
         {/* Статус подписки */}
         <div className={styles.subscriptionCard}>
           <h3 className={styles.sectionTitle}>СТАТУС ПОДПИСКИ</h3>
-          <div className={styles.subscriptionStatus}>
-            <span className={styles.statusBadge} style={{ 
-              background: isSubscriptionActive ? '#22c55e' : '#ef4444'
-            }}>
-              {isSubscriptionActive ? 'Активна' : 'Неактивна'}
-            </span>
-            {isSubscriptionActive && userData?.end_sub_club && (
-              <div className={styles.subscriptionEndDate}>
-                <Clock className={styles.clockIcon} />
-                <span className={styles.endDateText}>
-                  до {formatDateOnly(userData.end_sub_club)}
-                </span>
-              </div>
-            )}
-          </div>
+          {loadingUserData ? (
+            <div className={styles.subscriptionLoading}>
+              <Loader2 className={styles.loadingSpinner} />
+              <span>Загружаем статус подписки...</span>
+            </div>
+          ) : (
+            <div className={styles.subscriptionStatus}>
+              <span className={styles.statusBadge} style={{ 
+                background: isSubscriptionActive ? '#22c55e' : '#ef4444'
+              }}>
+                {isSubscriptionActive ? 'Активна' : 'Неактивна'}
+              </span>
+              {isSubscriptionActive && userData?.end_sub_club && (
+                <div className={styles.subscriptionEndDate}>
+                  <Clock className={styles.clockIcon} />
+                  <span className={styles.endDateText}>
+                    до {formatDateOnly(userData.end_sub_club)}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
           <div className={styles.subscriptionContent}>
             {isSubscriptionActive ? (
               <p className={styles.subscriptionText}>

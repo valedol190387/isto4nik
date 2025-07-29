@@ -57,6 +57,17 @@ export function Navigation() {
     loadUserData();
   }, [user?.id]);
 
+  // Перезагружаем данные каждые 30 секунд для актуальности
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (user?.id) {
+        loadUserData();
+      }
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [user?.id]);
+
   const isSubscriptionActive = userData?.status === 'Активна';
 
   // Обработчик для заблокированных разделов
