@@ -2,7 +2,7 @@
 
 import { Page } from '@/components/Page';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { 
   Search, 
@@ -13,6 +13,8 @@ import {
   MessageSquare,
   FileText
 } from 'lucide-react';
+import { SearchModal } from '@/components/SearchModal';
+import { searchService } from '@/services/searchService';
 import styles from './page.module.css';
 
 // Данные для хайлайтов с изображениями
@@ -53,9 +55,16 @@ const courses = [
 
 export default function Home() {
   const [currentDot, setCurrentDot] = useState(0);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   
   // 3 точки для навигации
   const dotsCount = 3;
+
+  // Инициализация поискового индекса в фоне
+  useEffect(() => {
+    // Запускаем индексацию в фоне для быстрого поиска
+    searchService.buildIndex().catch(console.error);
+  }, []);
   
   const scrollToPosition = (dotIndex: number) => {
     setCurrentDot(dotIndex);
@@ -118,14 +127,13 @@ export default function Home() {
 
         {/* Поисковая строка */}
         <div className={styles.searchContainer}>
-          <div className={styles.searchBox}>
+          <button 
+            className={styles.searchBox}
+            onClick={() => setIsSearchOpen(true)}
+          >
             <Search className={styles.searchIcon} size={20} />
-            <input 
-              type="text" 
-              placeholder="Поиск..." 
-              className={styles.searchInput}
-            />
-          </div>
+            <span className={styles.searchPlaceholder}>Поиск...</span>
+          </button>
         </div>
 
         {/* Курсы */}
@@ -205,7 +213,11 @@ export default function Home() {
         </div>
       </div>
 
-
+      {/* Поисковая модалка */}
+      <SearchModal 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)} 
+      />
     </Page>
   );
 }

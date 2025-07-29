@@ -38,6 +38,7 @@
   font-weight: 700;
   color: var(--text-main);
   margin: 0;
+  font-family: Montserrat !important;
 }
 
 .headerStats {
@@ -62,38 +63,34 @@
   color: #2C3F48 !important;
 }
 
+/* Loading состояние - как в Materials */
+.loading {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingContent {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.loadingIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--accent-blue);
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
 /* Контент */
 .content {
   position: relative;
 }
 
-/* Состояние загрузки */
-.loadingState {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 50vh;
-}
 
-.loadingContent {
-  text-align: center;
-}
-
-.loadingIcon {
-  width: 32px;
-  height: 32px;
-  color: var(--accent-blue);
-  animation: spin 1s linear infinite;
-  margin-bottom: 16px;
-  filter: drop-shadow(var(--shadow-medium));
-}
-
-.loadingText {
-  font-size: 16px;
-  color: var(--text-secondary);
-  font-weight: 500;
-  margin: 0;
-}
 
 @keyframes spin {
   from { transform: rotate(0deg); }
@@ -152,14 +149,16 @@
   font-weight: 700;
   color: var(--text-main);
   margin: 0 0 8px 0;
+  font-family: Montserrat !important;
 }
 
-.errorDescription {
+.errorText {
   font-size: 14px;
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.5;
   margin: 0;
+  font-family: Montserrat !important;
 }
 
 /* Пустое состояние */
@@ -192,14 +191,16 @@
   font-weight: 700;
   color: var(--text-main);
   margin: 0 0 8px 0;
+  font-family: Montserrat !important;
 }
 
-.emptyDescription {
+.emptyText {
   font-size: 14px;
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.5;
   margin: 0;
+  font-family: Montserrat !important;
 }
 
 /* Список отзывов */
@@ -315,20 +316,14 @@
   
   .headerTitle {
     font-size: 18px;
+    font-family: Montserrat !important;
   }
   
   .headerStats {
     margin-left: 32px;
   }
   
-  .loadingIcon {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .loadingText {
-    font-size: 14px;
-  }
+
   
   .errorState {
     padding: 16px;
@@ -415,6 +410,7 @@
   
   .headerTitle {
     font-size: 24px;
+    font-family: Montserrat !important;
   }
   
   .loadMoreContainer {

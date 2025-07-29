@@ -146,11 +146,22 @@
   overflow: hidden;
   box-shadow: var(--shadow-glow);
   transition: all 0.3s ease;
+  width: 100%;
+  padding: 12px 14px 12px 40px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  outline: none;
 }
 
 .searchBox:hover {
   transform: scale(1.02);
   box-shadow: var(--shadow-glow);
+}
+
+.searchBox:active {
+  transform: scale(0.98);
 }
 
 .searchIcon {
@@ -163,20 +174,11 @@
   font-size: 16px;
 }
 
-.searchInput {
-  width: 100%;
-  padding: 12px 14px 12px 40px;
-  background: transparent;
-  border: none;
-  color: white;
-  font-size: 15px;
-  outline: none;
-  font-weight: 500;
-  height: 44px;
-}
-
-.searchInput::placeholder {
+.searchPlaceholder {
   color: #B9B4AE;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Montserrat', sans-serif;
 }
 
 /* Курсы */

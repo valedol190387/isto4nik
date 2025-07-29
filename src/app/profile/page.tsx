@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock } from 'lucide-react';
+import { User, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check } from 'lucide-react';
 import { Page } from '@/components/Page';
 import { Payment } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
@@ -13,14 +13,35 @@ export default function ProfilePage() {
 
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
-    // В реальном приложении здесь будет Telegram WebApp API
-    // return window.Telegram.WebApp.initDataUnsafe.user.id.toString();
+    // Пробуем получить из Telegram WebApp API
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg?.initDataUnsafe?.user?.id) {
+        return tg.initDataUnsafe.user.id.toString();
+      }
+    }
+    
+    // Fallback для разработки - используем разные ID для тестирования
+    if (typeof window !== 'undefined') {
+      // В реальной среде этого не будет - только для разработки
+      const testIds = ['123456789', '987654321', '555666777'];
+      const randomId = testIds[Math.floor(Math.random() * testIds.length)];
+
+      return randomId;
+    }
+    
     return '123456789';
   };
 
   // Состояние для платежей
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loadingPayments, setLoadingPayments] = useState(false);
+  
+  // Состояние для копирования
+  const [copiedId, setCopiedId] = useState(false);
+  const [copiedSystemInfo, setCopiedSystemInfo] = useState(false);
+  
+
 
   // Загрузка истории платежей
   const loadPayments = async () => {
@@ -29,11 +50,20 @@ export default function ProfilePage() {
     setLoadingPayments(true);
     try {
       const telegramId = getTelegramId();
+
       const response = await fetch(`/api/payments?telegramId=${telegramId}&limit=10`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data: Payment[] = await response.json();
+
       setPayments(data);
     } catch (error) {
       console.error('Error loading payments:', error);
+      // В случае ошибки показываем пустое состояние
+      setPayments([]);
     } finally {
       setLoadingPayments(false);
     }
@@ -83,6 +113,7 @@ export default function ProfilePage() {
   const user = useSignal(initData.user);
   const [supportMessage, setSupportMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [messageSent, setMessageSent] = useState(false);
   const [systemInfoOpen, setSystemInfoOpen] = useState(false);
   const [paymentsOpen, setPaymentsOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);
@@ -92,12 +123,33 @@ export default function ProfilePage() {
     
     setIsSending(true);
     try {
-      // Здесь будет отправка в службу поддержки
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Имитация отправки
-      setSupportMessage('');
-      alert('Сообщение отправлено в службу поддержки!');
+      const telegramId = getTelegramId();
+      const userInfo = user ? `${user.first_name} ${user.last_name || ''}`.trim() : 'Неизвестный пользователь';
+      
+      // Отправляем сообщение на webhook
+      const response = await fetch('https://n8n.ayunabackoffice.ru/webhook/zabota', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: supportMessage,
+          telegram_id: telegramId,
+          user_name: userInfo,
+          timestamp: new Date().toISOString()
+        })
+      });
+      
+      if (response.ok) {
+        setSupportMessage('');
+        setMessageSent(true);
+        setTimeout(() => setMessageSent(false), 2500); // Убираем зеленое состояние через 2.5 секунды
+      } else {
+        throw new Error('Ошибка отправки');
+      }
     } catch (error) {
-      alert('Ошибка при отправке сообщения');
+      console.error('Ошибка при отправке сообщения:', error);
+      // При ошибке просто ничего не показываем (или можно добавить красную подсветку)
     } finally {
       setIsSending(false);
     }
@@ -188,6 +240,34 @@ export default function ProfilePage() {
     };
   };
 
+  // Универсальная функция копирования в буфер обмена
+  const copyToClipboard = async (text: string, setCopiedState: (value: boolean) => void) => {
+    try {
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+        setCopiedState(true);
+        setTimeout(() => setCopiedState(false), 2000); // Убираем галочку через 2 секунды
+      } else {
+        // Fallback для старых браузеров или HTTP
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+        setCopiedState(true);
+        setTimeout(() => setCopiedState(false), 2000); // Убираем галочку через 2 секунды
+      }
+    } catch (error) {
+      console.error('Ошибка копирования:', error);
+      // При ошибке можно показать красную иконку или просто ничего не делать
+    }
+  };
+
   const copySystemInfo = () => {
     const info = getDetailedSystemInfo();
     
@@ -266,8 +346,7 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
 === КОНЕЦ ДИАГНОСТИЧЕСКОЙ ИНФОРМАЦИИ ===
     `.trim();
     
-    navigator.clipboard.writeText(systemInfo);
-    alert('Расширенная диагностическая информация скопирована!');
+    copyToClipboard(systemInfo, setCopiedSystemInfo);
   };
 
   return (
@@ -298,13 +377,12 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
               <div className={styles.userId}>
                 <p className={styles.userIdText}>Telegram ID: {user.id}</p>
                 <button 
-                  className={styles.copyIdButton}
+                  className={`${styles.copyIdButton} ${copiedId ? styles.copied : ''}`}
                   onClick={() => {
-                    navigator.clipboard.writeText(user.id?.toString() || '');
-                    alert('ID скопирован');
+                    copyToClipboard(user.id?.toString() || '', setCopiedId);
                   }}
                 >
-                  <Copy size={16} />
+                  {copiedId ? <Check size={16} /> : <Copy size={16} />}
                 </button>
               </div>
               {user.username && (
@@ -322,11 +400,16 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
           </div>
           <div className={styles.subscriptionContent}>
             <p className={styles.subscriptionText}>
-              Подписка неактивна. Для получения доступа к материалам обратитесь к боту.
+              Подписка неактивна. Для получения доступа к материалам обратитесь к боту "Плоский живот с Аюной".
             </p>
-            <button className={styles.botButton}>
+            <a 
+              href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={styles.botButton}
+            >
               Перейти в бот
-            </button>
+            </a>
           </div>
         </div>
 
@@ -358,14 +441,19 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
                   rows={4}
                 />
                 <button 
-                  className={styles.sendButton}
+                  className={`${styles.sendButton} ${messageSent ? styles.sent : ''}`}
                   onClick={handleSendSupport}
-                  disabled={!supportMessage.trim() || isSending}
+                  disabled={!supportMessage.trim() || isSending || messageSent}
                 >
                   {isSending ? (
                     <>
                       <div className={styles.spinner} />
                       Отправка...
+                    </>
+                  ) : messageSent ? (
+                    <>
+                      <Check className={styles.sendIcon} />
+                      Отправлено
                     </>
                   ) : (
                     <>
@@ -425,9 +513,9 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
 
               </div>
               
-              <button className={styles.copyButton} onClick={copySystemInfo}>
-                <Copy className={styles.copyIcon} />
-                Скопировать
+              <button className={`${styles.copyButton} ${copiedSystemInfo ? styles.copied : ''}`} onClick={copySystemInfo}>
+                {copiedSystemInfo ? <Check className={styles.copyIcon} /> : <Copy className={styles.copyIcon} />}
+                {copiedSystemInfo ? 'Скопировано' : 'Скопировать'}
               </button>
             </div>
           )}

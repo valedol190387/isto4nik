@@ -125,6 +125,17 @@ export default function ReviewsPage() {
     loadInitialData();
   }, []);
 
+  if (loading) {
+    return (
+      <div className={styles.loading}>
+        <div className={styles.loadingContent}>
+          <Loader2 className={styles.loadingIcon} />
+          <p>Загружаем отзывы...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Page>
       <div className={styles.container}>
@@ -146,14 +157,7 @@ export default function ReviewsPage() {
 
         {/* Контент */}
         <div className={styles.content}>
-          {loading ? (
-            <div className={styles.loadingState}>
-              <div className={styles.loadingContent}>
-                <Loader2 className={styles.loadingIcon} />
-                <p className={styles.loadingText}>Загружаем отзывы...</p>
-              </div>
-            </div>
-          ) : error ? (
+          {error ? (
             <div className={styles.errorState}>
               <div className={styles.errorContent}>
                 <div className={styles.errorIconContainer}>

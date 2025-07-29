@@ -90,8 +90,8 @@
 
 .customerName {
   font-size: 18px !important;
-  font-weight: 700 !important;
-  font-family: Montserrat !important;
+  font-weight: 500 !important;
+  font-family: var(--font-heading) !important;
   color: var(--text-main);
   margin: 0 0 4px 0;
   z-index: 1;
@@ -99,9 +99,9 @@
 }
 
 .customerDescription {
-  font-size: 15px !important;
-  font-weight: 400 !important;
-  font-family: Montserrat !important;
+  font-size: 14px !important;
+  font-weight: 300 !important;
+  font-family: 'Montserrat', sans-serif !important;
   color: var(--text-secondary);
   margin: 0;
   z-index: 1;
@@ -110,10 +110,10 @@
 
 /* Текст отзыва */
 .reviewText {
-  font-size: 18px !important;
-  font-weight: 400 !important;
-  font-family: Montserrat !important;
-  line-height: 1.6;
+  font-size: 16px !important;
+  font-weight: 300 !important;
+  font-family: 'Montserrat', sans-serif !important;
+  line-height: 1.5;
   color: var(--text-main);
   margin: 0 0 16px 0;
   z-index: 1;
@@ -138,14 +138,14 @@
 }
 
 .ratingValue {
-  font-size: 22px !important;
+  font-size: 18px !important;
   font-weight: 400 !important;
   font-family: Montserrat !important;
   color: #2C3F48 !important;
 }
 
 .ratingMax {
-  font-size: 22px !important;
+  font-size: 18px !important;
   font-weight: 400 !important;
   font-family: Montserrat !important;
   color: #2C3F48 !important;
@@ -169,17 +169,21 @@
   }
   
   .customerName {
-    font-size: 15px;
+    font-size: 16px !important;
+    font-weight: 500 !important;
+    font-family: var(--font-heading) !important;
   }
   
   .customerDescription {
-    font-size: 12px;
+    font-size: 14px !important;
+    font-weight: 300 !important;
+    font-family: 'Montserrat', sans-serif !important;
   }
   
   .reviewText {
-    font-size: 16px !important;
-    font-weight: 400 !important;
-    font-family: Montserrat !important;
+    font-size: 14px !important;
+    font-weight: 300 !important;
+    font-family: 'Montserrat', sans-serif !important;
   }
   
   .reviewTextContainer {
