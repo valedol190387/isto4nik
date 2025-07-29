@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check } from 'lucide-react';
+import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check } from 'lucide-react';
 import { Page } from '@/components/Page';
-import { Payment } from '@/types/database';
+import { Payment, User as DbUser } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import Link from 'next/link';
 import styles from './page.module.css';
@@ -41,7 +41,12 @@ export default function ProfilePage() {
   const [copiedId, setCopiedId] = useState(false);
   const [copiedSystemInfo, setCopiedSystemInfo] = useState(false);
   
+  // Получаем пользователя из Telegram
+  const user = useSignal(initData.user);
 
+  // Добавляем состояние для данных пользователя из базы данных
+  const [userData, setUserData] = useState<DbUser | null>(null);
+  const [loadingUserData, setLoadingUserData] = useState(true);
 
   // Загрузка истории платежей
   const loadPayments = async () => {
@@ -68,6 +73,42 @@ export default function ProfilePage() {
       setLoadingPayments(false);
     }
   };
+
+  // Функция для загрузки данных пользователя из базы данных
+  const loadUserData = async () => {
+    setLoadingUserData(true);
+    try {
+      const telegramId = user?.id?.toString() || getTelegramId();
+      
+      const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Пользователь не найден в базе
+          console.log('Пользователь не найден в базе данных');
+          setUserData(null);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } else {
+        const data: DbUser = await response.json();
+        setUserData(data);
+        console.log('Данные пользователя загружены:', data);
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке данных пользователя:', error);
+      setUserData(null);
+    } finally {
+      setLoadingUserData(false);
+    }
+  };
+
+  // Вызываем загрузку данных пользователя при монтировании
+  useEffect(() => {
+    if (user?.id) {
+      loadUserData();
+    }
+  }, [user?.id]);
 
   // Форматирование даты
   const formatDate = (dateString: string | undefined) => {
@@ -110,7 +151,6 @@ export default function ProfilePage() {
       default: return '#6b7280';
     }
   };
-  const user = useSignal(initData.user);
   const [supportMessage, setSupportMessage] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
@@ -350,13 +390,16 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
     copyToClipboard(systemInfo, setCopiedSystemInfo);
   };
 
+  // Проверяем статус подписки
+  const isSubscriptionActive = userData?.status === 'Активна';
+
   return (
     <Page>
       <div className={styles.container}>
         {/* Заголовок */}
         <div className={styles.header}>
           <div className={styles.headerContent}>
-            <User className={styles.headerIcon} />
+            <LucideUser className={styles.headerIcon} />
             <h1 className={styles.headerTitle}>Профиль</h1>
           </div>
         </div>
@@ -368,7 +411,7 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
               {user.photo_url ? (
                 <img src={user.photo_url} alt="Аватар" className={styles.avatarImage} />
               ) : (
-                <User className={styles.avatarIcon} />
+                <LucideUser className={styles.avatarIcon} />
               )}
             </div>
             <div className={styles.userInfo}>
@@ -397,20 +440,32 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
         <div className={styles.subscriptionCard}>
           <h3 className={styles.sectionTitle}>СТАТУС ПОДПИСКИ</h3>
           <div className={styles.subscriptionStatus}>
-            <span className={styles.statusBadge}>Неактивна</span>
+            <span className={styles.statusBadge} style={{ 
+              background: isSubscriptionActive ? 'var(--success-green)' : 'var(--accent-red)'
+            }}>
+              {isSubscriptionActive ? 'Активна' : 'Неактивна'}
+            </span>
           </div>
           <div className={styles.subscriptionContent}>
-            <p className={styles.subscriptionText}>
-              Подписка неактивна. Для получения доступа к материалам обратитесь к боту "Плоский живот с Аюной".
-            </p>
-            <a 
-              href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className={styles.botButton}
-            >
-              Перейти в бот
-            </a>
+            {isSubscriptionActive ? (
+              <p className={styles.subscriptionText}>
+                Ваша подписка активна. Вы имеете доступ ко всем материалам.
+              </p>
+            ) : (
+              <>
+                <p className={styles.subscriptionText}>
+                  Подписка неактивна. Для получения доступа к материалам обратитесь к боту "Плоский живот с Аюной".
+                </p>
+                <a 
+                  href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className={styles.botButton}
+                >
+                  Перейти в бот
+                </a>
+              </>
+            )}
           </div>
         </div>
 
