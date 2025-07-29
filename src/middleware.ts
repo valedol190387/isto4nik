@@ -43,26 +43,8 @@ async function checkSubscriptionStatus(telegramId: string): Promise<boolean> {
 }
 
 export async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Проверяем только защищенные маршруты
-  if (PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
-    const telegramId = getTelegramIdFromHeaders(request);
-    
-    // Если нет telegram_id - редирект на главную
-    if (!telegramId) {
-      return NextResponse.redirect(new URL('/?error=no_auth', request.url));
-    }
-    
-    // Проверяем статус подписки
-    const hasActiveSubscription = await checkSubscriptionStatus(telegramId);
-    
-    if (!hasActiveSubscription) {
-      // Редирект на главную с параметром об ошибке доступа
-      return NextResponse.redirect(new URL('/?error=no_subscription', request.url));
-    }
-  }
-  
+  // ВРЕМЕННО ОТКЛЮЧАЕМ MIDDLEWARE - проверка подписки на стороне компонентов
+  // Telegram WebApp не передает telegram_id через заголовки
   return NextResponse.next();
 }
 

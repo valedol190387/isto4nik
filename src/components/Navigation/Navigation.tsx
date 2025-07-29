@@ -69,6 +69,10 @@ export function Navigation() {
   }, [user?.id]);
 
   const isSubscriptionActive = userData?.status === 'Активна';
+  
+  // DEBUG: временно показываем статус
+  console.log('Navigation userData:', userData);
+  console.log('Navigation isSubscriptionActive:', isSubscriptionActive);
 
   // Обработчик для заблокированных разделов
   const handleLockedClick = (e: React.MouseEvent) => {
@@ -87,7 +91,7 @@ export function Navigation() {
         </Link>
 
         {/* Материалы */}
-        {isSubscriptionActive ? (
+        {(!loadingUserData && isSubscriptionActive) ? (
           <Link href="/materials" className={`${styles.navItem} ${pathname === '/materials' ? styles.active : ''}`}>
             <FileText className={styles.navIcon} size={20} />
             <span className={styles.navText}>Материалы</span>
@@ -100,7 +104,7 @@ export function Navigation() {
         )}
 
         {/* Календарь */}
-        {isSubscriptionActive ? (
+        {(!loadingUserData && isSubscriptionActive) ? (
           <Link href="/calendar" className={`${styles.navItem} ${pathname === '/calendar' ? styles.active : ''}`}>
             <Calendar className={styles.navIcon} size={20} />
             <span className={styles.navText}>Календарь</span>
@@ -119,7 +123,7 @@ export function Navigation() {
         </Link>
 
         {/* Избранное */}
-        {isSubscriptionActive ? (
+        {(!loadingUserData && isSubscriptionActive) ? (
           <Link href="/favorites" className={`${styles.navItem} ${pathname === '/favorites' ? styles.active : ''}`}>
             <Star className={styles.navIcon} size={20} />
             <span className={styles.navText}>Избранное</span>

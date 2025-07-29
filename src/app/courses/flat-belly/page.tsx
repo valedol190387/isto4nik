@@ -12,6 +12,7 @@ export default function FlatBellyPage() {
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [courseLink, setCourseLink] = useState<string | null>(null);
 
   // Получаем пользователя из Telegram
   const user = useSignal(initData.user);
@@ -67,24 +68,13 @@ export default function FlatBellyPage() {
   // Проверяем статус подписки
   const isSubscriptionActive = userData?.status === 'Активна';
 
-  // Универсальная функция для открытия ссылок (работает на мобиле и десктопе)
-  const openSecureLink = (url: string) => {
-    if (typeof window !== 'undefined') {
-      // Проверяем есть ли Telegram WebApp API
-      const tg = (window as any).Telegram?.WebApp;
-      
-      if (tg && tg.openLink) {
-        // Используем Telegram WebApp API для мобилки
-        tg.openLink(url);
-      } else {
-        // Fallback для десктопа или обычного браузера
-        window.open(url, '_blank');
-      }
-    }
-  };
+  // Загружаем ссылку на курс когда статус подписки меняется
+  useEffect(() => {
+    loadCourseLink();
+  }, [isSubscriptionActive, user?.id]);
 
-  // Обработчик клика по кнопке курса
-  const handleCourseClick = async () => {
+  // Функция для загрузки защищенной ссылки на курс
+  const loadCourseLink = async () => {
     if (isSubscriptionActive) {
       try {
         const telegramId = user?.id?.toString() || getTelegramId();
@@ -92,15 +82,21 @@ export default function FlatBellyPage() {
         
         if (response.ok) {
           const data = await response.json();
-          openSecureLink(data.link);
-        } else {
-          setShowSubscriptionModal(true);
+          setCourseLink(data.link);
         }
       } catch (error) {
-        console.error('Error getting secure link:', error);
-        setShowSubscriptionModal(true);
+        console.error('Error loading course link:', error);
+        setCourseLink(null);
       }
     } else {
+      setCourseLink(null);
+    }
+  };
+
+  // Обработчик клика по кнопке курса (только для заблокированных)
+  const handleCourseClick = (e: React.MouseEvent) => {
+    if (!isSubscriptionActive) {
+      e.preventDefault();
       setShowSubscriptionModal(true);
     }
   };
@@ -254,10 +250,12 @@ export default function FlatBellyPage() {
 
         {/* Кнопка курса */}
         <div className={styles.courseButtonContainer}>
-          <button 
+          <a 
+            href={isSubscriptionActive && courseLink ? courseLink : "#"}
+            target={isSubscriptionActive && courseLink ? "_blank" : "_self"}
+            rel={isSubscriptionActive && courseLink ? "noopener noreferrer" : ""}
             onClick={handleCourseClick}
-            className={`${styles.courseButton} ${!isSubscriptionActive ? styles.lockedButton : ''}`}
-            disabled={loadingUserData}
+            className={`${styles.courseButton} ${!isSubscriptionActive ? styles.lockedButton : ''} ${loadingUserData ? styles.disabled : ''}`}
           >
             <span className={styles.buttonContent}>
               <span className={styles.lockIcon}>
@@ -269,7 +267,7 @@ export default function FlatBellyPage() {
               </span>
               СМОТРЕТЬ КУРС
             </span>
-          </button>
+          </a>
         </div>
       </div>
 
