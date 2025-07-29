@@ -313,3 +313,242 @@
     padding: 12px 16px; /* Уменьшены отступы */
   }
 } 
+
+/* Кнопка курса */
+.courseButtonContainer {
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+  margin: 40px 0 40px 0;
+}
+
+.courseButton {
+  display: block;
+  width: 100%;
+  background: #2C3F48;
+  color: white;
+  padding: 24px 32px;
+  border-radius: 16px;
+  border: none;
+  text-decoration: none;
+  text-align: center;
+  font-family: Cormorant;
+  font-style: normal;
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: uppercase;
+  transition: all 0.3s ease;
+  letter-spacing: 1px;
+  cursor: pointer;
+  position: relative;
+}
+
+.courseButton:hover:not(:disabled) {
+  background: #374951;
+  transform: translateY(-2px);
+}
+
+.courseButton:active {
+  transform: translateY(0);
+}
+
+.courseButton:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.buttonContent {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+}
+
+.lockIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lockedButton {
+  background: #6b7280;
+}
+
+.lockedButton:hover {
+  background: #6b7280;
+  transform: none;
+}
+
+/* Анимация пульсации для закрытого замка */
+.pulsingLock {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+}
+
+/* Модальное окно */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 16px;
+  padding: 0;
+  max-width: 400px;
+  width: 100%;
+  position: relative;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #6b7280;
+  transition: all 0.2s ease;
+  z-index: 1001;
+}
+
+.closeButton:hover {
+  background: rgba(0, 0, 0, 0.2);
+  color: #374151;
+}
+
+.modalBody {
+  padding: 40px 32px 32px;
+  text-align: center;
+}
+
+.modalIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  background: rgba(107, 114, 128, 0.1);
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  color: #6b7280;
+}
+
+.modalTitle {
+  font-family: 'Cormorant', serif;
+  font-size: 24px;
+  font-weight: 700;
+  color: #2C3F48;
+  margin: 0 0 16px 0;
+}
+
+.modalText {
+  font-family: 'Montserrat', sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #2C3F48;
+  margin: 0 0 32px 0;
+}
+
+.modalButton {
+  display: inline-block;
+  background: #2C3F48;
+  color: white;
+  padding: 16px 32px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-family: 'Cormorant', serif;
+  font-size: 20px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+}
+
+.modalButton:hover {
+  background: #374951;
+  transform: translateY(-1px);
+}
+
+/* Адаптивность для кнопки курса */
+@media (max-width: 480px) {
+  .courseButtonContainer {
+    padding: 0 12px;
+    margin: 32px 0;
+  }
+  
+  .courseButton {
+    font-size: 20px;
+    padding: 16px 20px;
+  }
+  
+  .buttonContent {
+    gap: 10px;
+  }
+  
+  .modalContent {
+    margin: 0 16px;
+  }
+  
+  .modalBody {
+    padding: 32px 24px 24px;
+  }
+  
+  .modalTitle {
+    font-size: 20px;
+  }
+  
+  .modalText {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 768px) {
+  .courseButtonContainer {
+    margin: 48px 0;
+  }
+  
+  .courseButton {
+    font-size: 26px;
+    padding: 22px 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .courseButtonContainer {
+    margin: 56px 0;
+  }
+  
+  .courseButton {
+    font-size: 28px;
+    padding: 24px 36px;
+  }
+} 

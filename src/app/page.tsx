@@ -11,10 +11,15 @@ import {
   User,
   Star,
   MessageSquare,
-  FileText
+  FileText,
+  Lock,
+  LockOpen,
+  X
 } from 'lucide-react';
 import { SearchModal } from '@/components/SearchModal';
 import { searchService } from '@/services/searchService';
+import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { User as DbUser } from '@/types/database';
 import styles from './page.module.css';
 
 // Данные для хайлайтов с изображениями
@@ -56,15 +61,104 @@ const courses = [
 export default function Home() {
   const [currentDot, setCurrentDot] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [userData, setUserData] = useState<DbUser | null>(null);
+  const [loadingUserData, setLoadingUserData] = useState(true);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
+  // Получаем пользователя из Telegram
+  const user = useSignal(initData.user);
   
   // 3 точки для навигации
   const dotsCount = 3;
+
+  // Получаем Telegram ID пользователя
+  const getTelegramId = () => {
+    // Пробуем получить из Telegram WebApp API
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg?.initDataUnsafe?.user?.id) {
+        return tg.initDataUnsafe.user.id.toString();
+      }
+    }
+    
+    // Fallback - только для разработки
+    return '123456789';
+  };
+
+  // Функция для загрузки данных пользователя из базы данных
+  const loadUserData = async () => {
+    setLoadingUserData(true);
+    try {
+      const telegramId = user?.id?.toString() || getTelegramId();
+      
+      const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Пользователь не найден в базе
+          setUserData(null);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } else {
+        const data: DbUser = await response.json();
+        setUserData(data);
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке данных пользователя:', error);
+      setUserData(null);
+    } finally {
+      setLoadingUserData(false);
+    }
+  };
+
+  // Проверяем статус подписки
+  const isSubscriptionActive = userData?.status === 'Активна';
+
+  // Обработчик клика по кнопке чата
+  const handleChatClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isSubscriptionActive) {
+      try {
+        const telegramId = user?.id?.toString() || getTelegramId();
+        const response = await fetch(`/api/secure-links?telegram_id=${telegramId}&type=chat`);
+        
+        if (response.ok) {
+          const data = await response.json();
+          window.open(data.link, '_blank');
+        } else {
+          // Если API вернул ошибку, показываем модальное окно
+          setShowSubscriptionModal(true);
+        }
+      } catch (error) {
+        console.error('Error getting secure link:', error);
+        setShowSubscriptionModal(true);
+      }
+    } else {
+      setShowSubscriptionModal(true);
+    }
+  };
 
   // Инициализация поискового индекса в фоне
   useEffect(() => {
     // Запускаем индексацию в фоне для быстрого поиска
     searchService.buildIndex().catch(console.error);
+    
+    // Проверяем параметры URL на ошибки безопасности
+    const urlParams = new URLSearchParams(window.location.search);
+    const error = urlParams.get('error');
+    
+    if (error === 'no_subscription') {
+      setShowSubscriptionModal(true);
+    }
   }, []);
+
+  // Вызываем загрузку данных пользователя при монтировании
+  useEffect(() => {
+    if (user?.id) {
+      loadUserData();
+    }
+  }, [user?.id]);
   
   const scrollToPosition = (dotIndex: number) => {
     setCurrentDot(dotIndex);
@@ -199,7 +293,7 @@ export default function Home() {
 
         {/* Чат клуба */}
         <div className={styles.clubChatSection}>
-          <Link href="/chat" className={styles.clubChatCard}>
+          <div className={styles.clubChatCard} onClick={handleChatClick}>
             <div className={styles.clubChatContent}>
               <Image
                 src="/images/chat.webp"
@@ -208,8 +302,19 @@ export default function Home() {
                 className={styles.clubChatImage}
                 sizes="(max-width: 768px) 100vw, 600px"
               />
+              {/* Прозрачное стекло поверх всей кнопки при заблокированном доступе */}
+              {!isSubscriptionActive && (
+                <div className={styles.chatGlassOverlay}>
+                  {/* Замок поверх стекла */}
+                  <div className={styles.chatLockContainer}>
+                    <div className={`${styles.chatLockIcon} ${styles.pulsingLock}`}>
+                      <Lock size={24} />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
-          </Link>
+          </div>
         </div>
       </div>
 
@@ -218,6 +323,42 @@ export default function Home() {
         isOpen={isSearchOpen} 
         onClose={() => setIsSearchOpen(false)} 
       />
+
+      {/* Модальное окно для покупки подписки */}
+      {showSubscriptionModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowSubscriptionModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button 
+              className={styles.closeButton}
+              onClick={() => setShowSubscriptionModal(false)}
+            >
+              <X size={24} />
+            </button>
+            
+            <div className={styles.modalBody}>
+              <div className={styles.modalIcon}>
+                <Lock size={48} />
+              </div>
+              
+              <h3 className={styles.modalTitle}>Доступ к чату клуба</h3>
+              
+              <p className={styles.modalText}>
+                Для доступа к чату клуба необходима активная подписка. 
+                Получите доступ ко всем материалам и начните свой путь к здоровью!
+              </p>
+              
+              <a 
+                href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.modalButton}
+              >
+                ПОЛУЧИТЬ ДОСТУП
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </Page>
   );
 }
