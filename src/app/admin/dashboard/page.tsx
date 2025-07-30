@@ -241,13 +241,18 @@ export default function AdminDashboard() {
 
         {/* Quick Actions */}
         <div className={styles.quickActions}>
-          <div className={styles.actionCard}>
+          <a 
+            href="https://t.me/brvalentin" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className={styles.actionCard}
+          >
             <MessageSquare className={styles.actionIcon} />
             <div className={styles.actionContent}>
               <h3>Техническая помощь</h3>
               <p>Свяжитесь с Валентином для технической поддержки</p>
             </div>
-          </div>
+          </a>
 
           <div className={styles.actionCard}>
             <FileText className={styles.actionIcon} />

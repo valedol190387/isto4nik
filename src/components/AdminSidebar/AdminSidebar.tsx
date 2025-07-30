@@ -54,18 +54,6 @@ const sidebarItems: SidebarItem[] = [
     title: 'Отзывы',
     icon: <Star size={20} />,
     path: '/admin/reviews'
-  },
-  {
-    id: 'support',
-    title: 'Поддержка',
-    icon: <MessageSquare size={20} />,
-    path: '/admin/support'
-  },
-  {
-    id: 'settings',
-    title: 'Настройки',
-    icon: <Settings size={20} />,
-    path: '/admin/settings'
   }
 ];
 
@@ -135,6 +123,14 @@ export function AdminSidebar() {
               <div className={styles.userName}>Администратор</div>
               <div className={styles.userRole}>Система управления</div>
             </div>
+            <a 
+              href="https://t.me/brvalentin" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className={styles.supportLink}
+            >
+              Связаться с Валентином
+            </a>
           </div>
         )}
       </div>

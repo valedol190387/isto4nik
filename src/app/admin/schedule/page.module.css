@@ -4,6 +4,21 @@
   font-family: var(--font-montserrat);
 }
 
+.page *,
+.page *::before, 
+.page *::after {
+  font-family: var(--font-montserrat) !important;
+}
+
+/* Все кнопки и формы в админке */
+.page button,
+.page input,
+.page select,
+.page textarea,
+.page label {
+  font-family: var(--font-montserrat) !important;
+}
+
 .loading {
   min-height: 100vh;
   display: flex;
@@ -19,6 +34,7 @@
   justify-content: center;
   gap: 20px;
   color: #64748b;
+  font-family: var(--font-montserrat);
 }
 
 .spinner {
@@ -39,6 +55,7 @@
   margin-left: 280px;
   padding: 32px 24px;
   min-height: 100vh;
+  font-family: var(--font-montserrat);
 }
 
 /* Header */
@@ -66,6 +83,7 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 8px 0;
+  font-family: var(--font-montserrat);
 }
 
 .titleIcon {
@@ -76,6 +94,7 @@
   color: #64748b;
   font-size: 14px;
   margin: 0;
+  font-family: var(--font-montserrat);
 }
 
 .addBtn {
@@ -91,6 +110,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: var(--font-montserrat);
 }
 
 .addBtn:hover {
@@ -176,6 +196,7 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 8px 0;
+  font-family: var(--font-montserrat);
 }
 
 .eventDateTime {
@@ -484,6 +505,7 @@
   font-size: 14px;
   font-weight: 500;
   color: #374151;
+  font-family: var(--font-montserrat);
 }
 
 .formGroup input,
@@ -492,7 +514,7 @@
   padding: 12px 16px;
   border: 2px solid #e1e5e9;
   border-radius: 8px;
-  font-family: var(--font-montserrat);
+  font-family: var(--font-montserrat) !important;
   font-size: 14px;
   transition: all 0.2s ease;
 }
@@ -533,6 +555,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: var(--font-montserrat);
 }
 
 .cancelBtn:hover {

@@ -4,6 +4,22 @@
   font-family: var(--font-montserrat);
 }
 
+/* Универсальные шрифты для всех элементов */
+.dashboard *,
+.dashboard *::before, 
+.dashboard *::after {
+  font-family: var(--font-montserrat) !important;
+}
+
+/* Все кнопки и формы в админке */
+.dashboard button,
+.dashboard input,
+.dashboard select,
+.dashboard textarea,
+.dashboard label {
+  font-family: var(--font-montserrat) !important;
+}
+
 .loading {
   min-height: 100vh;
   display: flex;
@@ -13,6 +29,7 @@
   gap: 20px;
   font-family: var(--font-montserrat);
   color: #64748b;
+  margin-left: 280px;
 }
 
 .spinner {
@@ -37,8 +54,8 @@
 }
 
 .headerContent {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: calc(100vw - 280px);
+  margin-left: 280px;
   padding: 0 24px;
   display: flex;
   justify-content: space-between;
@@ -57,6 +74,7 @@
   color: #64748b;
   font-size: 14px;
   margin: 0;
+  font-family: var(--font-montserrat);
 }
 
 .headerRight {
@@ -72,6 +90,7 @@
   color: #059669;
   font-size: 14px;
   font-weight: 500;
+  font-family: var(--font-montserrat);
 }
 
 .statusIndicator {
@@ -100,6 +119,7 @@
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: var(--font-montserrat);
 }
 
 .logoutBtn:hover {
@@ -109,8 +129,7 @@
 
 /* Main Content */
 .main {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: calc(100vw - 280px);
   margin-left: 280px;
   padding: 32px 24px;
   display: flex;
@@ -169,6 +188,7 @@
   color: #1e293b;
   line-height: 1;
   margin-bottom: 4px;
+  font-family: var(--font-montserrat);
 }
 
 .statLabel {
@@ -176,11 +196,13 @@
   font-weight: 600;
   color: #475569;
   margin-bottom: 2px;
+  font-family: var(--font-montserrat);
 }
 
 .statSubtext {
   font-size: 14px;
   color: #64748b;
+  font-family: var(--font-montserrat);
 }
 
 /* Secondary Stats */
@@ -212,6 +234,7 @@
   font-size: 16px;
   font-weight: 600;
   color: #374151;
+  font-family: var(--font-montserrat);
 }
 
 .miniStatList {
@@ -225,6 +248,7 @@
   align-items: center;
   gap: 12px;
   font-size: 14px;
+  font-family: var(--font-montserrat);
 }
 
 .miniStatDot {
@@ -242,11 +266,13 @@
 .miniStatValue {
   font-weight: 600;
   color: #374151;
+  font-family: var(--font-montserrat);
 }
 
 .miniStatStatus {
   font-weight: 600;
   color: #059669;
+  font-family: var(--font-montserrat);
 }
 
 /* Activity Section */
@@ -263,6 +289,7 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 20px 0;
+  font-family: var(--font-montserrat);
 }
 
 .activityContent {
@@ -277,6 +304,7 @@
   gap: 12px;
   font-size: 14px;
   color: #64748b;
+  font-family: var(--font-montserrat);
 }
 
 .activityDot {
@@ -304,6 +332,8 @@
   gap: 16px;
   cursor: pointer;
   transition: all 0.2s ease;
+  text-decoration: none;
+  color: inherit;
 }
 
 .actionCard:hover {
@@ -325,6 +355,7 @@
   font-weight: 600;
   color: #1e293b;
   margin: 0 0 8px 0;
+  font-family: var(--font-montserrat);
 }
 
 .actionContent p {
@@ -332,6 +363,7 @@
   color: #64748b;
   margin: 0;
   line-height: 1.5;
+  font-family: var(--font-montserrat);
 }
 
 /* Responsive */

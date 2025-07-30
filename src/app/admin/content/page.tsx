@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, X, ExternalLink, Tag, Folder } from 'lucide-react';
+import { Plus, Edit, Trash2, X, ExternalLink, Tag, Folder, ChevronDown, ChevronRight } from 'lucide-react';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import styles from './page.module.css';
 
@@ -64,7 +64,11 @@ export default function AdminContent() {
   const [form, setForm] = useState<MaterialForm>(initialForm);
   const [saving, setSaving] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['workouts']));
+  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const router = useRouter();
+
+  const ITEMS_PER_PAGE = 15;
 
   useEffect(() => {
     // Проверяем авторизацию
@@ -189,6 +193,51 @@ export default function AdminContent() {
     });
   };
 
+  // Группировка материалов по разделам
+  const groupedMaterials = sectionOptions.reduce((acc, section) => {
+    const sectionMaterials = materials
+      .filter(material => material.section_key === section.value)
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    
+    acc[section.value] = {
+      section,
+      materials: sectionMaterials,
+      total: sectionMaterials.length
+    };
+    
+    return acc;
+  }, {} as Record<string, { section: typeof sectionOptions[0], materials: Material[], total: number }>);
+
+  // Инициализация видимых элементов
+  useEffect(() => {
+    const initialCounts: Record<string, number> = {};
+    Object.keys(groupedMaterials).forEach(sectionKey => {
+      initialCounts[sectionKey] = Math.min(ITEMS_PER_PAGE, groupedMaterials[sectionKey].total);
+    });
+    setVisibleCounts(initialCounts);
+  }, [materials]);
+
+  const toggleSection = (sectionKey: string) => {
+    const newExpanded = new Set(expandedSections);
+    if (newExpanded.has(sectionKey)) {
+      newExpanded.delete(sectionKey);
+    } else {
+      newExpanded.add(sectionKey);
+    }
+    setExpandedSections(newExpanded);
+  };
+
+  const showMore = (sectionKey: string) => {
+    setVisibleCounts(prev => ({
+      ...prev,
+      [sectionKey]: prev[sectionKey] + ITEMS_PER_PAGE
+    }));
+  };
+
+  const getTotalMaterials = () => {
+    return Object.values(groupedMaterials).reduce((sum, group) => sum + group.total, 0);
+  };
+
   return (
     <div className={styles.adminLayout}>
       <AdminSidebar />
@@ -198,7 +247,9 @@ export default function AdminContent() {
           <div className={styles.headerContent}>
             <div>
               <h1 className={styles.title}>Управление контентом</h1>
-              <p className={styles.subtitle}>Материалы, методички и обучающие ресурсы</p>
+              <p className={styles.subtitle}>
+                {getTotalMaterials()} материалов в {Object.keys(groupedMaterials).filter(key => groupedMaterials[key].total > 0).length} разделах
+              </p>
             </div>
             <button
               onClick={() => {
@@ -217,57 +268,98 @@ export default function AdminContent() {
         <div className={styles.content}>
           {loading ? (
             <div className={styles.loading}>Загрузка материалов...</div>
-          ) : materials.length === 0 ? (
+          ) : getTotalMaterials() === 0 ? (
             <div className={styles.emptyState}>
               <Folder size={48} />
               <h3>Нет материалов</h3>
               <p>Создайте первый материал для контента</p>
             </div>
           ) : (
-            <div className={styles.materialsList}>
-              {materials.map((material) => (
-                <div key={material.id} className={styles.materialCard}>
-                  <div className={styles.materialHeader}>
-                    <div className={styles.materialInfo}>
-                      <h3 className={styles.materialTitle}>{material.title}</h3>
-                      <p className={styles.materialDescription}>{material.description}</p>
-                      <div className={styles.materialMeta}>
-                        <div className={styles.materialSection}>
-                          <Folder size={14} />
-                          {getSectionName(material.section_key)}
-                        </div>
-                        {material.url && (
-                          <a href={material.url} target="_blank" rel="noopener noreferrer" className={styles.materialLink}>
-                            <ExternalLink size={14} />
-                            Ссылка
-                          </a>
-                        )}
-                      </div>
-                      <div className={styles.materialTags}>
-                        {material.tags && material.tags.map((tag, index) => (
-                          <span key={index} className={styles.materialTag}>
-                            {tag}
-                          </span>
-                        ))}
+            <div className={styles.sectionsContainer}>
+              {Object.entries(groupedMaterials).map(([sectionKey, group]) => {
+                if (group.total === 0) return null;
+                
+                const isExpanded = expandedSections.has(sectionKey);
+                const visibleCount = visibleCounts[sectionKey] || ITEMS_PER_PAGE;
+                const visibleMaterials = group.materials.slice(0, visibleCount);
+                const hasMore = visibleCount < group.total;
+
+                return (
+                  <div key={sectionKey} className={styles.sectionGroup}>
+                    <div 
+                      className={styles.sectionHeader}
+                      onClick={() => toggleSection(sectionKey)}
+                    >
+                      <div className={styles.sectionInfo}>
+                        {isExpanded ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+                        <Folder size={20} />
+                        <h3 className={styles.sectionTitle}>{group.section.label}</h3>
+                        <span className={styles.sectionCount}>({group.total})</span>
                       </div>
                     </div>
+
+                    {isExpanded && (
+                      <div className={styles.sectionContent}>
+                        <div className={styles.materialsList}>
+                          {visibleMaterials.map((material) => (
+                            <div key={material.id} className={styles.materialCard}>
+                              <div className={styles.materialHeader}>
+                                <div className={styles.materialInfo}>
+                                  <h3 className={styles.materialTitle}>{material.title}</h3>
+                                  <p className={styles.materialDescription}>{material.description}</p>
+                                  <div className={styles.materialMeta}>
+                                    <div className={styles.materialDate}>
+                                      Добавлено {formatDate(material.created_at)}
+                                    </div>
+                                    {material.url && (
+                                      <a href={material.url} target="_blank" rel="noopener noreferrer" className={styles.materialLink}>
+                                        <ExternalLink size={14} />
+                                        Ссылка
+                                      </a>
+                                    )}
+                                  </div>
+                                  <div className={styles.materialTags}>
+                                    {material.tags && material.tags.map((tag, index) => (
+                                      <span key={index} className={styles.materialTag}>
+                                        {tag}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                              <div className={styles.materialActions}>
+                                <button
+                                  onClick={() => handleEdit(material)}
+                                  className={styles.editBtn}
+                                >
+                                  <Edit size={16} />
+                                </button>
+                                <button
+                                  onClick={() => handleDelete(material.id)}
+                                  className={styles.deleteBtn}
+                                >
+                                  <Trash2 size={16} />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        
+                        {hasMore && (
+                          <div className={styles.showMoreContainer}>
+                            <button
+                              onClick={() => showMore(sectionKey)}
+                              className={styles.showMoreBtn}
+                            >
+                              Показать еще ({group.total - visibleCount})
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <div className={styles.materialActions}>
-                    <button
-                      onClick={() => handleEdit(material)}
-                      className={styles.editBtn}
-                    >
-                      <Edit size={16} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(material.id)}
-                      className={styles.deleteBtn}
-                    >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
