@@ -12,7 +12,7 @@ interface AdminRootProps {
  */
 export function AdminRoot({ children }: AdminRootProps) {
   return (
-    <div className="admin-root" style={{ 
+    <div className="admin-root" style={{
       minHeight: '100vh',
       width: '100%',
       background: '#f8fafc',
