@@ -24,6 +24,8 @@ export async function GET(request: Request) {
           section_key,
           tags,
           display_order,
+          is_embedded_video,
+          video_embed_code,
           created_at
         )
       `)

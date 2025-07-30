@@ -86,12 +86,8 @@ export default function MaterialViewPage() {
   return (
     <Page>
       <div className={styles.container}>
-        {/* Шапка с кнопкой назад */}
+        {/* Шапка без кнопки назад (используется системная кнопка Telegram) */}
         <header className={styles.header}>
-          <button onClick={() => router.back()} className={styles.backButton}>
-            <ArrowLeft size={20} />
-            <span>Материалы</span>
-          </button>
         </header>
 
         {/* Основной контент */}
