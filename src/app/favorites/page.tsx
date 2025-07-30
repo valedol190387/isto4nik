@@ -78,8 +78,14 @@ export default function FavoritesPage() {
     }
   };
 
-  const handleMaterialClick = (url: string) => {
-    window.open(url, '_blank');
+  const handleMaterialClick = (material: Material) => {
+    if (material.is_embedded_video) {
+      // Для встроенного видео - переход на страницу просмотра
+      window.location.href = `/materials/${material.id}`;
+    } else {
+      // Для внешних ссылок - открытие в новом окне
+      window.open(material.url, '_blank');
+    }
   };
 
   if (loading) {
@@ -109,7 +115,7 @@ export default function FavoritesPage() {
           {materials.length > 0 ? (
             materials.map((material) => (
               <div key={material.id} className={styles.materialCard}>
-                <div className={styles.materialContent} onClick={() => handleMaterialClick(material.url)}>
+                <div className={styles.materialContent} onClick={() => handleMaterialClick(material)}>
                   <div className={styles.materialIcon}>
                     <Play className={styles.playIcon} />
                   </div>
