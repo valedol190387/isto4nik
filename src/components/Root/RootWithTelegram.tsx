@@ -25,6 +25,8 @@ import { ErrorPage } from '@/components/ErrorPage';
 import { useDidMount } from '@/hooks/useDidMount';
 import { setLocale } from '@/core/i18n/locale';
 import TelegramStickyApp from '@/components/TelegramStickyApp';
+import { checkAndCreateUser } from '@/lib/userRegistration';
+import { extractTelegramData, isValidTelegramUser } from '@/lib/utm';
 
 import './styles.css';
 
@@ -95,6 +97,44 @@ function RootInner({ children }: { children: any }) {
     initTelegramFeatures();
   }, []);
 
+  // UTM tracking и автоматическая регистрация пользователей
+  useEffect(() => {
+    const handleUserRegistration = async () => {
+      try {
+        console.log('🚀 Checking for user auto-registration...');
+        
+        // Пробуем получить данные пользователя из Telegram SDK
+        if (initDataUser && isValidTelegramUser(initDataUser)) {
+          console.log('✅ Got user from Telegram SDK:', initDataUser.id);
+          
+          // Получаем start_param для UTM меток
+          const startParam = lp.tgWebAppStartParam || null;
+          console.log('🏷️ Start param:', startParam);
+          
+          // Выполняем автоматическую регистрацию/обновление пользователя
+          await checkAndCreateUser(initDataUser, startParam);
+          return;
+        }
+
+        // Fallback: пробуем получить данные из WebApp напрямую
+        const { user, startParam } = extractTelegramData();
+        if (isValidTelegramUser(user)) {
+          console.log('✅ Got user from WebApp fallback:', user.id);
+          await checkAndCreateUser(user, startParam);
+          return;
+        }
+
+        console.log('ℹ️ No valid user data found for auto-registration');
+      } catch (error) {
+        console.error('❌ Error during user auto-registration:', error);
+      }
+    };
+
+    // Запускаем регистрацию с небольшой задержкой, чтобы Telegram успел инициализироваться
+    const timer = setTimeout(handleUserRegistration, 1000);
+    return () => clearTimeout(timer);
+  }, [initDataUser, lp.tgWebAppStartParam]);
+
   // Устанавливаем Safe Area отступы: комбинируем системные safe area + content safe area от Telegram
   useEffect(() => {
     const root = document.documentElement;
@@ -134,6 +174,6 @@ export function RootWithTelegram({ children }: { children: React.ReactNode }) {
       <RootInner>{children}</RootInner>
     </ErrorBoundary>
   ) : (
-    <div className="root-loading">Loading...</div>
+    <div className="root__loading">Загрузка...</div>
   );
 } 
