@@ -242,6 +242,19 @@
   background: #dbeafe;
 }
 
+.materialType {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #7c3aed;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: #f3e8ff;
+  font-family: var(--font-montserrat);
+}
+
 .materialTags {
   display: flex;
   flex-wrap: wrap;
@@ -415,6 +428,20 @@
 .checkboxLabel input[type="checkbox"] {
   width: auto !important;
   margin: 0;
+}
+
+.checkboxText {
+  font-size: 14px;
+  color: #374151;
+  font-family: var(--font-montserrat);
+}
+
+.fieldHint {
+  margin: 6px 0 0 0;
+  font-size: 12px;
+  color: #64748b;
+  font-family: var(--font-montserrat);
+  line-height: 1.4;
 }
 
 /* Tags */

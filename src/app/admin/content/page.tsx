@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, X, ExternalLink, Tag, Folder, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, Edit, Trash2, X, ExternalLink, Tag, Folder, ChevronDown, ChevronRight, Video } from 'lucide-react';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import styles from './page.module.css';
 
@@ -15,6 +15,8 @@ interface Material {
   tags: string[];
   is_active: boolean;
   display_order: number;
+  is_embedded_video: boolean;        // Новое поле: галочка "встроенное видео"
+  video_embed_code: string | null;   // Новое поле: код для вставки видео из Kinescope
   created_at: string;
   updated_at: string;
 }
@@ -27,6 +29,8 @@ interface MaterialForm {
   tags: string[];
   is_active: boolean;
   display_order: number;
+  is_embedded_video: boolean;        // Новое поле: галочка "встроенное видео"
+  video_embed_code: string;          // Новое поле: код для вставки видео из Kinescope
 }
 
 const initialForm: MaterialForm = {
@@ -36,7 +40,9 @@ const initialForm: MaterialForm = {
   section_key: 'workouts',
   tags: [],
   is_active: true,
-  display_order: 1
+  display_order: 1,
+  is_embedded_video: false,          // По умолчанию обычная ссылка
+  video_embed_code: ''               // Пустой код видео
 };
 
 // Доступные разделы
@@ -140,7 +146,9 @@ export default function AdminContent() {
       section_key: material.section_key,
       tags: material.tags,
       is_active: material.is_active,
-      display_order: material.display_order
+      display_order: material.display_order,
+      is_embedded_video: material.is_embedded_video,
+      video_embed_code: material.video_embed_code || ''
     });
     setShowForm(true);
   };
@@ -311,10 +319,15 @@ export default function AdminContent() {
                                     <div className={styles.materialDate}>
                                       Добавлено {formatDate(material.created_at)}
                                     </div>
-                                    {material.url && (
+                                    {material.is_embedded_video ? (
+                                      <div className={styles.materialType}>
+                                        <Video size={14} />
+                                        Встроенное видео
+                                      </div>
+                                    ) : material.url && (
                                       <a href={material.url} target="_blank" rel="noopener noreferrer" className={styles.materialLink}>
                                         <ExternalLink size={14} />
-                                        Ссылка
+                                        Внешняя ссылка
                                       </a>
                                     )}
                                   </div>
@@ -407,16 +420,56 @@ export default function AdminContent() {
                 />
               </div>
 
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label>Ссылка</label>
+              {/* Галочка для встроенного видео */}
+              <div className={styles.formGroup}>
+                <label className={styles.checkboxLabel}>
                   <input
-                    type="url"
-                    value={form.url}
-                    onChange={(e) => setForm({ ...form, url: e.target.value })}
-                    placeholder="https://example.com"
+                    type="checkbox"
+                    checked={form.is_embedded_video}
+                    onChange={(e) => setForm({ 
+                      ...form, 
+                      is_embedded_video: e.target.checked,
+                      // Очищаем поля при переключении типа
+                      url: e.target.checked ? '' : form.url,
+                      video_embed_code: e.target.checked ? form.video_embed_code : ''
+                    })}
                   />
-                </div>
+                  <span className={styles.checkboxText}>Встроенное видео (Kinescope)</span>
+                </label>
+                <p className={styles.fieldHint}>
+                  Если включено, материал будет открываться на отдельной странице с встроенным видео
+                </p>
+              </div>
+
+              <div className={styles.formRow}>
+                {/* Поле для ссылки ИЛИ кода видео в зависимости от типа */}
+                {!form.is_embedded_video ? (
+                  <div className={styles.formGroup}>
+                    <label>Ссылка</label>
+                    <input
+                      type="url"
+                      value={form.url}
+                      onChange={(e) => setForm({ ...form, url: e.target.value })}
+                      placeholder="https://example.com"
+                      required
+                    />
+                  </div>
+                ) : (
+                  <div className={styles.formGroup}>
+                    <label>Код видео Kinescope</label>
+                    <textarea
+                      value={form.video_embed_code}
+                      onChange={(e) => setForm({ ...form, video_embed_code: e.target.value })}
+                      placeholder='<div style="position: relative; padding-top: 56.25%; width: 100%"><iframe src="https://kinescope.io/embed/m5TDJj9zPbifV2HQfY8Kxc" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write; screen-wake-lock;" frameborder="0" allowfullscreen style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;"></iframe></div>'
+                      rows={6}
+                      required
+                    />
+                    <p className={styles.fieldHint}>
+                      Вставьте полный HTML код для встраивания видео из Kinescope
+                    </p>
+                  </div>
+                )}
+                
                 <div className={styles.formGroup}>
                   <label>Раздел</label>
                   <select

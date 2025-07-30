@@ -34,6 +34,8 @@ export interface Material {
   is_favorite: boolean;
   display_order: number;
   is_active: boolean;
+  is_embedded_video: boolean;          // Новое поле: галочка "встроенное видео"
+  video_embed_code: string | null;     // Новое поле: код для вставки видео из Kinescope
   created_at: string;
   updated_at: string;
 }
