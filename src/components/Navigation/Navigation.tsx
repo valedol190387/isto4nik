@@ -19,6 +19,11 @@ import styles from './Navigation.module.css';
 export function Navigation() {
   const pathname = usePathname();
   const user = useSignal(initData.user);
+
+  // Скрываем навигацию для админских страниц
+  if (pathname.startsWith('/admin')) {
+    return null;
+  }
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);

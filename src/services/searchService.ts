@@ -2,7 +2,7 @@ export interface SearchResult {
   id: string;
   title: string;
   content: string;
-  type: 'material' | 'review' | 'faq' | 'page';
+  type: 'material' | 'review' | 'faq' | 'page' | 'event';
   route: string;
   matchedText?: string;
 }
@@ -12,6 +12,7 @@ export interface SearchIndex {
   reviews: SearchResult[];
   faq: SearchResult[];
   pages: SearchResult[];
+  events: SearchResult[];
 }
 
 class SearchService {
@@ -19,7 +20,8 @@ class SearchService {
     materials: [],
     reviews: [],
     faq: [],
-    pages: []
+    pages: [],
+    events: []
   };
   
   private isIndexed = false;
@@ -134,6 +136,9 @@ class SearchService {
       // Индексируем отзывы
       await this.indexReviews();
       
+      // Индексируем события
+      await this.indexEvents();
+      
       this.isIndexed = true;
       console.log('Search index built successfully', this.getIndexStats());
     } catch (error) {
@@ -147,7 +152,8 @@ class SearchService {
       materials: [],
       reviews: [],
       faq: [],
-      pages: []
+      pages: [],
+      events: []
     };
   }
 
@@ -219,6 +225,35 @@ class SearchService {
       console.error('Error indexing materials:', error);
       // При ошибке добавляем мок данные
       this.addMockMaterials();
+    }
+  }
+
+  // Индексация событий
+  private async indexEvents(): Promise<void> {
+    try {
+      const response = await fetch('/api/events');
+      if (!response.ok) {
+        console.log('Events API not available');
+        return;
+      }
+      
+      const data = await response.json();
+      const events = data.success ? data.events : [];
+      
+      if (Array.isArray(events) && events.length > 0) {
+        events.forEach((event: any) => {
+          this.index.events.push({
+            id: `event-${event.id}`,
+            title: event.title,
+            content: `${event.title} ${event.description || ''} ${event.tags ? event.tags.join(' ') : ''}`,
+            type: 'event',
+            route: '/calendar'
+          });
+        });
+        console.log(`Indexed ${events.length} events`);
+      }
+    } catch (error) {
+      console.error('Error indexing events:', error);
     }
   }
 
@@ -352,7 +387,8 @@ class SearchService {
       material: [],
       review: [],
       faq: [],
-      page: []
+      page: [],
+      event: []
     };
 
     results.forEach(result => {

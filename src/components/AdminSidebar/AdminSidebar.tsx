@@ -1,0 +1,143 @@
+'use client';
+
+import { usePathname } from 'next/navigation';
+import Link from 'next/link';
+import { 
+  LayoutDashboard,
+  Calendar,
+  Users,
+  FileText,
+  Star,
+  MessageSquare,
+  Settings,
+  ChevronLeft,
+  ChevronRight
+} from 'lucide-react';
+import { useState } from 'react';
+import styles from './AdminSidebar.module.css';
+
+interface SidebarItem {
+  id: string;
+  title: string;
+  icon: React.ReactNode;
+  path: string;
+  badge?: number;
+}
+
+const sidebarItems: SidebarItem[] = [
+  {
+    id: 'dashboard',
+    title: 'Дашборд',
+    icon: <LayoutDashboard size={20} />,
+    path: '/admin/dashboard'
+  },
+  {
+    id: 'schedule',
+    title: 'Расписание',
+    icon: <Calendar size={20} />,
+    path: '/admin/schedule'
+  },
+  {
+    id: 'users',
+    title: 'Пользователи',
+    icon: <Users size={20} />,
+    path: '/admin/users'
+  },
+  {
+    id: 'content',
+    title: 'Контент',
+    icon: <FileText size={20} />,
+    path: '/admin/content'
+  },
+  {
+    id: 'reviews',
+    title: 'Отзывы',
+    icon: <Star size={20} />,
+    path: '/admin/reviews'
+  },
+  {
+    id: 'support',
+    title: 'Поддержка',
+    icon: <MessageSquare size={20} />,
+    path: '/admin/support'
+  },
+  {
+    id: 'settings',
+    title: 'Настройки',
+    icon: <Settings size={20} />,
+    path: '/admin/settings'
+  }
+];
+
+export function AdminSidebar() {
+  const pathname = usePathname();
+  const [isCollapsed, setIsCollapsed] = useState(false);
+
+  return (
+    <div className={`${styles.sidebar} ${isCollapsed ? styles.collapsed : ''}`}>
+      {/* Header */}
+      <div className={styles.header}>
+        <div className={styles.logo}>
+          {!isCollapsed && (
+            <>
+              <div className={styles.logoIcon}>A</div>
+              <span className={styles.logoText}>Ayuna Admin</span>
+            </>
+          )}
+          {isCollapsed && (
+            <div className={styles.logoIcon}>A</div>
+          )}
+        </div>
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className={styles.collapseBtn}
+        >
+          {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+        </button>
+      </div>
+
+      {/* Navigation */}
+      <nav className={styles.nav}>
+        <div className={styles.navSection}>
+          {!isCollapsed && (
+            <div className={styles.sectionTitle}>Основное</div>
+          )}
+          <ul className={styles.navList}>
+            {sidebarItems.map((item) => (
+              <li key={item.id}>
+                <Link
+                  href={item.path}
+                  className={`${styles.navItem} ${
+                    pathname === item.path ? styles.active : ''
+                  }`}
+                >
+                  <span className={styles.navIcon}>{item.icon}</span>
+                  {!isCollapsed && (
+                    <>
+                      <span className={styles.navText}>{item.title}</span>
+                      {item.badge && (
+                        <span className={styles.badge}>{item.badge}</span>
+                      )}
+                    </>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+
+      {/* Footer */}
+      <div className={styles.footer}>
+        {!isCollapsed && (
+          <div className={styles.footerContent}>
+            <div className={styles.userInfo}>
+              <div className={styles.userName}>Администратор</div>
+              <div className={styles.userRole}>Система управления</div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+} 

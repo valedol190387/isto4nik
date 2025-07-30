@@ -364,6 +364,9 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  color: var(--accent-blue);
 }
 
 .eventIconSvg {
@@ -554,4 +557,23 @@
   .headerTitle {
     font-size: 24px;
   }
+} 
+
+/* Event Tags */
+.eventTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.eventTag {
+  background: var(--border-light);
+  color: var(--text-secondary);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 300;
+  text-transform: lowercase;
+  font-family: 'Montserrat', sans-serif;
+  border: 1px solid var(--border-light);
 } 

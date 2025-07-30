@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, FileText, MessageSquare, HelpCircle, Home, Loader2 } from 'lucide-react';
+import { Search, X, FileText, MessageSquare, HelpCircle, Home, Loader2, Calendar } from 'lucide-react';
 import { searchService, type SearchResult } from '@/services/searchService';
 import styles from './SearchModal.module.css';
 
@@ -139,6 +139,8 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
         return <HelpCircle size={16} className={styles.typeIcon} />;
       case 'page':
         return <Home size={16} className={styles.typeIcon} />;
+      case 'event':
+        return <Calendar size={16} className={styles.typeIcon} />;
       default:
         return <Search size={16} className={styles.typeIcon} />;
     }
@@ -154,6 +156,8 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
         return 'FAQ';
       case 'page':
         return 'Страницы';
+      case 'event':
+        return 'События';
       default:
         return 'Результат';
     }
@@ -202,7 +206,7 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
               <Search className={styles.emptyIcon} />
               <h3 className={styles.emptyTitle}>Поиск по приложению</h3>
               <p className={styles.emptyText}>
-                Введите запрос для поиска по материалам, отзывам, FAQ и страницам
+                Введите запрос для поиска по материалам, отзывам, событиям, FAQ и страницам
               </p>
             </div>
           ) : query.length < 2 ? (

@@ -1,7 +1,7 @@
 'use client';
 
 import { StagewiseToolbar } from '@stagewise/toolbar-next';
-import ReactPlugin from '@stagewise-plugins/react';
+// import ReactPlugin from '@stagewise-plugins/react';
 
 export function StagewiseToolbarClient() {
   // Проверяем, что мы в режиме разработки и на клиенте
@@ -12,7 +12,7 @@ export function StagewiseToolbarClient() {
   return (
     <StagewiseToolbar
       config={{
-        plugins: [ReactPlugin],
+        plugins: [],
       }}
     />
   );

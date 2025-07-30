@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Zap, Heart, Sun, Loader2, Star, Sparkles } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Loader2 } from "lucide-react"
+import { renderIcon } from '@/utils/iconRenderer'
 import { Page } from '@/components/Page'
 import styles from './page.module.css'
 
@@ -14,10 +15,9 @@ interface DBEvent {
   event_date: string;
   event_time?: string;
   icon: string | null;
-  color_class: string | null;
   is_active: boolean;
   link: string | null;
-  category: string | null;
+  tags: string[] | null;
 }
 
 // Получаем текущую дату для генерации событий
@@ -30,14 +30,7 @@ const months = [
   "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"
 ]
 
-const categoryNames: Record<string, string> = {
-  'практика': 'Практика',
-  'лекция': 'Лекция',
-  'активация': 'Активация',
-  'медитация': 'Медитация',
-  'встреча': 'Встреча',
-  'энергия': 'Энергия'
-}
+// Больше не нужно, так как используем теги напрямую
 
 export default function CalendarPage() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
@@ -62,32 +55,14 @@ export default function CalendarPage() {
             // Получаем дату события
             const eventDate = new Date(event.event_date)
             
-            // Получаем иконку в зависимости от значения из БД
-            let icon = Star
-            if (event.icon === 'calendar') icon = CalendarIcon
-            else if (event.icon === 'zap') icon = Zap
-            else if (event.icon === 'heart') icon = Heart
-            else if (event.icon === 'sun') icon = Sun
-            else if (event.icon === 'sparkles') icon = Sparkles
-            
-            // Получаем цвет в зависимости от значения из БД (используем палитру Ayuna)
-            let color = "bg-[var(--accent-blue)]/10 text-[var(--accent-blue)]"
-            if (event.color_class === 'orange') 
-              color = "bg-orange-100 text-orange-600"
-            else if (event.color_class === 'red') 
-              color = "bg-pink-100 text-pink-600"
-            else if (event.color_class === 'green') 
-              color = "bg-[var(--accent-blue)]/10 text-[var(--accent-blue)]"
-            
             return {
               id: event.id,
               date: eventDate,
               title: event.title,
-              category: event.category || "событие",
+              tags: event.tags || [],
               time: event.event_time ? `${event.event_time} МСК` : "12:00 МСК",
               description: event.description || "",
-              icon: icon,
-              color: color,
+              icon: event.icon || 'Star',
               link: event.link
             }
           })
@@ -119,13 +94,14 @@ export default function CalendarPage() {
       ? event.date.toDateString() === selectedDate.toDateString()
       : event.date.getMonth() === currentViewMonth && event.date.getFullYear() === currentViewYear
     
-    const categoryMatch = !selectedCategory || event.category === selectedCategory
+    const categoryMatch = !selectedCategory || event.tags?.includes(selectedCategory)
     
     return dateMatch && categoryMatch
   })
   
-  // Получаем уникальные категории для фильтров
-  const categories = Array.from(new Set(events.map(event => event.category)))
+  // Получаем уникальные теги для фильтров
+  const allTags = events.flatMap(event => event.tags || [])
+  const uniqueTags = [...new Set(allTags)].filter(Boolean)
   
   // Получаем даты с событиями для подсветки в календаре (для просматриваемого месяца)
   const eventDates = viewMonthEvents.map(event => event.date.getDate())
@@ -233,8 +209,8 @@ export default function CalendarPage() {
             )}
           </div>
           
-          {/* Category Filters */}
-          {categories.length > 0 && (
+          {/* Tag Filters */}
+          {uniqueTags.length > 0 && (
             <div className={styles.filtersCard}>
               <h3 className={styles.filtersTitle}>Фильтры</h3>
               <div className={styles.filterButtons}>
@@ -244,13 +220,13 @@ export default function CalendarPage() {
                 >
                   Все
                 </button>
-                {categories.map(category => (
+                {uniqueTags.map((tag: string) => (
                   <button
-                    key={category}
-                    onClick={() => setSelectedCategory(category)}
-                    className={`${styles.filterButton} ${selectedCategory === category ? styles.filterButtonActive : ''}`}
+                    key={tag}
+                    onClick={() => setSelectedCategory(tag)}
+                    className={`${styles.filterButton} ${selectedCategory === tag ? styles.filterButtonActive : ''}`}
                   >
-                    {categoryNames[category] || category}
+                    {tag}
                   </button>
                 ))}
               </div>
@@ -308,22 +284,29 @@ export default function CalendarPage() {
             {filteredEvents.length > 0 ? (
               <div className={styles.eventsList}>
                 {filteredEvents.map((event) => {
-                  const IconComponent = event.icon
-                  
                   return (
                     <div key={event.id} className={styles.eventCard}>
                       <div className={styles.eventContent}>
-                        <div className={`${styles.eventIcon} ${event.color}`}>
-                          <IconComponent className={styles.eventIconSvg} />
+                        <div className={styles.eventIcon}>
+                          {renderIcon(event.icon, 20)}
                         </div>
                         <div className={styles.eventDetails}>
                           <div className={styles.eventHeader}>
                             <h4 className={styles.eventTitle}>
                               {event.title}
                             </h4>
-                            <span className={styles.eventCategory}>
-                              {categoryNames[event.category] || event.category}
-                            </span>
+                            {event.tags && event.tags.length > 0 && (
+                              <div className={styles.eventTags}>
+                                                                 {event.tags.slice(0, 2).map((tag: string, index: number) => (
+                                  <span key={index} className={styles.eventTag}>
+                                    {tag}
+                                  </span>
+                                ))}
+                                {event.tags.length > 2 && (
+                                  <span className={styles.eventTag}>+{event.tags.length - 2}</span>
+                                )}
+                              </div>
+                            )}
                           </div>
                           <div className={styles.eventMeta}>
                             <span>{formatDate(event.date)}</span>
