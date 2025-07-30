@@ -22,6 +22,7 @@ const montserrat = Montserrat({
 });
 import { I18nProvider } from '@/core/i18n/provider';
 import { Navigation } from '@/components/Navigation/Navigation';
+import UserAutoRegistration from '@/components/UserAutoRegistration';
 
 
 import '@telegram-apps/telegram-ui/dist/styles.css';
@@ -40,8 +41,10 @@ export default async function RootLayout({ children }: PropsWithChildren) {
     <html lang={locale} suppressHydrationWarning>
       <body className={`${montserrat.variable} ${cormorant.variable}`}>
         <I18nProvider>
-          <Root>{children}</Root>
-          <Navigation />
+          <UserAutoRegistration>
+            <Root>{children}</Root>
+            <Navigation />
+          </UserAutoRegistration>
         </I18nProvider>
       </body>
     </html>
