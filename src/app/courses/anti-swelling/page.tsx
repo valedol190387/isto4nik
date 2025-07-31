@@ -275,9 +275,8 @@ export default function AntiSwellingPage() {
         {/* Кнопка курса */}
         <div className={styles.courseButtonContainer}>
           <a 
-            href={isSubscriptionActive && courseLink ? courseLink : "#"}
-            target={isSubscriptionActive && courseLink ? "_blank" : "_self"}
-            rel={isSubscriptionActive && courseLink ? "noopener noreferrer" : ""}
+            href={isSubscriptionActive ? "/materials?section=course_anti_swelling" : "#"}
+            target="_self"
             onClick={handleCourseClick}
             className={`${styles.courseButton} ${!isSubscriptionActive ? styles.lockedButton : ''} ${loadingUserData ? styles.disabled : ''}`}
           >

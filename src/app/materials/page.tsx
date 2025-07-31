@@ -1,10 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Page } from '@/components/Page';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FileText, Heart, Play, ExternalLink, Dumbbell, BookOpen, Sparkles, UtensilsCrossed, Video, Loader2 } from 'lucide-react';
+import { FileText, Heart, Play, ExternalLink, Dumbbell, BookOpen, Sparkles, UtensilsCrossed, Video, Loader2, Sun, Droplets, HelpCircle, Lock, X } from 'lucide-react';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import styles from './page.module.css';
@@ -20,6 +21,34 @@ interface Section {
 
 // Данные разделов (статичные)
 const sections: Section[] = [
+  { 
+    id: 'course_flat_belly', 
+    name: 'Курс: Плоский живот', 
+    description: 'Комплексная программа для создания идеального живота',
+    icon: Dumbbell,
+    image: '/images/materials/slim.png'
+  },
+  { 
+    id: 'course_anti_swelling', 
+    name: 'Курс: Отёки', 
+    description: 'Эффективные методы борьбы с отёками и улучшения самочувствия',
+    icon: Droplets,
+    image: '/images/materials/oteki.png'
+  },
+  { 
+    id: 'course_bloom', 
+    name: 'Курс: Расцветай', 
+    description: 'Программа для раскрытия внутренней красоты и уверенности',
+    icon: Sun,
+    image: '/images/materials/sun.png'
+  },
+  { 
+    id: 'useful', 
+    name: 'Полезное', 
+    description: 'Практические советы и рекомендации для здоровья и красоты',
+    icon: HelpCircle,
+    image: '/images/materials/other.png'
+  },
   { 
     id: 'workouts', 
     name: 'Тренировки', 
@@ -60,13 +89,17 @@ const sections: Section[] = [
 export default function MaterialsPage() {
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeSection, setActiveSection] = useState<string>('workouts');
+  const [activeSection, setActiveSection] = useState<string>('course_flat_belly');
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [currentDot, setCurrentDot] = useState(0);
+  const [showComingSoonModal, setShowComingSoonModal] = useState(false);
 
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
+  
+  // Читаем URL параметры
+  const searchParams = useSearchParams();
 
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
@@ -131,10 +164,25 @@ export default function MaterialsPage() {
     fetchData();
   }, []);
 
-  const currentSection = sections.find(section => section.id === activeSection);
+  // Инициализация раздела из URL при загрузке
+  useEffect(() => {
+    const sectionFromUrl = searchParams.get('section');
+    if (sectionFromUrl && sectionFromUrl !== 'course_bloom') {
+      // Проверяем что раздел существует
+      const validSection = sections.find(section => section.id === sectionFromUrl);
+      if (validSection) {
+        setActiveSection(sectionFromUrl);
+      }
+    }
+  }, [searchParams]);
+
+  // Если выбран заблокированный раздел, переключаем на первый доступный
+  const actualActiveSection = activeSection === 'course_bloom' ? 'course_flat_belly' : activeSection;
+  
+  const currentSection = sections.find(section => section.id === actualActiveSection);
   
   // Получаем материалы текущего раздела
-  const sectionMaterials = materials.filter(material => material.section_key === activeSection);
+  const sectionMaterials = materials.filter(material => material.section_key === actualActiveSection);
   
   // Собираем все теги из материалов текущего раздела
   const allTags = Array.from(new Set(sectionMaterials.flatMap(material => material.tags)));
@@ -230,10 +278,14 @@ export default function MaterialsPage() {
                 <button
                   key={section.id}
                   onClick={() => {
-                    setActiveSection(section.id);
-                    setSelectedTag(null);
+                    if (section.id === 'course_bloom') {
+                      setShowComingSoonModal(true);
+                    } else {
+                      setActiveSection(section.id);
+                      setSelectedTag(null);
+                    }
                   }}
-                  className={styles.highlightCard}
+                  className={`${styles.highlightCard} ${section.id === 'course_bloom' ? styles.lockedSection : ''}`}
                 >
                   <div className={styles.highlightContent}>
                     <Image
@@ -243,6 +295,13 @@ export default function MaterialsPage() {
                       className={styles.highlightImage}
                       sizes="120px"
                     />
+                    {section.id === 'course_bloom' && (
+                      <div className={styles.lockOverlay}>
+                        <div className={styles.lockIcon}>
+                          <Lock size={32} />
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </button>
               );
@@ -340,6 +399,32 @@ export default function MaterialsPage() {
         {/* Отступ снизу */}
         <div className={styles.bottomSpacing}></div>
       </div>
+
+      {/* Модальное окно "Скоро откроется" */}
+      {showComingSoonModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowComingSoonModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button 
+              className={styles.closeButton}
+              onClick={() => setShowComingSoonModal(false)}
+            >
+              <X size={24} />
+            </button>
+            
+            <div className={styles.modalBody}>
+              <div className={styles.modalIcon}>
+                <Lock size={48} />
+              </div>
+              
+              <h3 className={styles.modalTitle}>Курс "Расцветай"</h3>
+              
+              <p className={styles.modalText}>
+                Этот курс откроется позже. Следите за обновлениями!
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </Page>
   );
 } 

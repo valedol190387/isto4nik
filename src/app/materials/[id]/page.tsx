@@ -86,10 +86,6 @@ export default function MaterialViewPage() {
   return (
     <Page>
       <div className={styles.container}>
-        {/* Шапка без кнопки назад (используется системная кнопка Telegram) */}
-        <header className={styles.header}>
-        </header>
-
         {/* Основной контент */}
         <main className={styles.main}>
           {/* Заголовок материала */}

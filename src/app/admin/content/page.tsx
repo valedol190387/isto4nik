@@ -37,7 +37,7 @@ const initialForm: MaterialForm = {
   title: '',
   description: '',
   url: '',
-  section_key: 'workouts',
+  section_key: 'course_flat_belly',
   tags: [],
   is_active: true,
   display_order: 1,
@@ -47,6 +47,10 @@ const initialForm: MaterialForm = {
 
 // Доступные разделы
 const sectionOptions = [
+  { value: 'course_flat_belly', label: 'Курс: Плоский живот' },
+  { value: 'course_anti_swelling', label: 'Курс: Отёки' },
+  { value: 'course_bloom', label: 'Курс: Расцветай' },
+  { value: 'useful', label: 'Полезное' },
   { value: 'workouts', label: 'Тренировки' },
   { value: 'guides', label: 'Методички' },
   { value: 'motivation', label: 'Мотивация' },
@@ -56,10 +60,12 @@ const sectionOptions = [
 
 // Предустановленные теги
 const predefinedTags = [
+  'плоский живот', 'пресс', 'похудение', 'отеки', 'лимфодренаж', 'детокс',
+  'расцветай', 'красота', 'уверенность', 'полезное', 'советы', 'здоровье',
   'утро', 'зарядка', 'энергия', 'йога', 'релакс', 'гибкость',
-  'кардио', 'похудение', 'интенсив', 'силовые', 'пресс', 'ноги',
-  'руки', 'спина', 'растяжка', 'медитация', 'дыхание', 'мотивация',
-  'здоровье', 'красота', 'питание', 'рецепты', 'детокс', 'витамины'
+  'кардио', 'интенсив', 'силовые', 'ноги', 'руки', 'спина', 
+  'растяжка', 'медитация', 'дыхание', 'мотивация', 'питание', 
+  'рецепты', 'витамины'
 ];
 
 export default function AdminContent() {
@@ -70,7 +76,7 @@ export default function AdminContent() {
   const [form, setForm] = useState<MaterialForm>(initialForm);
   const [saving, setSaving] = useState(false);
   const [newTag, setNewTag] = useState('');
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['workouts']));
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['course_flat_belly']));
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const router = useRouter();
 

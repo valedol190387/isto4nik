@@ -109,7 +109,11 @@ export default function CalendarPage() {
   // Генерируем дни для календаря
   const firstDay = new Date(currentViewYear, currentViewMonth, 1)
   const startDate = new Date(firstDay)
-  startDate.setDate(startDate.getDate() - firstDay.getDay())
+  // Корректируем для понедельника как первого дня недели
+  // getDay() возвращает 0 для воскресенья, 1 для понедельника и т.д.
+  // Нам нужно чтобы понедельник был 0, поэтому: (getDay() + 6) % 7
+  const dayOffset = (firstDay.getDay() + 6) % 7
+  startDate.setDate(startDate.getDate() - dayOffset)
 
   const calendarDays = []
   const current = new Date(startDate)
@@ -237,7 +241,7 @@ export default function CalendarPage() {
           <div className={styles.calendarCard}>
             <div className={`${styles.calendarGrid} ${viewMonthEvents.length === 0 ? styles.calendarDisabled : ''}`}>
               <div className={styles.weekDays}>
-                {['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'].map((day) => (
+                {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map((day) => (
                   <div key={day} className={styles.weekDay}>
                     {day}
                   </div>

@@ -321,6 +321,9 @@
   padding-left: calc(16px + var(--safe-area-inset-left, 0px));
   padding-right: calc(16px + var(--safe-area-inset-right, 0px));
   margin: 40px 0 40px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .courseButton {
@@ -356,6 +359,17 @@
 .courseButton:disabled {
   opacity: 0.7;
   cursor: not-allowed;
+}
+
+/* Кнопка материалов */
+.materialsButton {
+  background: var(--accent-blue) !important;
+  font-size: 22px !important;
+}
+
+.materialsButton:hover {
+  background: #1c7a8f !important;
+  transform: translateY(-2px);
 }
 
 .buttonContent {
