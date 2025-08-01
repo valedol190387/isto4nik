@@ -95,16 +95,16 @@ export function Navigation() {
           <span className={styles.navText}>Главная</span>
         </Link>
 
-        {/* Материалы */}
+        {/* Курсы */}
         {(!loadingUserData && isSubscriptionActive) ? (
           <Link href="/materials" className={`${styles.navItem} ${pathname === '/materials' ? styles.active : ''}`}>
             <FileText className={styles.navIcon} size={20} />
-            <span className={styles.navText}>Материалы</span>
+            <span className={styles.navText}>Курсы</span>
           </Link>
         ) : (
           <div className={`${styles.navItem} ${styles.lockedItem}`} onClick={handleLockedClick}>
             <Lock className={styles.navIcon} size={20} />
-            <span className={styles.navText}>Материалы</span>
+            <span className={styles.navText}>Курсы</span>
           </div>
         )}
 

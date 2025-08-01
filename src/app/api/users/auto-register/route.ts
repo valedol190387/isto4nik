@@ -99,6 +99,18 @@ export async function POST(request: Request) {
       utm_4: utmParams.utm_4,
       utm_5: utmParams.utm_5,
       
+      // Дефолтные доступы к курсам (НОВЫЕ КЛЮЧИ!)
+      course_access: {
+        stomach: true,        // course_flat_belly - всегда открыт
+        swelling: false,      // course_anti_swelling
+        blossom: false,       // course_bloom  
+        flexibility: false,   // useful (Рельеф и гибкость)
+        face: false,          // workouts (Для лица)
+        foot: false,          // guides (Стопы)
+        bodyflow: false,      // motivation (BodyFlow)
+        posture: false        // nutrition (Осанка)
+      },
+      
       // Дополнительные данные если переданы
       ...otherData
     };

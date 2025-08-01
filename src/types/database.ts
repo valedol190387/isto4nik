@@ -40,6 +40,20 @@ export interface Material {
   updated_at: string;
 }
 
+export interface CourseAccess {
+  stomach: boolean;       // course_flat_belly
+  swelling: boolean;      // course_anti_swelling  
+  blossom: boolean;       // course_bloom
+  flexibility: boolean;   // useful (Рельеф и гибкость)
+  face: boolean;          // workouts (Для лица)
+  foot: boolean;          // guides (Стопы)
+  bodyflow: boolean;      // motivation (BodyFlow)
+  posture: boolean;       // nutrition (Осанка)
+  
+  // Index signature для совместимости с Record<string, boolean>
+  [key: string]: boolean;
+}
+
 export interface User {
   id: number;
   telegram_id: number;
@@ -71,6 +85,8 @@ export interface User {
   testing: boolean;
   istochnik: string | null;
   forma_oplaty: string | null;
+  total_payments: number;
+  course_access: CourseAccess | null;
   created_at: string;
   updated_at: string;
 }
@@ -114,6 +130,16 @@ export interface Payment {
   created_at: string;
 }
 
+export interface FAQ {
+  id: number;
+  question: string;
+  answer: string;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -146,6 +172,11 @@ export type Database = {
         Row: Payment;
         Insert: Omit<Payment, 'id' | 'created_at'>;
         Update: Partial<Omit<Payment, 'id'>>;
+      };
+      faq: {
+        Row: FAQ;
+        Insert: Omit<FAQ, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<FAQ, 'id'>>;
       };
     };
   };

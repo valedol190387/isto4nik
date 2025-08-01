@@ -8,6 +8,7 @@ import {
   Users,
   FileText,
   Star,
+  MessageCircle,
   MessageSquare,
   Settings,
   ChevronLeft,
@@ -54,6 +55,18 @@ const sidebarItems: SidebarItem[] = [
     title: 'Отзывы',
     icon: <Star size={20} />,
     path: '/admin/reviews'
+  },
+  {
+    id: 'faq',
+    title: 'FAQ',
+    icon: <MessageCircle size={20} />,
+    path: '/admin/faq'
+  },
+  {
+    id: 'course-access',
+    title: 'Доступы к курсам',
+    icon: <Users size={20} />,
+    path: '/admin/course-access'
   }
 ];
 

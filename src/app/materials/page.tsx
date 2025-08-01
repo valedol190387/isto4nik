@@ -8,6 +8,8 @@ import Image from 'next/image';
 import { FileText, Heart, Play, ExternalLink, Dumbbell, BookOpen, Sparkles, UtensilsCrossed, Video, Loader2, Sun, Droplets, HelpCircle, Lock, X } from 'lucide-react';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { useCourseAccess } from '@/hooks/useCourseAccess';
+import { hasAccessToSection } from '@/utils/courseAccessMapping';
 import styles from './page.module.css';
 
 // Интерфейс для разделов (локальные данные)
@@ -44,45 +46,38 @@ const sections: Section[] = [
   },
   { 
     id: 'useful', 
-    name: 'Полезное', 
-    description: 'Практические советы и рекомендации для здоровья и красоты',
+    name: 'Рельеф и гибкость', 
+    description: 'Упражнения для создания красивого рельефа и развития гибкости',
     icon: HelpCircle,
-    image: '/images/materials/other.png'
+    image: '/images/materials/relef.png'
   },
   { 
     id: 'workouts', 
-    name: 'Тренировки', 
-    description: 'Видеотренировки и практики для красоты и здоровья',
+    name: 'Для лица', 
+    description: 'Специальные упражнения и практики для красоты лица',
     icon: Dumbbell,
-    image: '/images/materials/trening.png'
+    image: '/images/materials/face.png'
   },
   { 
     id: 'guides', 
-    name: 'Методички', 
-    description: 'Подробные руководства и инструкции по уходу за собой',
+    name: 'Стопы', 
+    description: 'Комплексы упражнений для здоровья и красоты стоп',
     icon: BookOpen,
-    image: '/images/materials/book.png'
+    image: '/images/materials/foot.png'
   },
   { 
     id: 'motivation', 
-    name: 'Мотивация', 
-    description: 'Вдохновляющие материалы для поддержания мотивации',
+    name: 'BodyFlow', 
+    description: 'Плавные движения и мобильность для гармонии тела',
     icon: Sparkles,
-    image: '/images/materials/motivation.png'
+    image: '/images/materials/mobility.png'
   },
   { 
     id: 'nutrition', 
-    name: 'Питание', 
-    description: 'Рецепты и советы по питанию для красоты изнутри',
+    name: 'Осанка', 
+    description: 'Упражнения и рекомендации для правильной осанки',
     icon: UtensilsCrossed,
-    image: '/images/materials/food.png'
-  },
-  { 
-    id: 'livestreams', 
-    name: 'Прямые эфиры', 
-    description: 'Записи прямых эфиров и вебинаров',
-    icon: Video,
-    image: '/images/materials/live.png'
+    image: '/images/materials/osanka.png'
   }
 ];
 
@@ -94,9 +89,14 @@ export default function MaterialsPage() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [currentDot, setCurrentDot] = useState(0);
   const [showComingSoonModal, setShowComingSoonModal] = useState(false);
+  const [lockedSectionName, setLockedSectionName] = useState<string>('');
+  const [requestingAccess, setRequestingAccess] = useState(false);
 
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
+  
+  // Получаем доступы к курсам из БД
+  const { access: courseAccess, loading: accessLoading } = useCourseAccess();
   
   // Читаем URL параметры
   const searchParams = useSearchParams();
@@ -177,7 +177,8 @@ export default function MaterialsPage() {
   }, [searchParams]);
 
   // Если выбран заблокированный раздел, переключаем на первый доступный
-  const actualActiveSection = activeSection === 'course_bloom' ? 'course_flat_belly' : activeSection;
+  const hasAccessToActiveSection = courseAccess ? hasAccessToSection(courseAccess, activeSection) : false;
+  const actualActiveSection = hasAccessToActiveSection ? activeSection : 'course_flat_belly';
   
   const currentSection = sections.find(section => section.id === actualActiveSection);
   
@@ -191,6 +192,54 @@ export default function MaterialsPage() {
   const filteredMaterials = selectedTag 
     ? sectionMaterials.filter(material => material.tags.includes(selectedTag))
     : sectionMaterials;
+
+  // Функция для запроса доступа к курсу через webhook
+  const requestCourseAccess = async () => {
+    try {
+      setRequestingAccess(true);
+      
+      const telegramId = getTelegramId();
+      
+      // Получаем данные пользователя из БД
+      const userResponse = await fetch(`/api/users?telegramId=${telegramId}`);
+      
+      if (!userResponse.ok) {
+        alert('Не удалось получить данные пользователя');
+        return;
+      }
+      
+      const user = await userResponse.json();
+      
+      // Отправляем данные на webhook
+      const webhookData = {
+        telegram_id: user.telegram_id,
+        status: user.status,
+        tg_username: user.tg_username,
+        course_access: user.course_access
+      };
+      
+      const webhookResponse = await fetch('https://n8n.ayunabackoffice.ru/webhook/courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookData)
+      });
+      
+      if (webhookResponse.ok) {
+        alert('Запрос на доступ отправлен! В боте вы увидите дальнейшие инструкции.');
+        setShowComingSoonModal(false);
+      } else {
+        alert('Произошла ошибка при отправке запроса. Попробуйте позже.');
+      }
+      
+    } catch (error) {
+      console.error('Error requesting course access:', error);
+      alert('Произошла ошибка при отправке запроса. Попробуйте позже.');
+    } finally {
+      setRequestingAccess(false);
+    }
+  };
 
   const toggleFavorite = async (materialId: number) => {
     const telegramId = user?.id?.toString() || getTelegramId();
@@ -244,12 +293,12 @@ export default function MaterialsPage() {
     }
   };
 
-  if (loading) {
+  if (loading || accessLoading) {
     return (
       <div className={styles.loading}>
         <div className={styles.loadingContent}>
           <Loader2 className={styles.loadingIcon} />
-          <p>Загружаем материалы...</p>
+          <p>Загружаем курсы...</p>
         </div>
       </div>
     );
@@ -262,7 +311,7 @@ export default function MaterialsPage() {
         <div className={styles.header}>
           <div className={styles.headerContent}>
             <FileText className={styles.headerIcon} />
-            <h1 className={styles.headerTitle}>МАТЕРИАЛЫ</h1>
+            <h1 className={styles.headerTitle}>КУРСЫ</h1>
           </div>
         </div>
 
@@ -274,18 +323,22 @@ export default function MaterialsPage() {
             onScroll={handleScroll}
           >
             {sections.map((section) => {
+              const sectionHasAccess = courseAccess ? hasAccessToSection(courseAccess, section.id) : false;
+              const isLocked = !sectionHasAccess;
+              
               return (
                 <button
                   key={section.id}
                   onClick={() => {
-                    if (section.id === 'course_bloom') {
+                    if (isLocked) {
+                      setLockedSectionName(section.name);
                       setShowComingSoonModal(true);
                     } else {
                       setActiveSection(section.id);
                       setSelectedTag(null);
                     }
                   }}
-                  className={`${styles.highlightCard} ${section.id === 'course_bloom' ? styles.lockedSection : ''}`}
+                  className={`${styles.highlightCard} ${isLocked ? styles.lockedSection : ''}`}
                 >
                   <div className={styles.highlightContent}>
                     <Image
@@ -295,7 +348,7 @@ export default function MaterialsPage() {
                       className={styles.highlightImage}
                       sizes="120px"
                     />
-                    {section.id === 'course_bloom' && (
+                    {isLocked && (
                       <div className={styles.lockOverlay}>
                         <div className={styles.lockIcon}>
                           <Lock size={32} />
@@ -400,7 +453,7 @@ export default function MaterialsPage() {
         <div className={styles.bottomSpacing}></div>
       </div>
 
-      {/* Модальное окно "Скоро откроется" */}
+      {/* Модальное окно доступа к курсу */}
       {showComingSoonModal && (
         <div className={styles.modalOverlay} onClick={() => setShowComingSoonModal(false)}>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
@@ -411,16 +464,26 @@ export default function MaterialsPage() {
               <X size={24} />
             </button>
             
-            <div className={styles.modalBody}>
+            <div className={styles.modalHeader}>
               <div className={styles.modalIcon}>
-                <Lock size={48} />
+                <Lock size={32} />
               </div>
-              
-              <h3 className={styles.modalTitle}>Курс "Расцветай"</h3>
-              
+              <h2 className={styles.modalTitle}>Курс пока недоступен</h2>
+            </div>
+            
+            <div className={styles.modalBody}>
               <p className={styles.modalText}>
-                Этот курс откроется позже. Следите за обновлениями!
+                Открытие этого курса возможно только через нашего Telegram-бота.
+                Там вы узнаете условия доступа и сможете разблокировать материалы всего за пару кликов
               </p>
+              
+              <button
+                className={styles.subscribeButton}
+                onClick={requestCourseAccess}
+                disabled={requestingAccess}
+              >
+                {requestingAccess ? 'Отправляем...' : 'ПОЛУЧИТЬ ДОСТУП'}
+              </button>
             </div>
           </div>
         </div>
