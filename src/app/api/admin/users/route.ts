@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
       .from('payments')
       .select('telegram_id, payment_callback');
 
-    // Группируем платежи по telegram_id (только успешные платежи)
+    // Группируем платежи по telegram_id (все платежи с суммой)
     const paymentsByUser: Record<string, number> = {};
     (payments || []).forEach((payment: any) => {
       let amount = 0;
@@ -109,21 +109,27 @@ export async function GET(request: NextRequest) {
         // Если payment_callback - это строка, парсим её
         if (typeof payment.payment_callback === 'string') {
           try {
-            const parsed = JSON.parse(payment.payment_callback);
-            amount = parsed.Amount || parsed.PaymentAmount || 0;
+            // Сначала парсим внешний JSON (если есть)
+            let parsed = JSON.parse(payment.payment_callback);
+            // Если внутри ещё одна JSON строка, парсим её тоже
+            if (typeof parsed === 'string') {
+              parsed = JSON.parse(parsed);
+            }
+            amount = parseFloat(parsed.Amount || parsed.PaymentAmount || 0);
             status = parsed.Status;
           } catch (e) {
             console.error('Error parsing payment_callback:', e);
           }
         } else {
           // Если это уже объект
-          amount = payment.payment_callback.Amount || payment.payment_callback.PaymentAmount || 0;
+          amount = parseFloat(payment.payment_callback.Amount || payment.payment_callback.PaymentAmount || 0);
           status = payment.payment_callback.Status;
         }
       }
       
-      // Учитываем только успешные платежи
-      if (telegramId && amount && status === 'Completed') {
+      // Учитываем все платежи с положительной суммой
+      // Исключаем только явно неуспешные статусы
+      if (telegramId && amount > 0 && status !== 'Failed' && status !== 'Cancelled') {
         paymentsByUser[telegramId] = (paymentsByUser[telegramId] || 0) + amount;
       }
     });
