@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
       
       // Учитываем только успешные платежи
       if (telegramId && amount && status === 'Completed') {
-        paymentsByUser[telegramId] = (paymentsByUser[telegramId] || 0) + parseFloat(amount);
+        paymentsByUser[telegramId] = (paymentsByUser[telegramId] || 0) + amount;
       }
     });
 
