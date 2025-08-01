@@ -559,12 +559,14 @@ export default function AdminUsersPage() {
             <div className={styles.clearFiltersRow}>
               <button
                 onClick={() => {
+                  setSearchTerm('');
                   setUtm1Filter('');
                   setUtm2Filter('');
                   setUtm3Filter('');
                   setUtm4Filter('');
                   setUtm5Filter('');
                   setPaymentFilter('all');
+                  setStatusFilter('all');
                 }}
                 className={styles.clearFiltersBtn}
               >
@@ -675,6 +677,19 @@ export default function AdminUsersPage() {
                   className={styles.paginationBtn}
                 >
                   Вперед
+                </button>
+                <button
+                  onClick={async () => {
+                    setIsLoading(true);
+                    await loadAllUsers();
+                    setUsers(allUsers);
+                    setCurrentPage(1);
+                    setIsLoading(false);
+                  }}
+                  className={`${styles.paginationBtn} ${styles.showAllBtn}`}
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Загрузка...' : 'Все'}
                 </button>
               </div>
             </div>

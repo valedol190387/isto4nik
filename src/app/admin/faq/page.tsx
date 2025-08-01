@@ -17,7 +17,7 @@ const initialForm: FAQForm = {
   question: '',
   answer: '',
   is_active: true,
-  sort_order: 0
+  sort_order: 1
 };
 
 export default function AdminFAQ() {
@@ -57,10 +57,7 @@ export default function AdminFAQ() {
     try {
       setSaving(true);
       
-      // Автоматически устанавливаем sort_order если не указан
-      if (form.sort_order === 0) {
-        form.sort_order = faqItems.length + 1;
-      }
+      // sort_order уже установлен в форме
       
       const url = editingFaq ? '/api/admin/faq' : '/api/admin/faq';
       const method = editingFaq ? 'PUT' : 'POST';
@@ -131,6 +128,21 @@ export default function AdminFAQ() {
     setShowForm(false);
   };
 
+  const getNextSortOrder = () => {
+    if (faqItems.length === 0) return 1;
+    const maxOrder = Math.max(...faqItems.map(item => item.sort_order));
+    return maxOrder + 1;
+  };
+
+  const handleAddNew = () => {
+    setEditingFaq(null);
+    setForm({
+      ...initialForm,
+      sort_order: getNextSortOrder()
+    });
+    setShowForm(true);
+  };
+
   const showMore = () => {
     setVisibleCount(prev => prev + ITEMS_PER_PAGE);
   };
@@ -170,7 +182,7 @@ export default function AdminFAQ() {
           </div>
           <div className={styles.headerRight}>
             <button 
-              onClick={() => setShowForm(true)}
+              onClick={handleAddNew}
               className={styles.addBtn}
             >
               <Plus size={20} />

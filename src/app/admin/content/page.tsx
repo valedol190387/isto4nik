@@ -184,6 +184,22 @@ export default function AdminContent() {
     }
   };
 
+  const getNextDisplayOrder = (sectionKey: string) => {
+    const sectionMaterials = materials.filter(material => material.section_key === sectionKey);
+    if (sectionMaterials.length === 0) return 1;
+    const maxOrder = Math.max(...sectionMaterials.map(material => material.display_order));
+    return maxOrder + 1;
+  };
+
+  const handleAddNew = () => {
+    setEditingMaterial(null);
+    setForm({
+      ...initialForm,
+      display_order: getNextDisplayOrder(initialForm.section_key)
+    });
+    setShowForm(true);
+  };
+
   const addTag = (tag: string) => {
     if (tag && !form.tags.includes(tag)) {
       setForm({ ...form, tags: [...form.tags, tag] });
@@ -269,11 +285,7 @@ export default function AdminContent() {
               </p>
             </div>
             <button
-              onClick={() => {
-                setEditingMaterial(null);
-                setForm(initialForm);
-                setShowForm(true);
-              }}
+              onClick={handleAddNew}
               className={styles.addBtn}
             >
               <Plus size={20} />
@@ -483,7 +495,14 @@ export default function AdminContent() {
                   <label>Раздел</label>
                   <select
                     value={form.section_key}
-                    onChange={(e) => setForm({ ...form, section_key: e.target.value })}
+                    onChange={(e) => {
+                      const newSectionKey = e.target.value;
+                      setForm({ 
+                        ...form, 
+                        section_key: newSectionKey,
+                        display_order: editingMaterial ? form.display_order : getNextDisplayOrder(newSectionKey)
+                      });
+                    }}
                     required
                   >
                     {sectionOptions.map(option => (

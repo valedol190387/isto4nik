@@ -131,9 +131,9 @@ export default function AdminDashboard() {
               <CreditCard className={styles.icon} />
             </div>
             <div className={styles.statContent}>
-              <div className={styles.statNumber}>{stats?.totalPayments || 0}</div>
-              <div className={styles.statLabel}>Разделы</div>
-              <div className={styles.statSubtext}>14 подразделов</div>
+              <div className={styles.statNumber}>{stats?.totalMaterials || 0}</div>
+              <div className={styles.statLabel}>Курсы</div>
+              <div className={styles.statSubtext}>элементов курсов в системе</div>
             </div>
           </div>
 
@@ -142,7 +142,7 @@ export default function AdminDashboard() {
               <Users className={styles.icon} />
             </div>
             <div className={styles.statContent}>
-              <div className={styles.statNumber}>{stats?.activeSubscriptions || 0}</div>
+              <div className={styles.statNumber}>{stats?.totalUsers || 0}</div>
               <div className={styles.statLabel}>Пользователи</div>
               <div className={styles.statSubtext}>всего в системе</div>
             </div>
@@ -153,7 +153,7 @@ export default function AdminDashboard() {
               <Star className={styles.icon} />
             </div>
             <div className={styles.statContent}>
-              <div className={styles.statNumber}>{stats?.totalUsers || 0}</div>
+              <div className={styles.statNumber}>{stats?.activeSubscriptions || 0}</div>
               <div className={styles.statLabel}>Активные подписки</div>
               <div className={styles.statSubtext}>{stats?.activePercentage || 0}% от общего числа</div>
             </div>
@@ -254,29 +254,53 @@ export default function AdminDashboard() {
             </div>
           </a>
 
-          <div className={styles.actionCard}>
+          <a href="/admin/content" className={styles.actionCard}>
             <FileText className={styles.actionIcon} />
             <div className={styles.actionContent}>
               <h3>Управление контентом</h3>
-              <p>Просмотр и редактирование контента по разделам</p>
+              <p>Просмотр и редактирование курсов и материалов</p>
             </div>
-          </div>
+          </a>
 
-          <div className={styles.actionCard}>
+          <a href="/admin/users" className={styles.actionCard}>
             <Users className={styles.actionIcon} />
             <div className={styles.actionContent}>
               <h3>Пользователи</h3>
-              <p>Просмотр статистики пользователей</p>
+              <p>Просмотр и управление пользователями</p>
             </div>
-          </div>
+          </a>
 
-          <div className={styles.actionCard}>
+          <a href="/admin/course-access" className={styles.actionCard}>
+            <Star className={styles.actionIcon} />
+            <div className={styles.actionContent}>
+              <h3>Доступы к курсам</h3>
+              <p>Управление доступами пользователей к курсам</p>
+            </div>
+          </a>
+
+          <a href="/admin/schedule" className={styles.actionCard}>
             <Calendar className={styles.actionIcon} />
             <div className={styles.actionContent}>
               <h3>Расписание</h3>
               <p>Управление событиями календаря</p>
             </div>
-          </div>
+          </a>
+          
+          <a href="/admin/reviews" className={styles.actionCard}>
+            <MessageSquare className={styles.actionIcon} />
+            <div className={styles.actionContent}>
+              <h3>Отзывы</h3>
+              <p>Управление отзывами пользователей</p>
+            </div>
+          </a>
+          
+          <a href="/admin/faq" className={styles.actionCard}>
+            <TrendingUp className={styles.actionIcon} />
+            <div className={styles.actionContent}>
+              <h3>FAQ</h3>
+              <p>Управление вопросами и ответами</p>
+            </div>
+          </a>
         </div>
       </main>
     </div>

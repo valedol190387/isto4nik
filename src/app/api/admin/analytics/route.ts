@@ -57,12 +57,32 @@ export async function GET(request: NextRequest) {
       console.error('Error fetching payments:', paymentsError);
     }
 
-    // Группируем платежи по telegram_id
+    // Группируем платежи по telegram_id (только успешные платежи)
     const paymentsByUser: Record<string, number> = {};
     (payments || []).forEach((payment: any) => {
-      const amount = payment.payment_callback?.Amount || payment.payment_callback?.PaymentAmount;
+      let amount = 0;
+      let status = null;
       const telegramId = payment.telegram_id;
-      if (telegramId && amount) {
+      
+      if (payment.payment_callback) {
+        // Если payment_callback - это строка, парсим её
+        if (typeof payment.payment_callback === 'string') {
+          try {
+            const parsed = JSON.parse(payment.payment_callback);
+            amount = parsed.Amount || parsed.PaymentAmount || 0;
+            status = parsed.Status;
+          } catch (e) {
+            console.error('Error parsing payment_callback:', e);
+          }
+        } else {
+          // Если это уже объект
+          amount = payment.payment_callback.Amount || payment.payment_callback.PaymentAmount || 0;
+          status = payment.payment_callback.Status;
+        }
+      }
+      
+      // Учитываем только успешные платежи
+      if (telegramId && amount && status === 'Completed') {
         paymentsByUser[telegramId] = (paymentsByUser[telegramId] || 0) + parseFloat(amount);
       }
     });
@@ -78,15 +98,25 @@ export async function GET(request: NextRequest) {
 
     // Топ пользователей по платежам
     const topPayingUsers = filteredUsers
-      .filter((user: User) => user.sum && user.sum > 0)
-      .sort((a: User, b: User) => (b.sum || 0) - (a.sum || 0))
+      .filter((user: User) => {
+        const userPayments = paymentsByUser[user.telegram_id.toString()] || 0;
+        return userPayments > 0;
+      })
+      .sort((a: User, b: User) => {
+        const aPayments = paymentsByUser[a.telegram_id.toString()] || 0;
+        const bPayments = paymentsByUser[b.telegram_id.toString()] || 0;
+        return bPayments - aPayments;
+      })
       .slice(0, 10)
-      .map((user: User) => ({
-        telegram_id: user.telegram_id.toString(),
-        name: user.name || user.tg_username || 'Без имени',
-        total_payments: user.sum || 0,
-        last_payment: user.sum || 0 // В данной структуре нет отдельного поля для последнего платежа
-      }));
+      .map((user: User) => {
+        const totalPayments = paymentsByUser[user.telegram_id.toString()] || 0;
+        return {
+          telegram_id: user.telegram_id.toString(),
+          name: user.name || user.tg_username || 'Без имени',
+          total_payments: totalPayments,
+          last_payment: totalPayments // В данной структуре нет отдельного поля для последнего платежа
+        };
+      });
 
     // Статистика по статусам
     const statusStats: Record<string, number> = {};
