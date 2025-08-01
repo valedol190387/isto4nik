@@ -200,22 +200,9 @@ export default function MaterialsPage() {
       
       const telegramId = getTelegramId();
       
-      // Получаем данные пользователя из БД
-      const userResponse = await fetch(`/api/users?telegramId=${telegramId}`);
-      
-      if (!userResponse.ok) {
-        alert('Не удалось получить данные пользователя');
-        return;
-      }
-      
-      const user = await userResponse.json();
-      
-      // Отправляем данные на webhook
+      // Отправляем только telegram_id на webhook
       const webhookData = {
-        telegram_id: user.telegram_id,
-        status: user.status,
-        tg_username: user.tg_username,
-        course_access: user.course_access
+        telegram_id: parseInt(telegramId)
       };
       
       const webhookResponse = await fetch('https://n8n.ayunabackoffice.ru/webhook/courses', {
