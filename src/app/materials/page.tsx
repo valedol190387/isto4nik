@@ -198,11 +198,18 @@ export default function MaterialsPage() {
     try {
       setRequestingAccess(true);
       
-      const telegramId = getTelegramId();
+      // Получаем РЕАЛЬНЫЙ telegram_id пользователя
+      const realTelegramId = user?.id;
       
-      // Отправляем только telegram_id на webhook
+      if (!realTelegramId) {
+        alert('Не удалось получить данные пользователя из Telegram');
+        return;
+      }
+      
+      // Отправляем telegram_id и название раздела на webhook
       const webhookData = {
-        telegram_id: parseInt(telegramId)
+        telegram_id: realTelegramId,
+        section_name: lockedSectionName
       };
       
       const webhookResponse = await fetch('https://n8n.ayunabackoffice.ru/webhook/courses', {
