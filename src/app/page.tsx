@@ -20,6 +20,7 @@ import { SearchModal } from '@/components/SearchModal';
 import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser } from '@/types/database';
+
 import styles from './page.module.css';
 
 // Данные для хайлайтов с изображениями
@@ -65,6 +66,9 @@ export default function Home() {
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [chatLink, setChatLink] = useState<string | null>(null);
+
+
+
 
   // Получаем пользователя из Telegram
   const user = useSignal(initData.user);
@@ -157,6 +161,8 @@ export default function Home() {
       setChatLink(null);
     }
   };
+
+
 
   // Вызываем загрузку данных пользователя при монтировании
   useEffect(() => {
@@ -375,6 +381,8 @@ export default function Home() {
           </div>
         </div>
       )}
+
+
     </Page>
   );
 }

@@ -12,6 +12,8 @@ export default function FlatBellyPage() {
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showCourseAccessModal, setShowCourseAccessModal] = useState(false);
+  const [requestingAccess, setRequestingAccess] = useState(false);
   const [courseLink, setCourseLink] = useState<string | null>(null);
 
   // Получаем пользователя из Telegram

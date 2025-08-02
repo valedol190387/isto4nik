@@ -6,16 +6,23 @@ import Image from 'next/image';
 import { Lock, LockOpen, X, Play } from 'lucide-react';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser } from '@/types/database';
+import { useCourseAccess } from '@/hooks/useCourseAccess';
+import { hasAccessToSection } from '@/utils/courseAccessMapping';
 import styles from './page.module.css';
 
 export default function AntiSwellingPage() {
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+  const [showCourseAccessModal, setShowCourseAccessModal] = useState(false);
+  const [requestingAccess, setRequestingAccess] = useState(false);
   const [courseLink, setCourseLink] = useState<string | null>(null);
 
   // Получаем пользователя из Telegram
   const user = useSignal(initData.user);
+
+  // Получаем доступы к курсам из БД
+  const { access: courseAccess, loading: accessLoading } = useCourseAccess();
 
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
@@ -93,12 +100,73 @@ export default function AntiSwellingPage() {
     }
   };
 
-  // Обработчик клика по кнопке курса (только для заблокированных)
-  const handleCourseClick = (e: React.MouseEvent) => {
-    if (!isSubscriptionActive) {
-      e.preventDefault();
-      setShowSubscriptionModal(true);
+  // Функция для запроса доступа к курсу через webhook
+  const requestCourseAccess = async () => {
+    try {
+      setRequestingAccess(true);
+      
+      // Получаем РЕАЛЬНЫЙ telegram_id пользователя
+      const realTelegramId = user?.id;
+      
+      if (!realTelegramId) {
+        alert('Не удалось получить данные пользователя из Telegram');
+        return;
+      }
+      
+      // Отправляем telegram_id и название курса на webhook
+      const webhookData = {
+        telegram_id: realTelegramId,
+        section_name: 'Отёки'
+      };
+      
+      const webhookResponse = await fetch('https://n8n.ayunabackoffice.ru/webhook/courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookData)
+      });
+      
+      if (webhookResponse.ok) {
+        alert('Запрос на доступ отправлен! В боте вы увидите дальнейшие инструкции.');
+        setShowCourseAccessModal(false);
+      } else {
+        alert('Произошла ошибка при отправке запроса. Попробуйте позже.');
+      }
+      
+    } catch (error) {
+      console.error('Error requesting course access:', error);
+      alert('Произошла ошибка при отправке запроса. Попробуйте позже.');
+    } finally {
+      setRequestingAccess(false);
     }
+  };
+
+  // Обработчик клика по кнопке курса 
+  const handleCourseClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    
+    // Сначала проверяем подписку
+    if (!isSubscriptionActive) {
+      setShowSubscriptionModal(true);
+      return;
+    }
+
+    // Если подписка активна, проверяем доступ к курсу
+    if (!courseAccess || accessLoading) {
+      // Данные о доступе еще загружаются
+      return;
+    }
+
+    const hasAccess = hasAccessToSection(courseAccess, 'course_anti_swelling');
+    if (!hasAccess) {
+      // Нет доступа к курсу - показываем модальное окно с webhook
+      setShowCourseAccessModal(true);
+      return;
+    }
+
+    // Есть доступ - переходим на материалы
+    window.location.href = "/materials?section=course_anti_swelling";
   };
 
   return (
@@ -274,15 +342,14 @@ export default function AntiSwellingPage() {
 
         {/* Кнопка курса */}
         <div className={styles.courseButtonContainer}>
-          <a 
-            href={isSubscriptionActive ? "/materials?section=course_anti_swelling" : "#"}
-            target="_self"
+          <button 
             onClick={handleCourseClick}
-            className={`${styles.courseButton} ${!isSubscriptionActive ? styles.lockedButton : ''} ${loadingUserData ? styles.disabled : ''}`}
+            className={`${styles.courseButton} ${(!isSubscriptionActive || (courseAccess && !hasAccessToSection(courseAccess, 'course_anti_swelling'))) ? styles.lockedButton : ''} ${loadingUserData || accessLoading ? styles.disabled : ''}`}
+            disabled={loadingUserData || accessLoading}
           >
             <span className={styles.buttonContent}>
               <span className={styles.lockIcon}>
-                {isSubscriptionActive ? (
+                {(isSubscriptionActive && courseAccess && hasAccessToSection(courseAccess, 'course_anti_swelling')) ? (
                   <Play size={24} />
                 ) : (
                   <Lock size={24} className={styles.pulsingLock} />
@@ -290,7 +357,7 @@ export default function AntiSwellingPage() {
               </span>
               СМОТРЕТЬ КУРС
             </span>
-          </a>
+          </button>
         </div>
       </div>
 
@@ -325,6 +392,41 @@ export default function AntiSwellingPage() {
               >
                 ПОЛУЧИТЬ ДОСТУП
               </a>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Модальное окно доступа к курсу */}
+      {showCourseAccessModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowCourseAccessModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <button 
+              className={styles.closeButton}
+              onClick={() => setShowCourseAccessModal(false)}
+            >
+              <X size={24} />
+            </button>
+            
+            <div className={styles.modalBody}>
+              <div className={styles.modalIcon}>
+                <Lock size={48} />
+              </div>
+              
+              <h3 className={styles.modalTitle}>🔒 Курс пока недоступен</h3>
+              
+              <p className={styles.modalText}>
+                Открытие этого курса возможно только через нашего Telegram-бота.<br/>
+                Там вы узнаете условия доступа и сможете разблокировать материалы всего за пару кликов
+              </p>
+              
+              <button
+                className={styles.modalButton}
+                onClick={requestCourseAccess}
+                disabled={requestingAccess}
+              >
+                {requestingAccess ? 'Отправляем...' : 'ПОЛУЧИТЬ ДОСТУП'}
+              </button>
             </div>
           </div>
         </div>
