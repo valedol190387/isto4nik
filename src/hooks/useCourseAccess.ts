@@ -39,6 +39,37 @@ export function useCourseAccess(): CourseAccessResult {
     return null;
   };
 
+  // Функция для автоматической регистрации пользователя
+  const autoRegisterUser = async (telegramId: string) => {
+    try {
+      console.log('🆕 Auto-registering user:', telegramId);
+      
+      const response = await fetch('/api/users/auto-register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          telegram_id: telegramId,
+          name: user?.first_name || 'Новый пользователь',
+          tg_username: user?.username || null,
+          start_param: null // UTM пока не передаем, можно добавить позже
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error(`Auto-registration failed: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ User auto-registered:', result.isNewUser ? 'NEW' : 'EXISTING');
+      return result;
+    } catch (error) {
+      console.error('❌ Auto-registration error:', error);
+      throw error;
+    }
+  };
+
   // Функция для загрузки доступов
   const fetchAccess = async () => {
     try {
@@ -68,7 +99,13 @@ export function useCourseAccess(): CourseAccessResult {
       
       if (!response.ok) {
         if (response.status === 404) {
-          console.log('👤 User not found, using default access');
+          console.log('👤 User not found, creating automatically...');
+          
+          // Создаем пользователя автоматически
+          await autoRegisterUser(telegramId);
+          
+          // После создания пользователя, сразу возвращаем дефолтные доступы
+          // (они уже установлены в auto-register API)
           setAccess({
             stomach: true,        // course_flat_belly
             swelling: false,      // course_anti_swelling
