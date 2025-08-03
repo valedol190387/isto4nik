@@ -79,6 +79,7 @@ export default function AdminContent() {
   const [form, setForm] = useState<MaterialForm>(initialForm);
   const [saving, setSaving] = useState(false);
   const [newTag, setNewTag] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['course_flat_belly']));
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const router = useRouter();
@@ -138,6 +139,7 @@ export default function AdminContent() {
         setForm(initialForm);
       } else {
         console.error('Error saving material:', data.message);
+        alert(`Ошибка при сохранении материала: ${data.message}`);
       }
     } catch (error) {
       console.error('Error saving material:', error);
@@ -159,6 +161,7 @@ export default function AdminContent() {
       is_embedded_video: material.is_embedded_video,
       video_embed_code: material.video_embed_code || ''
     });
+    setShowPreview(false);
     setShowForm(true);
   };
 
@@ -187,8 +190,21 @@ export default function AdminContent() {
   const getNextDisplayOrder = (sectionKey: string) => {
     const sectionMaterials = materials.filter(material => material.section_key === sectionKey);
     if (sectionMaterials.length === 0) return 1;
-    const maxOrder = Math.max(...sectionMaterials.map(material => material.display_order));
-    return maxOrder + 1;
+    
+    // Получаем все существующие display_order и находим первый свободный номер
+    const existingOrders = sectionMaterials
+      .map(material => material.display_order)
+      .sort((a, b) => a - b);
+    
+    // Ищем первый пропуск в последовательности
+    for (let i = 1; i <= existingOrders.length + 1; i++) {
+      if (!existingOrders.includes(i)) {
+        return i;
+      }
+    }
+    
+    // Если пропусков нет, возвращаем следующий номер
+    return Math.max(...existingOrders) + 1;
   };
 
   const handleAddNew = () => {
@@ -197,6 +213,7 @@ export default function AdminContent() {
       ...initialForm,
       display_order: getNextDisplayOrder(initialForm.section_key)
     });
+    setShowPreview(false);
     setShowForm(true);
   };
 
@@ -209,6 +226,48 @@ export default function AdminContent() {
 
   const removeTag = (tagToRemove: string) => {
     setForm({ ...form, tags: form.tags.filter(tag => tag !== tagToRemove) });
+  };
+
+  // Функция для вставки HTML тегов
+  const insertHtmlTag = (tag: string, hasClosingTag: boolean = true) => {
+    const textarea = document.querySelector('textarea[placeholder*="HTML форматирование"]') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    // Сохраняем текущую позицию скролла
+    const scrollTop = textarea.scrollTop;
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = form.description.substring(start, end);
+    
+    let insertText;
+    if (hasClosingTag) {
+      const tagName = tag.split(' ')[0]; // Для тегов с атрибутами берем только имя тега
+      insertText = selectedText 
+        ? `<${tag}>${selectedText}</${tagName}>`
+        : `<${tag}></${tagName}>`;
+    } else {
+      insertText = `<${tag}>`;
+    }
+    
+    const newDescription = form.description.substring(0, start) + insertText + form.description.substring(end);
+    setForm({ ...form, description: newDescription });
+    
+    // Устанавливаем курсор в правильное место без изменения скролла
+    requestAnimationFrame(() => {
+      textarea.focus({ preventScroll: true });
+      
+      if (hasClosingTag && !selectedText) {
+        const newPosition = start + tag.length + 2; // После открывающего тега
+        textarea.setSelectionRange(newPosition, newPosition);
+      } else if (selectedText) {
+        // Если был выделенный текст, ставим курсор после закрывающего тега
+        const newPosition = start + insertText.length;
+        textarea.setSelectionRange(newPosition, newPosition);
+      }
+      
+      // Восстанавливаем позицию скролла
+      textarea.scrollTop = scrollTop;
+    });
   };
 
   const getSectionName = (sectionKey: string) => {
@@ -230,7 +289,7 @@ export default function AdminContent() {
   const groupedMaterials = sectionOptions.reduce((acc, section) => {
     const sectionMaterials = materials
       .filter(material => material.section_key === section.value)
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      .sort((a, b) => a.display_order - b.display_order);
     
     acc[section.value] = {
       section,
@@ -432,13 +491,99 @@ export default function AdminContent() {
               </div>
 
               <div className={styles.formGroup}>
-                <label>Описание</label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) => setForm({ ...form, description: e.target.value })}
-                  placeholder="Краткое описание материала"
-                  rows={3}
-                />
+                <div className={styles.descriptionHeader}>
+                  <label>Описание</label>
+                  <div className={styles.previewToggle}>
+                    <button 
+                      type="button"
+                      onClick={() => setShowPreview(false)}
+                      className={`${styles.toggleButton} ${!showPreview ? styles.active : ''}`}
+                    >
+                      Редактирование
+                    </button>
+                    <button 
+                      type="button"
+                      onClick={() => setShowPreview(true)}
+                      className={`${styles.toggleButton} ${showPreview ? styles.active : ''}`}
+                    >
+                      Предпросмотр
+                    </button>
+                  </div>
+                </div>
+
+                {!showPreview ? (
+                  <textarea
+                    value={form.description}
+                    onChange={(e) => setForm({ ...form, description: e.target.value })}
+                    placeholder="Описание материала (поддерживается HTML форматирование)"
+                    rows={6}
+                  />
+                ) : (
+                  <div className={styles.preview}>
+                    <div 
+                      className={styles.previewContent}
+                      dangerouslySetInnerHTML={{ __html: form.description.replace(/\n/g, '<br />') }}
+                    />
+                  </div>
+                )}
+
+                <div className={styles.htmlHint}>
+                  <p className={styles.hintTitle}>Быстрая вставка HTML тегов:</p>
+                  <div className={styles.htmlButtons}>
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.preventDefault(); insertHtmlTag('b'); }} 
+                      className={styles.htmlButton}
+                    >
+                      <strong>B</strong>
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.preventDefault(); insertHtmlTag('i'); }} 
+                      className={styles.htmlButton}
+                    >
+                      <em>I</em>
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.preventDefault(); insertHtmlTag('u'); }} 
+                      className={styles.htmlButton}
+                    >
+                      <u>U</u>
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.preventDefault(); insertHtmlTag('h3'); }} 
+                      className={styles.htmlButton}
+                    >
+                      H3
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.preventDefault(); insertHtmlTag('p'); }} 
+                      className={styles.htmlButton}
+                    >
+                      ¶
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={(e) => { e.preventDefault(); insertHtmlTag('br', false); }} 
+                      className={styles.htmlButton}
+                    >
+                      ↵
+                    </button>
+                  </div>
+                  <div className={styles.htmlTags}>
+                    <span className={styles.htmlTag}>&lt;b&gt;жирный&lt;/b&gt;</span>
+                    <span className={styles.htmlTag}>&lt;i&gt;курсив&lt;/i&gt;</span>
+                    <span className={styles.htmlTag}>&lt;u&gt;подчеркнутый&lt;/u&gt;</span>
+                    <span className={styles.htmlTag}>&lt;h3&gt;заголовок&lt;/h3&gt;</span>
+                    <span className={styles.htmlTag}>&lt;p&gt;абзац&lt;/p&gt;</span>
+                    <span className={styles.htmlTag}>&lt;br&gt; - перенос</span>
+                    <span className={styles.htmlTag}>&lt;ul&gt;&lt;li&gt;список&lt;/li&gt;&lt;/ul&gt;</span>
+                    <span className={styles.htmlTag}>&lt;a href=""&gt;ссылка&lt;/a&gt;</span>
+                  </div>
+                </div>
               </div>
 
               {/* Галочка для встроенного видео */}

@@ -119,11 +119,10 @@ export default function MaterialViewPage() {
           {material.description && (
             <div className={styles.descriptionSection}>
               <h2 className={styles.sectionTitle}>Описание</h2>
-              <div className={styles.description}>
-                {material.description.split('\n').map((line, index) => (
-                  <p key={index}>{line}</p>
-                ))}
-              </div>
+              <div 
+                className={styles.description}
+                dangerouslySetInnerHTML={{ __html: material.description.replace(/\n/g, '<br />') }}
+              />
             </div>
           )}
 

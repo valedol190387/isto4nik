@@ -48,7 +48,7 @@ export async function GET(request: Request) {
         created_at
       `)
       .in('id', materialIds)
-      .order('created_at', { ascending: false });
+      .order('display_order', { ascending: true });
 
     if (materialsError) {
       throw materialsError;

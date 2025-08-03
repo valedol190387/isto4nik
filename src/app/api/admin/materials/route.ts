@@ -7,7 +7,7 @@ export async function GET() {
     const { data: materials, error } = await supabase
       .from('materials')
       .select('*')
-      .order('created_at', { ascending: false });
+      .order('display_order', { ascending: true });
 
     if (error) {
       throw error;
@@ -27,6 +27,28 @@ export async function GET() {
 export async function POST(request: Request) {
   try {
     const materialData = await request.json();
+    const { display_order, section_key } = materialData;
+    
+    // Проверяем, есть ли другой материал с таким же display_order в том же разделе
+    if (display_order && section_key) {
+      const { data: existingMaterial, error: checkError } = await supabase
+        .from('materials')
+        .select('id')
+        .eq('section_key', section_key)
+        .eq('display_order', display_order)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+
+      if (existingMaterial) {
+        return NextResponse.json(
+          { success: false, message: `Материал с порядком отображения ${display_order} уже существует в разделе "${section_key}"` },
+          { status: 400 }
+        );
+      }
+    }
     
     // Добавляем временные метки
     materialData.created_at = new Date().toISOString();
@@ -55,13 +77,35 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const materialData = await request.json();
-    const { id } = materialData;
+    const { id, display_order, section_key } = materialData;
 
     if (!id) {
       return NextResponse.json(
         { success: false, message: 'Material ID is required' },
         { status: 400 }
       );
+    }
+
+    // Проверяем, есть ли другой материал с таким же display_order в том же разделе
+    if (display_order && section_key) {
+      const { data: existingMaterial, error: checkError } = await supabase
+        .from('materials')
+        .select('id')
+        .eq('section_key', section_key)
+        .eq('display_order', display_order)
+        .neq('id', id)
+        .single();
+
+      if (checkError && checkError.code !== 'PGRST116') {
+        throw checkError;
+      }
+
+      if (existingMaterial) {
+        return NextResponse.json(
+          { success: false, message: `Материал с порядком отображения ${display_order} уже существует в разделе "${section_key}"` },
+          { status: 400 }
+        );
+      }
     }
 
     // Добавляем временную метку обновления

@@ -385,7 +385,7 @@ export default function AntiSwellingPage() {
               </p>
               
               <a 
-                href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot"
+                href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot?start=start"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.modalButton}

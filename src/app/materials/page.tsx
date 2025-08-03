@@ -115,6 +115,24 @@ export default function MaterialsPage() {
     return '123456789';
   };
 
+  // Функция для проверки, нужна ли кнопка "далее"
+  const needsReadMore = (description: string) => {
+    if (!description) return false;
+    
+    // Более точная эвристика: считаем строки по переносам и длине
+    const lines = description.split('\n');
+    let totalLines = 0;
+    
+    lines.forEach(line => {
+      // Считаем что в строке помещается примерно 50-60 символов (зависит от экрана)
+      const charsPerLine = 55;
+      const linesForThisText = Math.ceil(line.length / charsPerLine) || 1;
+      totalLines += linesForThisText;
+    });
+    
+    return totalLines > 3;
+  };
+
   // 3 точки для навигации как на главной
   const dotsCount = 3;
   
@@ -402,7 +420,21 @@ export default function MaterialsPage() {
                   </div>
                   <div className={styles.materialInfo}>
                     <h3 className={styles.materialTitle}>{material.title}</h3>
-                    <p className={styles.materialDescription}>{material.description}</p>
+                    <div 
+                      className={styles.materialDescription}
+                      dangerouslySetInnerHTML={{ __html: material.description?.replace(/\n/g, '<br />') || '' }}
+                    />
+                    {material.description && needsReadMore(material.description) && (
+                      <button 
+                        className={styles.readMoreButton}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMaterialClick(material);
+                        }}
+                      >
+                        далее
+                      </button>
+                    )}
                     {material.tags.length > 0 && (
                       <div className={styles.materialTags}>
                         {material.tags.map((tag, index) => (
