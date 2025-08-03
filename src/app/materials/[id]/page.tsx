@@ -118,7 +118,6 @@ export default function MaterialViewPage() {
           {/* Описание */}
           {material.description && (
             <div className={styles.descriptionSection}>
-              <h2 className={styles.sectionTitle}>Описание</h2>
               <div 
                 className={styles.description}
                 dangerouslySetInnerHTML={{ __html: material.description.replace(/\n/g, '<br />') }}
