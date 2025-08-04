@@ -138,6 +138,4 @@ more details.
 
 - [Platform documentation](https://docs.telegram-mini-apps.com/)
 - [@telegram-apps/sdk-react documentation](https://docs.telegram-mini-apps.com/packages/telegram-apps-sdk-react)
-- [Telegram developers community chat](https://t.me/devs)# Force rebuild cache
-Test deploy without workspace
-FINAL FIX: Remove pnpm-workspace.yaml from project
+- [Telegram developers community chat](https://t.me/devs)
