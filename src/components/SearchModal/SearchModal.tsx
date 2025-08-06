@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, X, FileText, MessageSquare, HelpCircle, Home, Loader2, Calendar } from 'lucide-react';
+import { Search, X, FileText, MessageSquare, HelpCircle, Home, Loader2, Calendar, Lock } from 'lucide-react';
 import { searchService, type SearchResult } from '@/services/searchService';
+import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { User as DbUser } from '@/types/database';
 import styles from './SearchModal.module.css';
 
 interface SearchModalProps {
@@ -21,6 +23,65 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
   const inputRef = useRef<HTMLInputElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Состояния для проверки подписки
+  const [userData, setUserData] = useState<DbUser | null>(null);
+  const [loadingUserData, setLoadingUserData] = useState(false);
+  const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
+
+  // Получаем реального пользователя из Telegram
+  const user = useSignal(initData.user);
+
+  // Получаем Telegram ID пользователя
+  const getTelegramId = () => {
+    // Пробуем получить из Telegram WebApp API
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg?.initDataUnsafe?.user?.id) {
+        return tg.initDataUnsafe.user.id.toString();
+      }
+    }
+    
+    // Fallback - только для разработки
+    return '123456789';
+  };
+
+  // Функция для загрузки данных пользователя из базы данных
+  const loadUserData = async () => {
+    setLoadingUserData(true);
+    try {
+      const telegramId = user?.id?.toString() || getTelegramId();
+      
+      const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      
+      if (!response.ok) {
+        if (response.status === 404) {
+          // Пользователь не найден в базе
+          setUserData(null);
+        } else {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+      } else {
+        const data: DbUser = await response.json();
+        setUserData(data);
+      }
+    } catch (error) {
+      console.error('Ошибка при загрузке данных пользователя:', error);
+      setUserData(null);
+    } finally {
+      setLoadingUserData(false);
+    }
+  };
+
+  // Проверяем статус подписки
+  const isSubscriptionActive = userData?.status === 'Активна';
+
+  // Загружаем данные пользователя при открытии модала
+  useEffect(() => {
+    if (isOpen && user?.id) {
+      loadUserData();
+    }
+  }, [isOpen, user?.id]);
 
   // Инициализация поискового индекса
   useEffect(() => {
@@ -118,6 +179,12 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
   }, [selectedIndex]);
 
   const handleResultClick = (result: SearchResult) => {
+    // Проверяем подписку только для материалов
+    if (result.type === 'material' && !isSubscriptionActive) {
+      setShowSubscriptionModal(true);
+      return;
+    }
+    
     router.push(result.route);
     onClose();
   };
@@ -277,6 +344,44 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
 
 
       </div>
+
+      {/* Модальное окно подписки */}
+      {showSubscriptionModal && (
+        <div className={styles.subscriptionModalOverlay} onClick={() => setShowSubscriptionModal(false)}>
+          <div className={styles.subscriptionModalContent} onClick={e => e.stopPropagation()}>
+            <button 
+              className={styles.subscriptionCloseButton}
+              onClick={() => setShowSubscriptionModal(false)}
+            >
+              <X size={24} />
+            </button>
+            
+            <div className={styles.subscriptionModalHeader}>
+              <div className={styles.subscriptionModalIcon}>
+                <Lock size={32} />
+              </div>
+              <h2 className={styles.subscriptionModalTitle}>Требуется подписка</h2>
+            </div>
+            
+            <div className={styles.subscriptionModalBody}>
+              <p className={styles.subscriptionModalText}>
+                Для доступа к материалам необходима активная подписка. 
+                Получите доступ ко всем материалам и функциям приложения.
+              </p>
+              
+              <a
+                href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot?start=start"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.subscribeButton}
+                onClick={() => setShowSubscriptionModal(false)}
+              >
+                ПОЛУЧИТЬ ДОСТУП
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 } 
