@@ -144,13 +144,23 @@ export default function Home() {
       setShowSubscriptionModal(true);
     }
 
-    // НОВОЕ: Проверяем deep links
+    // НОВОЕ: Проверяем deep links (только один раз за сессию)
     const handleDeepLink = () => {
+      // Проверяем, был ли deep link уже обработан в этой сессии
+      const deepLinkProcessed = sessionStorage.getItem('deepLinkProcessed');
+      if (deepLinkProcessed) {
+        console.log('🔄 Deep link already processed in this session, skipping');
+        return;
+      }
+
       const startParam = getStartParam();
       const deepLinkResult = checkDeepLink(startParam);
       
       if (deepLinkResult.isDeepLink && deepLinkResult.type === 'materials' && deepLinkResult.materialId) {
         console.log('🚀 Deep link navigation to material:', deepLinkResult.materialId);
+        
+        // Отмечаем что deep link был обработан
+        sessionStorage.setItem('deepLinkProcessed', 'true');
         
         // Небольшая задержка для полной инициализации Telegram WebApp
         setTimeout(() => {
