@@ -3,6 +3,8 @@
  * Отдельный модуль, не трогает существующую UTM систему
  */
 
+import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
+
 export interface DeepLinkResult {
   isDeepLink: boolean;
   type?: 'materials';
@@ -38,7 +40,7 @@ export function checkDeepLink(startParam: string | null): DeepLinkResult {
 }
 
 /**
- * Получение startapp параметра из Telegram WebApp
+ * Получение startapp параметра из Telegram WebApp SDK
  */
 export function getStartParam(): string | null {
   if (typeof window === 'undefined') {
@@ -46,14 +48,25 @@ export function getStartParam(): string | null {
   }
 
   try {
-    const tg = (window as any).Telegram?.WebApp;
-    const startParam = tg?.initDataUnsafe?.start_param;
+    // Используем retrieveLaunchParams из @telegram-apps/sdk-react
+    const launchParams = retrieveLaunchParams();
+    const startParam = launchParams.tgWebAppStartParam;
     
-    console.log('📱 Got start_param:', startParam);
+    console.log('📱 Got tgWebAppStartParam:', startParam);
     return startParam || null;
   } catch (error) {
     console.error('❌ Error getting start_param:', error);
-    return null;
+    
+    // Fallback на старый метод
+    try {
+      const tg = (window as any).Telegram?.WebApp;
+      const fallbackParam = tg?.initDataUnsafe?.start_param;
+      console.log('🔄 Fallback start_param:', fallbackParam);
+      return fallbackParam || null;
+    } catch (fallbackError) {
+      console.error('❌ Fallback also failed:', fallbackError);
+      return null;
+    }
   }
 }
 
