@@ -3,6 +3,7 @@
 import { Page } from '@/components/Page';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { 
   Search, 
@@ -20,6 +21,7 @@ import { SearchModal } from '@/components/SearchModal';
 import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser } from '@/types/database';
+import { checkDeepLink, getStartParam } from '@/lib/deepLinks';
 
 import styles from './page.module.css';
 
@@ -66,6 +68,7 @@ export default function Home() {
   const [loadingUserData, setLoadingUserData] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [chatLink, setChatLink] = useState<string | null>(null);
+  const router = useRouter();
 
 
 
@@ -140,7 +143,24 @@ export default function Home() {
     if (error === 'no_subscription') {
       setShowSubscriptionModal(true);
     }
-  }, []);
+
+    // НОВОЕ: Проверяем deep links
+    const handleDeepLink = () => {
+      const startParam = getStartParam();
+      const deepLinkResult = checkDeepLink(startParam);
+      
+      if (deepLinkResult.isDeepLink && deepLinkResult.type === 'materials' && deepLinkResult.materialId) {
+        console.log('🚀 Deep link navigation to material:', deepLinkResult.materialId);
+        
+        // Небольшая задержка для полной инициализации Telegram WebApp
+        setTimeout(() => {
+          router.push(`/materials/${deepLinkResult.materialId}`);
+        }, 800);
+      }
+    };
+
+    handleDeepLink();
+  }, [router]);
 
   // Функция для загрузки защищенной ссылки на чат
   const loadChatLink = async () => {

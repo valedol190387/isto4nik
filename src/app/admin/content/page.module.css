@@ -280,7 +280,7 @@
   margin-left: 16px;
 }
 
-.editBtn, .deleteBtn {
+.editBtn, .deleteBtn, .linkBtn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -291,6 +291,21 @@
   background: white;
   cursor: pointer;
   transition: all 0.2s ease;
+}
+
+.linkBtn {
+  color: #10b981;
+}
+
+.linkBtn:hover {
+  background: #ecfdf5;
+  border-color: #10b981;
+}
+
+.linkBtnSuccess {
+  background: #10b981 !important;
+  color: white !important;
+  border-color: #10b981 !important;
 }
 
 .editBtn {

@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, X, ExternalLink, Tag, Folder, ChevronDown, ChevronRight, Video } from 'lucide-react';
+import { Plus, Edit, Trash2, X, ExternalLink, Tag, Folder, ChevronDown, ChevronRight, Video, Link, Copy } from 'lucide-react';
 import { AdminSidebar } from '@/components/AdminSidebar';
+import { createMaterialShareLink, copyLinkToClipboard } from '@/lib/adminLinks';
 import styles from './page.module.css';
 
 interface Material {
@@ -82,6 +83,7 @@ export default function AdminContent() {
   const [showPreview, setShowPreview] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['course_flat_belly']));
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
+  const [linkCopiedFor, setLinkCopiedFor] = useState<string | null>(null);
   const router = useRouter();
 
   const ITEMS_PER_PAGE = 15;
@@ -184,6 +186,29 @@ export default function AdminContent() {
       }
     } catch (error) {
       console.error('Error deleting material:', error);
+    }
+  };
+
+  const handleCopyLink = async (materialId: string, title: string) => {
+    try {
+      const link = createMaterialShareLink(materialId);
+      const success = await copyLinkToClipboard(link);
+      
+      if (success) {
+        setLinkCopiedFor(materialId);
+        console.log(`✅ Ссылка на материал "${title}" скопирована:`, link);
+        
+        // Скрываем уведомление через 2 секунды
+        setTimeout(() => {
+          setLinkCopiedFor(null);
+        }, 2000);
+      } else {
+        // Показываем ссылку в alert если копирование не удалось
+        alert(`Ссылка на материал:\n${link}\n\nСкопируйте вручную.`);
+      }
+    } catch (error) {
+      console.error('Error copying material link:', error);
+      alert('Ошибка при создании ссылки');
     }
   };
 
@@ -421,6 +446,13 @@ export default function AdminContent() {
                                 </div>
                               </div>
                               <div className={styles.materialActions}>
+                                <button
+                                  onClick={() => handleCopyLink(material.id, material.title)}
+                                  className={`${styles.linkBtn} ${linkCopiedFor === material.id ? styles.linkBtnSuccess : ''}`}
+                                  title={linkCopiedFor === material.id ? 'Ссылка скопирована!' : 'Скопировать ссылку на материал'}
+                                >
+                                  {linkCopiedFor === material.id ? <Copy size={16} /> : <Link size={16} />}
+                                </button>
                                 <button
                                   onClick={() => handleEdit(material)}
                                   className={styles.editBtn}
