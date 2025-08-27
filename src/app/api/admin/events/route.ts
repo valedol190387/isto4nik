@@ -32,7 +32,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Title and event_date are required' }, { status: 400 });
     }
 
-    // Создаем событие с московским временем
+    // Создаем событие
     const { data: event, error } = await supabase
       .from('events')
       .insert([{
@@ -43,9 +43,7 @@ export async function POST(request: Request) {
         icon: icon || 'Calendar',
         link,
         tags: tags || [],
-        is_active: true,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString()
+        is_active: true
       }])
       .select()
       .single();
@@ -82,8 +80,7 @@ export async function PUT(request: Request) {
         icon,
         link,
         tags,
-        is_active,
-        updated_at: new Date().toISOString()
+        is_active
       })
       .eq('id', id)
       .select()

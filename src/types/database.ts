@@ -16,12 +16,11 @@ export interface Event {
   event_date: string;
   event_time: string | null;
   icon: string | null;
-  color_class: string | null;
   is_active: boolean;
   created_at: string;
   updated_at: string;
   link: string | null;
-  category: string | null;
+  tags: string[] | null;
 }
 
 export interface Material {
