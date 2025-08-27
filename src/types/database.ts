@@ -13,12 +13,12 @@ export interface Event {
   id: number;
   title: string;
   description: string | null;
-  event_date: string;
+  event_date: string | null;  // nullable в БД
   event_time: string | null;
   icon: string | null;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  is_active: boolean | null;  // nullable в БД, но имеет default: true
+  created_at: string | null;  // nullable в БД, но имеет default: now()
+  updated_at: string | null;  // nullable в БД, но имеет default: now()
   link: string | null;
   tags: string[] | null;
 }
