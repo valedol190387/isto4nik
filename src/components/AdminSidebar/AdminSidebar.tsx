@@ -82,7 +82,7 @@ export function AdminSidebar() {
           {!isCollapsed && (
             <>
               <div className={styles.logoIcon}>A</div>
-              <span className={styles.logoText}>Ayuna Admin</span>
+              <span className={styles.logoText}>Isto4nik Admin</span>
             </>
           )}
           {isCollapsed && (

@@ -1,11 +1,13 @@
 import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 
-// Получить избранные материалы пользователя
+// Получить избранные материалы пользователя с пагинацией
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const telegramId = searchParams.get('telegramId');
+    const page = parseInt(searchParams.get('page') || '0');
+    const limit = parseInt(searchParams.get('limit') || '10');
 
     if (!telegramId) {
       return NextResponse.json({ error: 'Telegram ID is required' }, { status: 400 });
@@ -32,6 +34,15 @@ export async function GET(request: Request) {
       return NextResponse.json([]);
     }
 
+    // Применяем пагинацию к списку ID
+    const startIndex = page * limit;
+    const endIndex = startIndex + limit;
+    const paginatedIds = materialIds.slice(startIndex, endIndex);
+
+    if (paginatedIds.length === 0) {
+      return NextResponse.json([]);
+    }
+
     // Получаем полную информацию о материалах
     const { data: materials, error: materialsError } = await supabase
       .from('materials')
@@ -45,9 +56,10 @@ export async function GET(request: Request) {
         display_order,
         is_embedded_video,
         video_embed_code,
+        pic_url,
         created_at
       `)
-      .in('id', materialIds)
+      .in('id', paginatedIds)
       .order('display_order', { ascending: true });
 
     if (materialsError) {

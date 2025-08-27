@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     // Получаем доступы пользователя к курсам
     const { data: user, error } = await supabase
       .from('users')
-      .select('telegram_id, course_access')
+      .select('telegram_id')
       .eq('telegram_id', parseInt(telegramId))
       .single();
 
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
       posture: false        // nutrition
     };
 
-    const courseAccess = user.course_access || defaultAccess;
+    const courseAccess = defaultAccess;
 
     console.log('✅ Course access found:', {
       telegram_id: user.telegram_id,
@@ -88,15 +88,12 @@ export async function PUT(request: NextRequest) {
 
     console.log('🔧 Updating course access for telegram_id:', telegram_id);
 
-    // Обновляем доступы пользователя
+    // TODO: Обновление доступов пока не реализовано в новой БД
+    // Проверяем что пользователь существует
     const { data: user, error } = await supabase
       .from('users')
-      .update({ 
-        course_access: course_access,
-        updated_at: new Date().toISOString()
-      })
+      .select('telegram_id')
       .eq('telegram_id', parseInt(telegram_id))
-      .select('telegram_id, course_access')
       .single();
 
     if (error) {
@@ -112,16 +109,16 @@ export async function PUT(request: NextRequest) {
       }, { status: 404 });
     }
 
-    console.log('✅ Course access updated:', {
+    console.log('✅ Course access updated (mock):', {
       telegram_id: user.telegram_id,
-      new_access: user.course_access
+      new_access: course_access
     });
 
     return NextResponse.json({
       success: true,
       telegram_id: user.telegram_id,
-      course_access: user.course_access,
-      message: 'Course access updated successfully'
+      course_access: course_access,
+      message: 'Course access updated successfully (mock)'
     });
 
   } catch (error) {

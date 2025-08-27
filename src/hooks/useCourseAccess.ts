@@ -73,7 +73,6 @@ export function useCourseAccess(): CourseAccessResult {
   // Функция для загрузки доступов
   const fetchAccess = async () => {
     try {
-      setLoading(true);
       setError(null);
 
       const telegramId = getTelegramId();

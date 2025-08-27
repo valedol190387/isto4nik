@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Loader2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Calendar as CalendarIcon, Clock, Loader2, Filter } from "lucide-react"
 import { renderIcon } from '@/utils/iconRenderer'
 import { Page } from '@/components/Page'
 import styles from './page.module.css'
@@ -156,7 +156,7 @@ export default function CalendarPage() {
       <div className={styles.loading}>
         <div className={styles.loadingContent}>
           <Loader2 className={styles.loadingIcon} />
-          <p>Загрузка календаря...</p>
+          <p>Загружаем календарь...</p>
         </div>
       </div>
     )
@@ -216,7 +216,10 @@ export default function CalendarPage() {
           {/* Tag Filters */}
           {uniqueTags.length > 0 && (
             <div className={styles.filtersCard}>
-              <h3 className={styles.filtersTitle}>Фильтры</h3>
+              <div className={styles.sectionHeader}>
+                <Filter className={styles.sectionIcon} />
+                <h3 className={styles.filtersTitle}>Фильтры</h3>
+              </div>
               <div className={styles.filterButtons}>
                 <button
                   onClick={() => setSelectedCategory(null)}
@@ -284,7 +287,10 @@ export default function CalendarPage() {
 
           {/* Events List */}
           <div className={styles.eventsSection}>
-            <h3 className={styles.eventsTitle}>События</h3>
+            <div className={styles.sectionHeader}>
+              <CalendarIcon className={styles.sectionIcon} />
+              <h3 className={styles.eventsTitle}>События</h3>
+            </div>
             {filteredEvents.length > 0 ? (
               <div className={styles.eventsList}>
                 {filteredEvents.map((event) => {

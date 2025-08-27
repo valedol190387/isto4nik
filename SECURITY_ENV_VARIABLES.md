@@ -4,9 +4,9 @@
 
 ### Database (уже настроены)
 ```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
+NEXT_PUBLIC_SUPABASE_URL=https://supabase.istochnikbackoffice.ru
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc1NDEzNTgyMCwiZXhwIjo0OTA5ODA5NDIwLCJyb2xlIjoiYW5vbiJ9.wMRiOXMk23wfbDJr3y4DcWlTzG2PEc1v3UlX6_VrzbU
+SUPABASE_SERVICE_ROLE_KEY=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc1NDEzNTgyMCwiZXhwIjo0OTA5ODA5NDIwLCJyb2xlIjoic2VydmljZV9yb2xlIn0.5wZYu52nx53Y4mLNSL4maX0AgpKxYCeViZkscoHEL8Y
 ```
 
 ### Telegram Security Links (НОВЫЕ - нужно добавить)

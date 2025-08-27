@@ -1,4 +1,21 @@
-/* Favorites Page Styles - Ayuna Beauty Theme */
+/* Favorites Page Styles - isto4nik Theme */
+
+/* Шрифты для избранного */
+@font-face {
+  font-family: 'RalewayMedium';
+  src: url('/fonts/Raleway-v4020-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
 
 .container {
   background: var(--bg-primary);
@@ -9,7 +26,8 @@
   padding-left: calc(16px + var(--safe-area-inset-left, 0px));
   padding-right: calc(16px + var(--safe-area-inset-right, 0px));
   color: var(--text-main);
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
   position: relative;
 }
 
@@ -29,16 +47,16 @@
 .headerIcon {
   width: 24px;
   height: 24px;
-  color: var(--accent-blue);
+  color: #082445;
   filter: drop-shadow(var(--shadow-medium));
 }
 
 .headerTitle {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-main);
   margin: 0;
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -55,12 +73,14 @@
 .loadingContent {
   text-align: center;
   color: var(--text-secondary);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
 .loadingIcon {
   width: 48px;
   height: 48px;
-  color: var(--accent-blue);
+  color: #082445;
   animation: spin 1s linear infinite;
   margin: 0 auto 16px;
 }
@@ -84,54 +104,83 @@
 
 .materialCard {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  background: var(--bg-card);
+  flex-direction: column;
+  background: #E4DEDC;
   border-radius: 16px;
   border: 1px solid var(--border-light);
   overflow: hidden;
-  transition: all 0.2s ease;
-}
-
-.materialCard:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-light);
-}
-
-.materialContent {
-  flex: 1;
-  background: none;
-  border: none;
-  padding: 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
+  width: 100%;
   cursor: pointer;
-  text-align: left;
-  transition: all 0.2s ease;
-  font-family: var(--font-body);
 }
 
-.materialContent:hover {
+/* Контейнер изображения с кнопкой избранного */
+.materialImageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
   background: var(--border-light);
 }
 
-.materialIcon {
-  width: 48px;
-  height: 48px;
-  background: var(--accent-blue);
-  border-radius: 12px;
+.materialImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.materialImagePlaceholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  background: var(--border-light);
 }
 
-.playIcon {
+.placeholderIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+/* Кнопка избранного на изображении */
+.favoriteButtonOverlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  background: #082445;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(8, 36, 69, 0.2);
+}
+
+.favoriteButtonOverlay .starIcon {
   width: 20px;
   height: 20px;
-  color: white;
-  margin-left: 2px;
+  color: #ffffff;
+}
+
+.favoriteButtonOverlay .favoriteActive {
+  fill: #ffffff;
+  color: #ffffff;
+}
+
+.materialContent {
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: left;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
 .materialInfo {
@@ -145,7 +194,7 @@
   margin: 0 0 6px 0;
   color: var(--text-main);
   line-height: 1.3;
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   text-transform: uppercase;
 }
 
@@ -154,7 +203,7 @@
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.5;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
   display: -webkit-box;
   -webkit-line-clamp: 3;
@@ -197,7 +246,7 @@
 }
 
 .materialDescription a {
-  color: var(--accent-blue);
+  color: #082445;
   text-decoration: none;
 }
 
@@ -208,19 +257,14 @@
 .readMoreButton {
   background: none;
   border: none;
-  color: var(--accent-blue);
+  color: #082445;
   font-size: 14px;
-  font-weight: 400;
-  font-family: 'Montserrat', sans-serif;
+  font-weight: 300;
+  font-family: 'GilroyLight', sans-serif;
   cursor: pointer;
   padding: 0;
   margin-top: 4px;
-  transition: opacity 0.2s ease;
   text-align: left;
-}
-
-.readMoreButton:hover {
-  opacity: 0.8;
 }
 
 .materialTags {
@@ -237,7 +281,7 @@
   font-weight: 300;
   padding: 4px 8px;
   border-radius: 12px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
 }
 
 .linkIcon {
@@ -245,38 +289,31 @@
   height: 16px;
   color: var(--text-secondary);
   flex-shrink: 0;
+  margin-top: 2px;
 }
 
-.favoriteButton {
-  background: none;
-  border: none;
-  padding: 12px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  border-left: 1px solid var(--border-light);
-  min-width: 52px;
-  min-height: 52px;
-}
-
-.heartIcon {
-  width: 28px;
-  height: 28px;
+/* Индикатор загрузки дополнительных материалов */
+.loadingMore {
+  text-align: center;
+  padding: 24px;
   color: var(--text-secondary);
-  transition: all 0.2s ease;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
-.favoriteActive {
-  color: #e11d48;
+.loadingMoreIcon {
+  width: 32px;
+  height: 32px;
+  color: #082445;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 8px;
 }
 
 /* Empty State */
 .emptyState {
   text-align: center;
   padding: 64px 24px;
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   border: 1px solid var(--border-light);
 }
@@ -290,7 +327,7 @@
 }
 
 .emptyTitle {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 16px;
   font-weight: 500;
   margin: 0 0 8px 0;
@@ -303,7 +340,7 @@
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.4;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
 }
 
@@ -332,17 +369,6 @@
   
   .materialContent {
     padding: 12px;
-    gap: 12px;
-  }
-  
-  .materialIcon {
-    width: 40px;
-    height: 40px;
-  }
-  
-  .playIcon {
-    width: 16px;
-    height: 16px;
   }
   
   .materialTitle {
@@ -354,22 +380,26 @@
     font-weight: 300;
   }
   
-  .favoriteButton {
-    padding: 10px;
-    min-width: 48px;
-    min-height: 48px;
+  .favoriteButtonOverlay {
+    width: 36px;
+    height: 36px;
+    top: 8px;
+    right: 8px;
   }
   
-  .heartIcon {
-    width: 24px;
-    height: 24px;
+  .favoriteButtonOverlay .starIcon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .placeholderIcon {
+    width: 40px;
+    height: 40px;
   }
 }
 
 @media (max-width: 768px) {
-  .materialContent {
-    gap: 14px;
-  }
+  /* Стили для планшетов - наследуются базовые */
 }
 
 @media (min-width: 768px) {

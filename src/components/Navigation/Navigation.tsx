@@ -85,7 +85,7 @@ export function Navigation() {
     setShowSubscriptionModal(true);
   };
 
-  const lockedSections = ['/materials', '/calendar', '/favorites'];
+  const lockedSections = ['/calendar', '/favorites'];
 
   return (
     <>
@@ -95,18 +95,11 @@ export function Navigation() {
           <span className={styles.navText}>Главная</span>
         </Link>
 
-        {/* Курсы */}
-        {(!loadingUserData && isSubscriptionActive) ? (
-          <Link href="/materials" className={`${styles.navItem} ${pathname === '/materials' ? styles.active : ''}`}>
-            <FileText className={styles.navIcon} size={20} />
-            <span className={styles.navText}>Курсы</span>
-          </Link>
-        ) : (
-          <div className={`${styles.navItem} ${styles.lockedItem}`} onClick={handleLockedClick}>
-            <Lock className={styles.navIcon} size={20} />
-            <span className={styles.navText}>Курсы</span>
-          </div>
-        )}
+        {/* Ресурсы - всегда доступен */}
+        <Link href="/resources" className={`${styles.navItem} ${pathname === '/resources' ? styles.active : ''}`}>
+          <FileText className={styles.navIcon} size={20} />
+          <span className={styles.navText}>Ресурсы</span>
+        </Link>
 
         {/* Календарь */}
         {(!loadingUserData && isSubscriptionActive) ? (
@@ -166,7 +159,7 @@ export function Navigation() {
               </p>
               
               <a
-                href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot?start=start"
+                href="https://t.me/istochnik_clubbot?start=closedclub"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.subscribeButton}

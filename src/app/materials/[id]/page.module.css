@@ -1,3 +1,20 @@
+/* Шрифты для material view */
+@font-face {
+  font-family: 'RalewayMedium';
+  src: url('/fonts/Raleway-v4020-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Общие стили */
 .container {
   max-width: 800px;
@@ -10,7 +27,8 @@
   padding-left: calc(16px + var(--safe-area-inset-left, 0px));
   padding-right: calc(16px + var(--safe-area-inset-right, 0px));
   color: var(--text-main);
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
   position: relative;
 }
 
@@ -46,18 +64,102 @@
   margin-top: var(--safe-area-inset-top, 0px);
 }
 
+/* Секция изображения */
+.imageSection {
+  width: 100%;
+  margin: 0 auto;
+}
+
+.materialImageContainer {
+  position: relative;
+  width: 100%;
+}
+
+.materialImage {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Кнопка избранного на изображении */
+.favoriteButtonOverlay {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 48px;
+  height: 48px;
+  background: #082445;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(8, 36, 69, 0.3);
+}
+
+.favoriteButtonOverlay .starIcon {
+  width: 24px;
+  height: 24px;
+  color: #ffffff;
+}
+
+.favoriteButtonOverlay .favoriteActive {
+  fill: #ffffff;
+  color: #ffffff;
+}
+
 /* Секция заголовка */
 .titleSection {
   text-align: center;
 }
 
+.titleContainer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
 .title {
   font-size: 28px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-main);
-  margin: 0 0 16px 0;
+  margin: 0;
   line-height: 1.3;
-  font-family: var(--font-cormorant);
+  font-family: 'RalewayMedium', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  flex: 1;
+}
+
+/* Кнопка избранного в заголовке (для материалов без изображения) */
+.favoriteButtonTitle {
+  background: none;
+  border: 2px solid #082445;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.favoriteButtonTitle .starIcon {
+  width: 20px;
+  height: 20px;
+  color: #082445;
+}
+
+.favoriteButtonTitle .favoriteActive {
+  fill: #082445;
+  color: #082445;
 }
 
 .meta {
@@ -73,7 +175,8 @@
   gap: 6px;
   color: var(--text-secondary);
   font-size: 14px;
-  font-family: var(--font-montserrat);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
 /* Секция видео */
@@ -105,16 +208,20 @@
 
 .sectionTitle {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-main);
   margin: 0 0 16px 0;
-  font-family: var(--font-cormorant);
+  font-family: 'RalewayMedium', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .description {
   color: var(--text-secondary);
   line-height: 1.6;
-  font-family: var(--font-montserrat);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+  font-size: 16px;
 }
 
 .description p {
@@ -149,11 +256,13 @@
 .description h4,
 .description h5,
 .description h6 {
-  font-family: var(--font-cormorant);
-  font-weight: 600;
+  font-family: 'RalewayMedium', sans-serif;
+  font-weight: 500;
   color: var(--text-main);
   margin: 20px 0 12px 0;
   line-height: 1.3;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .description h1:first-child,
@@ -237,31 +346,31 @@
   border-bottom-color: var(--accent-blue);
 }
 
-/* Секция внешней ссылки */
-.linkSection {
+/* Секция действий */
+.actionSection {
   display: flex;
   justify-content: center;
+  margin-top: 32px;
 }
 
-.externalLink {
+.primaryButton {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  color: var(--accent-blue);
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 32px;
+  background: #082445;
+  border: none;
+  border-radius: 16px;
+  color: white;
   text-decoration: none;
-  font-weight: 500;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  font-family: var(--font-montserrat);
-}
-
-.externalLink:hover {
-  background: var(--accent-blue-light);
-  border-color: var(--accent-blue);
+  font-weight: 600;
+  font-size: 16px;
+  font-family: 'RalewayMedium', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  min-width: 200px;
+  box-shadow: 0 4px 14px rgba(8, 36, 69, 0.3);
 }
 
 /* Состояния загрузки и ошибки */
@@ -285,6 +394,8 @@
 .loadingContent {
   text-align: center;
   color: var(--text-secondary);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
 .errorContent {
@@ -314,16 +425,19 @@
 
 .errorContent h2 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--status-error);
   margin: 0 0 8px 0;
-  font-family: var(--font-cormorant);
+  font-family: 'RalewayMedium', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .errorContent p {
   color: var(--text-secondary);
   margin: 0 0 24px 0;
-  font-family: var(--font-montserrat);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
 .errorContent .backButton {
@@ -346,15 +460,52 @@
   }
   
   .title {
-    font-size: 24px;
+    font-size: 22px;
   }
   
   .meta {
     gap: 16px;
   }
   
+  .primaryButton {
+    padding: 14px 24px;
+    font-size: 14px;
+    min-width: 180px;
+  }
+  
+  .actionSection {
+    margin-top: 24px;
+  }
+  
   .main {
     gap: 24px;
+  }
+  
+  .favoriteButtonOverlay {
+    width: 44px;
+    height: 44px;
+    top: 12px;
+    right: 12px;
+  }
+  
+  .favoriteButtonOverlay .starIcon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .titleContainer {
+    gap: 12px;
+  }
+  
+  .favoriteButtonTitle {
+    width: 36px;
+    height: 36px;
+    margin-top: 2px;
+  }
+  
+  .favoriteButtonTitle .starIcon {
+    width: 18px;
+    height: 18px;
   }
   
   .videoContainer {

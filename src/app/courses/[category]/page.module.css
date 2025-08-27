@@ -1,0 +1,456 @@
+/* Course Category Page Styles - isto4nik Theme */
+
+/* Шрифты для courses */
+@font-face {
+  font-family: 'RalewayMedium';
+  src: url('/fonts/Raleway-v4020-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+.container {
+  background: var(--bg-primary);
+  min-height: 100vh;
+  padding: 16px;
+  padding-top: calc(16px + var(--safe-area-inset-top, 0px));
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+  color: var(--text-main);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+  position: relative;
+}
+
+/* Заголовок страницы */
+.header {
+  margin-bottom: 24px;
+  margin-top: var(--safe-area-inset-top, 0px);
+}
+
+.headerContent {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.headerIcon {
+  width: 24px;
+  height: 24px;
+  color: #082445;
+  filter: drop-shadow(var(--shadow-medium));
+}
+
+.headerTitle {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin: 0;
+  font-family: 'RalewayMedium', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.headerDescription {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+}
+
+/* Loading состояние */
+.loading {
+  min-height: 100vh;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingContent {
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+}
+
+.loadingIcon {
+  width: 48px;
+  height: 48px;
+  color: #082445;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 16px;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Раздел материалов */
+.materialsSection {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.materialCard {
+  display: flex;
+  flex-direction: column;
+  background: #E4DEDC;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  width: 100%;
+  cursor: pointer;
+}
+
+/* Контейнер изображения с кнопкой избранного */
+.materialImageContainer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 2 / 1;
+  overflow: hidden;
+  background: var(--border-light);
+}
+
+.materialImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.materialImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--border-light);
+}
+
+.placeholderIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+/* Кнопка избранного на изображении */
+.favoriteButtonOverlay {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 40px;
+  height: 40px;
+  background: #082445;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(8, 36, 69, 0.2);
+}
+
+.favoriteButtonOverlay .starIcon {
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+}
+
+.favoriteButtonOverlay .favoriteActive {
+  fill: #ffffff;
+  color: #ffffff;
+}
+
+.materialContent {
+  padding: 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: left;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+}
+
+.materialInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.materialTitle {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 6px 0;
+  color: var(--text-main);
+  line-height: 1.3;
+  font-family: 'RalewayMedium', sans-serif;
+  text-transform: uppercase;
+}
+
+.materialDescription {
+  font-size: 16px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: calc(1.5em * 3); /* 3 строки с учетом line-height */
+}
+
+/* HTML форматирование в коротком описании */
+.materialDescription b,
+.materialDescription strong {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.materialDescription i,
+.materialDescription em {
+  font-style: italic;
+  color: var(--text-main);
+}
+
+.materialDescription u {
+  text-decoration: underline;
+  color: var(--text-main);
+}
+
+.materialDescription h1,
+.materialDescription h2,
+.materialDescription h3,
+.materialDescription h4,
+.materialDescription h5,
+.materialDescription h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--text-main);
+  margin: 4px 0;
+  line-height: 1.3;
+  font-size: 16px; /* Ограничиваем размер в коротком описании */
+}
+
+.materialDescription a {
+  color: #082445;
+  text-decoration: none;
+}
+
+.materialDescription a:hover {
+  text-decoration: underline;
+}
+
+.readMoreButton {
+  background: none;
+  border: none;
+  color: #082445;
+  font-size: 14px;
+  font-weight: 300;
+  font-family: 'GilroyLight', sans-serif;
+  cursor: pointer;
+  padding: 0;
+  margin-top: 4px;
+  text-align: left;
+}
+
+.materialTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.materialTag {
+  background: var(--border-light);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 300;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-family: 'GilroyLight', sans-serif;
+}
+
+.linkIcon {
+  width: 16px;
+  height: 16px;
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 64px 24px;
+  background: #E4DEDC;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+}
+
+.emptyIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-secondary);
+  margin: 0 auto 16px;
+  opacity: 0.5;
+}
+
+.emptyTitle {
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: var(--text-main);
+  text-transform: uppercase;
+}
+
+.emptyDescription {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+}
+
+/* Error State */
+.errorState {
+  text-align: center;
+  padding: 64px 24px;
+  background: #E4DEDC;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+}
+
+.errorIcon {
+  width: 48px;
+  height: 48px;
+  color: var(--text-secondary);
+  margin: 0 auto 16px;
+  opacity: 0.5;
+}
+
+.errorTitle {
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0 0 8px 0;
+  color: var(--text-main);
+}
+
+.errorDescription {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.4;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+}
+
+.bottomSpacing {
+  height: 16px;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .container {
+    padding: 12px;
+    padding-top: calc(12px + var(--safe-area-inset-top, 0px));
+    padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+    padding-left: calc(12px + var(--safe-area-inset-left, 0px));
+    padding-right: calc(12px + var(--safe-area-inset-right, 0px));
+  }
+
+  .header {
+    margin-bottom: 16px;
+    margin-top: 0;
+  }
+
+  .headerTitle {
+    font-size: 18px;
+  }
+  
+  .materialContent {
+    padding: 12px;
+  }
+  
+  .materialTitle {
+    font-size: 16px;
+  }
+  
+  .materialDescription {
+    font-size: 14px;
+    font-weight: 300;
+  }
+  
+  .favoriteButtonOverlay {
+    width: 36px;
+    height: 36px;
+    top: 8px;
+    right: 8px;
+  }
+  
+  .favoriteButtonOverlay .starIcon {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .placeholderIcon {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Стили для планшетов - наследуются базовые */
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+    padding: 24px;
+    padding-top: calc(24px + var(--safe-area-inset-top, 0px));
+    padding-bottom: calc(100px + var(--safe-area-inset-bottom, 0px));
+  }
+  
+  .header {
+    margin-bottom: 32px;
+  }
+  
+  .headerTitle {
+    font-size: 24px;
+  }
+  
+  .materialsSection {
+    margin-bottom: 32px;
+  }
+}

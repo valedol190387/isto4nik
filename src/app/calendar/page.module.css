@@ -1,4 +1,29 @@
-/* Calendar Page Styles - Ayuna Beauty Theme */
+/* Calendar Page Styles - isto4nik Theme */
+
+/* Шрифты для календаря */
+@font-face {
+  font-family: 'RalewayMedium';
+  src: url('/fonts/Raleway-v4020-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyExtraBold';
+  src: url('/fonts/Gilroy-ExtraBold.otf') format('opentype');
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
 
 .container {
   background: var(--bg-primary);
@@ -9,7 +34,8 @@
   padding-left: calc(16px + var(--safe-area-inset-left, 0px));
   padding-right: calc(16px + var(--safe-area-inset-right, 0px));
   color: var(--text-main);
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
   position: relative;
 }
 
@@ -24,12 +50,14 @@
 .loadingContent {
   text-align: center;
   color: var(--text-secondary);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
 .loadingIcon {
   width: 48px;
   height: 48px;
-  color: var(--accent-blue);
+  color: #082445;
   animation: spin 1s linear infinite;
   margin: 0 auto 16px;
 }
@@ -59,16 +87,16 @@
 .headerIcon {
   width: 24px;
   height: 24px;
-  color: var(--accent-blue);
+  color: #082445;
   filter: drop-shadow(var(--shadow-medium));
 }
 
 .headerTitle {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-main);
   margin: 0;
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   text-transform: uppercase;
 }
 
@@ -82,7 +110,7 @@
 
 /* Month Card */
 .monthCard {
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   padding: 24px;
   box-shadow: var(--shadow-light);
@@ -115,15 +143,15 @@
 .monthIcon {
   width: 20px;
   height: 20px;
-  color: var(--accent-blue);
+  color: #082445;
 }
 
 .monthTitle {
-  font-family: var(--font-heading);
+  font-family: 'GilroyExtraBold', sans-serif;
   font-size: 20px;
-  font-weight: 500;
+  font-weight: 800;
   margin: 0;
-  color: var(--accent-blue);
+  color: #082445;
   text-transform: uppercase;
 }
 
@@ -132,19 +160,20 @@
   font-size: 16px;
   margin: 0 0 16px 0;
   line-height: 1.5;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
 }
 
 .showAllButton {
   background: none;
   border: none;
-  color: var(--accent-blue);
+  color: #082445;
   font-size: 14px;
   cursor: pointer;
   padding: 0;
   text-decoration: underline;
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
 .showAllButton:hover {
@@ -153,7 +182,7 @@
 
 /* Filters */
 .filtersCard {
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   padding: 24px;
   box-shadow: var(--shadow-light);
@@ -161,11 +190,11 @@
 }
 
 .filtersTitle {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 18px;
   font-weight: 500;
-  margin: 0 0 16px 0;
-  color: var(--accent-blue);
+  margin: 0;
+  color: #082445;
   text-transform: uppercase;
 }
 
@@ -173,6 +202,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-top: 16px;
 }
 
 .filterButton {
@@ -184,7 +214,7 @@
   cursor: pointer;
   transition: all 0.2s ease;
   color: var(--text-secondary);
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
   text-transform: lowercase;
 }
@@ -194,19 +224,19 @@
 }
 
 .filterButtonActive {
-  background: var(--accent-blue);
+  background: #082445;
   color: white;
-  border-color: var(--accent-blue);
+  border-color: #082445;
 }
 
 .filterButtonActive:hover {
-  background: var(--accent-blue);
-  opacity: 0.9;
+  background: #0a2a52;
+  opacity: 1;
 }
 
 /* Calendar Grid */
 .calendarCard {
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   padding: 24px;
   box-shadow: var(--shadow-light);
@@ -236,7 +266,7 @@
   color: var(--text-secondary);
   font-size: 14px;
   padding: 8px;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
 }
 
 .calendarDays {
@@ -256,7 +286,7 @@
   border: none;
   cursor: pointer;
   transition: all 0.2s ease;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
   margin: 0 auto;
 }
@@ -271,7 +301,7 @@
 }
 
 .today {
-  background: var(--accent-blue);
+  background: #082445;
   color: white;
   font-weight: 600;
 }
@@ -283,7 +313,7 @@
 
 .hasEvent {
   background: #ffd700;
-  color: var(--accent-blue);
+  color: #082445;
   font-weight: 500;
 }
 
@@ -311,7 +341,7 @@
   font-weight: 300;
   text-align: center;
   margin: 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-size: 16px;
 }
 
@@ -322,14 +352,27 @@
   gap: 16px;
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 8px;
+}
+
+.sectionIcon {
+  width: 20px;
+  height: 20px;
+  color: #082445;
+  flex-shrink: 0;
+}
+
 .eventsTitle {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 20px;
   font-weight: 500;
   margin: 0;
-  color: var(--accent-blue);
+  color: #082445;
   text-transform: uppercase;
-  padding: 0 8px;
 }
 
 .eventsList {
@@ -339,7 +382,7 @@
 }
 
 .eventCard {
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   padding: 20px;
   box-shadow: var(--shadow-light);
@@ -366,7 +409,7 @@
   flex-shrink: 0;
   background: var(--bg-card);
   border: 1px solid var(--border-light);
-  color: var(--accent-blue);
+  color: #082445;
 }
 
 .eventIconSvg {
@@ -388,11 +431,11 @@
 }
 
 .eventTitle {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 16px;
   font-weight: 500;
   margin: 0;
-  color: var(--accent-blue);
+  color: #082445;
   text-transform: uppercase;
 }
 
@@ -404,7 +447,7 @@
   font-size: 12px;
   font-weight: 300;
   text-transform: lowercase;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
 }
 
 .eventMeta {
@@ -414,7 +457,7 @@
   margin-bottom: 12px;
   font-size: 14px;
   color: var(--text-secondary);
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
 }
 
@@ -434,7 +477,7 @@
   font-size: 16px;
   line-height: 1.5;
   margin: 0 0 12px 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
 }
 
@@ -443,10 +486,10 @@
 }
 
 .eventLinkButton {
-  color: var(--accent-blue);
+  color: #082445;
   font-size: 14px;
   text-decoration: underline;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
 }
 
@@ -455,7 +498,7 @@
 }
 
 .emptyState {
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   padding: 48px 24px;
   text-align: center;
@@ -465,7 +508,7 @@
 .emptyState p {
   color: var(--text-secondary);
   margin: 0;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
   font-size: 16px;
 }
@@ -574,6 +617,6 @@
   font-size: 12px;
   font-weight: 300;
   text-transform: lowercase;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   border: 1px solid var(--border-light);
 } 

@@ -1,222 +1,329 @@
 /* Основной контейнер */
 .container {
-  background: #DEE6E9; /* Цвет фона как указано */
+  background: #E4DEDC; /* Цвет фона как в resources */
   min-height: 100vh;
-  padding: 0; /* Убираем padding для полноэкранного изображения */
-  /* Safe Area отступы только снизу */
+  padding: 0;
+  /* Safe Area отступ снизу для навигации */
   padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
   color: var(--text-main);
   font-family: var(--font-body);
   position: relative;
 }
 
-/* Главное изображение */
-.heroImage {
-  position: relative;
+/* Псевдоэлемент для заливки фона до самого верха */
+.container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
   width: 100%;
-  height: 400px;
-  margin-bottom: 24px;
-  overflow: hidden;
+  height: calc(200px + var(--safe-area-inset-top, 0px));
+  background: #E4DEDC;
+  z-index: -1;
 }
 
+/* Главное изображение */
 .heroImg {
-  object-fit: cover;
+  width: 100%;
+  height: auto;
+  margin-top: calc(10px + var(--safe-area-inset-top, 0px));
+  display: block;
 }
 
-/* Контентная область с отступами */
-.content {
+/* Заголовок (не используется) */
+.title {
+  font-family: Cormorant;
+  font-style: normal;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0 0 24px 0; /* Убираем верхний отступ - логотип идет первым */
   padding: 0 16px;
   /* Safe Area отступы по бокам */
   padding-left: calc(16px + var(--safe-area-inset-left, 0px));
   padding-right: calc(16px + var(--safe-area-inset-right, 0px));
 }
 
-/* Заголовок */
-.title {
-  font-family: Cormorant;
-  font-size: 28px;
-  color: var(--accent-blue);
-  font-weight: 600;
-  font-style: normal;
-  text-transform: uppercase;
-  margin: 0 0 20px 0;
-  line-height: 1.2;
-}
-
-/* Описание */
-.description {
+/* Основной текст */
+.mainText {
   font-family: Montserrat;
   font-style: normal;
-  font-size: 16px;
-  color: var(--text-secondary);
-  text-transform: lowercase;
-  margin: 0 0 32px 0;
+  font-size: 18px;
+  font-weight: 400;
   line-height: 1.5;
-}
-
-/* Подзаголовок */
-.subtitle {
-  font-family: Cormorant;
-  font-size: 28px;
-  color: var(--accent-blue);
-  font-weight: 600;
-  font-style: normal;
-  text-transform: uppercase;
-  margin: 0 0 24px 0;
-  line-height: 1.2;
-}
-
-/* Секция с блоками */
-.blocksSection {
-  margin-bottom: 40px;
-}
-
-/* Сетка блоков */
-.blocksGrid {
-  display: grid;
-  grid-template-columns: 1.45fr 1.85fr; /* Ширина пропорциональна соотношениям */
-  grid-template-rows: 1fr 1fr; /* Два ряда одинаковой высоты */
-  gap: 16px;
-  width: 100%;
-  aspect-ratio: 3.35 / 2; /* Общее соотношение сетки (сумма ширин / количество рядов) */
-}
-
-/* Все блоки заполняют свои ячейки */
-.blockNarrow,
-.blockWide {
-  position: relative;
-  border-radius: 12px;
-  overflow: hidden;
-  width: 100%;
-  height: 100%;
-}
-
-/* Изображения в блоках */
-.blockImage {
-  object-fit: cover;
-}
-
-/* Секция уникальности клуба */
-.uniqueSection {
-  margin-bottom: 40px;
-}
-
-/* Заголовок уникальности (маленький) */
-.uniqueTitle {
-  font-family: Montserrat;
-  font-style: normal;
-  font-size: 16px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  margin: 0 0 16px 0;
-  letter-spacing: 0.02em;
-  font-weight: 500;
-}
-
-/* Описание уникальности */
-.uniqueDescription {
-  font-family: Montserrat;
-  font-style: normal;
-  font-size: 16px;
-  color: var(--text-secondary);
-  text-transform: lowercase;
+  color: #2C3F48;
+  text-align: left;
   margin: 0 0 32px 0;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+/* Синяя плашка */
+.highlightBlock {
+  background: #2C3F48;
+  border-radius: 0; /* Убрал закругления */
+  padding: 16px 20px; /* Уменьшил отступы */
+  margin: 0 16px 32px 16px;
+  text-align: center;
+  /* Safe Area отступы по бокам */
+  margin-left: calc(16px + var(--safe-area-inset-left, 0px));
+  margin-right: calc(16px + var(--safe-area-inset-right, 0px));
+}
+
+.highlightText {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 22px; /* Увеличил размер шрифта */
+  font-weight: 400; /* Сделал обычным вместо жирного */
+  line-height: 1.4;
+  color: white;
+  text-transform: uppercase;
+}
+
+/* Вторичный текст */
+.secondaryText {
+  font-family: Montserrat;
+  font-style: normal;
+  font-size: 18px;
+  font-weight: 400;
   line-height: 1.5;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0 0 40px 0;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
 }
 
-/* Список подходов */
-.approachList {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+/* Блок для видео - заглушка */
+.videoPlaceholder {
+  margin: 0 16px 40px 16px;
+  /* Safe Area отступы по бокам */
+  margin-left: calc(16px + var(--safe-area-inset-left, 0px));
+  margin-right: calc(16px + var(--safe-area-inset-right, 0px));
 }
 
-/* Элемент списка подходов */
-.approachItem {
+.videoContainer {
+  background: #f0f0f0;
+  border: 2px dashed #2C3F48;
+  border-radius: 16px;
+  padding: 60px 20px;
+  text-align: center;
+  min-height: 250px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: center;
 }
 
-/* Иконка чекбокса */
-.checkIcon {
-  width: 24px;
-  height: 24px;
-  flex-shrink: 0;
+.videoText {
+  font-family: Montserrat;
+  font-size: 16px;
+  font-weight: 500;
+  color: #2C3F48;
+  opacity: 0.7;
 }
 
-/* Текст элемента списка */
-.approachItem span {
+/* Финальный текст */
+.finalText {
   font-family: Montserrat;
   font-style: normal;
-  font-size: 16px;
-  color: var(--text-secondary);
-  text-transform: lowercase;
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #2C3F48;
+  text-align: left;
+  margin: 0 0 40px 0;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
 }
 
-/* Изображение девушки в конце */
-.girlImage {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 12 / 9; /* Фиксированное соотношение сторон */
+/* Шрифты для списка правил */
+@font-face {
+  font-family: 'RalewayBold';
+  src: url('/fonts/Raleway-v4020-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Список правил */
+.reasonsList {
   margin-top: 40px;
-  overflow: hidden;
+  margin-bottom: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0 16px;
+  /* Safe Area отступы по бокам */
+  padding-left: calc(16px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(16px + var(--safe-area-inset-right, 0px));
 }
 
-.girlImg {
-  object-fit: cover;
+/* Элемент правила */
+.reasonItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  background: #CECBCD;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Номер правила */
+.reasonNumber {
+  font-family: 'RalewayBold', sans-serif;
+  font-size: 60px;
+  font-weight: 700;
+  color: #2C3F48;
+  line-height: 1;
+  flex-shrink: 0;
+  margin-top: -5px;
+}
+
+/* Текст правила */
+.reasonText {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: #2C3F48;
+  line-height: 1.4;
+  margin-top: 10px;
+}
+
+/* Кнопка назад на главную */
+.backToHomeContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.backToHomeLink {
+  display: inline-block;
+  width: 60%;
+  max-width: 300px;
+  min-width: 120px;
+  transition: opacity 0.2s ease;
+}
+
+.backToHomeLink:hover {
+  opacity: 0.8;
+}
+
+.backToHomeImage {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 /* Адаптивность */
 @media (max-width: 480px) {
-  .content {
+  .reasonsList {
+    margin-top: 24px;
+    margin-bottom: 32px;
+    gap: 24px;
     padding: 0 12px;
   }
   
-  .heroImage {
-    height: 300px;
-    margin-bottom: 20px;
-  }
-  
-  .title {
-    font-size: 24px;
-    margin-bottom: 16px;
-  }
-  
-  .subtitle {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  .description {
-    font-size: 15px;
-    margin-bottom: 28px;
-  }
-  
-  .blocksGrid {
-    gap: 12px;
-  }
-  
-  .uniqueTitle {
-    font-size: 14px;
-    margin-bottom: 14px;
-  }
-  
-  .uniqueDescription {
-    font-size: 15px;
-    margin-bottom: 24px;
-  }
-  
-  .approachList {
+  .reasonItem {
     gap: 16px;
+    padding: 16px;
+    border-radius: 6px;
   }
   
-  .approachItem span {
+  .reasonNumber {
+    font-size: 40px;
+    margin-top: -3px;
+  }
+  
+  .reasonText {
+    font-size: 16px;
+    margin-top: 5px;
+  }
+
+  .backToHomeContainer {
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+
+  .title {
+    margin: 0 0 20px 0;
+    font-size: 24px;
+    padding: 0 12px;
+  }
+  
+  .mainText,
+  .secondaryText,
+  .finalText {
+    font-size: 16px;
+    padding: 0 12px;
+  }
+  
+  .highlightBlock {
+    margin: 0 12px 24px 12px;
+    padding: 12px 16px; /* Еще меньше отступы на мобильных */
+  }
+  
+  .highlightText {
+    font-size: 18px; /* Крупнее на мобильных */
+  }
+  
+  .videoPlaceholder {
+    margin: 0 12px 32px 12px;
+  }
+  
+  .videoContainer {
+    padding: 40px 16px;
+    min-height: 200px;
+  }
+  
+  .videoText {
     font-size: 14px;
   }
-  
-  .girlImage {
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .reasonsList {
     margin-top: 32px;
+    margin-bottom: 48px;
+    gap: 28px;
+  }
+  
+  .reasonItem {
+    gap: 20px;
+    padding: 18px;
+    border-radius: 7px;
+  }
+  
+  .reasonNumber {
+    font-size: 50px;
+    margin-top: -4px;
+  }
+  
+  .reasonText {
+    font-size: 18px;
+    margin-top: 8px;
+  }
+
+  .backToHomeContainer {
+    margin-top: 18px;
+    margin-bottom: 10px;
   }
 }
 
@@ -226,70 +333,114 @@
     margin: 0 auto;
   }
   
-  .heroImage {
-    height: 450px;
-    margin-bottom: 32px;
+  .container::before {
+    max-width: 600px;
+  }
+  
+  .reasonsList {
+    margin-top: 40px;
+    margin-bottom: 48px;
+    gap: 30px;
+  }
+  
+  .reasonItem {
+    gap: 24px;
+    padding: 20px;
+    border-radius: 8px;
+  }
+  
+  .reasonNumber {
+    font-size: 55px;
+    margin-top: -5px;
+  }
+  
+  .reasonText {
+    font-size: 20px;
+    margin-top: 10px;
+  }
+
+  .backToHomeContainer {
+    margin-top: 20px;
+    margin-bottom: 10px;
   }
   
   .title {
     font-size: 32px;
-    margin-bottom: 24px;
+    margin: 0 0 28px 0;
   }
   
-  .subtitle {
-    font-size: 32px;
-    margin-bottom: 28px;
+  .mainText,
+  .secondaryText,
+  .finalText {
+    font-size: 20px;
   }
   
-  .description {
-    font-size: 18px;
-    margin-bottom: 40px;
+  .highlightText {
+    font-size: 24px; /* Крупнее на планшетах */
   }
   
-  .blocksGrid {
-    gap: 20px;
-  }
-  
-  .girlImage {
-    margin-top: 48px;
+  .highlightBlock {
+    padding: 18px 24px; /* Меньше отступы */
   }
 }
 
 @media (min-width: 1024px) {
   .container {
     max-width: 800px;
-    padding-bottom: 100px;
   }
   
-  .content {
-    padding: 0 24px;
+  .container::before {
+    max-width: 800px;
   }
   
-  .heroImage {
-    height: 500px;
-    margin-bottom: 40px;
+  .reasonsList {
+    margin-top: 40px;
+    margin-bottom: 56px;
+    gap: 32px;
+  }
+  
+  .reasonItem {
+    gap: 24px;
+    padding: 24px;
+    border-radius: 10px;
+  }
+  
+  .reasonNumber {
+    font-size: 60px;
+    margin-top: -5px;
+  }
+  
+  .reasonText {
+    font-size: 22px;
+    margin-top: 10px;
+  }
+
+  .backToHomeContainer {
+    margin-top: 24px;
+    margin-bottom: 12px;
   }
   
   .title {
     font-size: 36px;
-    margin-bottom: 28px;
+    margin: 0 0 32px 0;
   }
   
-  .subtitle {
-    font-size: 36px;
-    margin-bottom: 32px;
+  .mainText,
+  .secondaryText,
+  .finalText {
+    font-size: 22px;
   }
   
-  .description {
-    font-size: 20px;
-    margin-bottom: 48px;
+  .highlightText {
+    font-size: 26px; /* Крупнее на десктопе */
   }
   
-  .blocksGrid {
-    gap: 24px;
+  .highlightBlock {
+    padding: 20px 32px; /* Меньше отступы */
   }
   
-  .girlImage {
-    margin-top: 56px;
+  .videoContainer {
+    min-height: 300px;
+    padding: 80px 40px;
   }
 } 

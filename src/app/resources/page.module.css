@@ -1,0 +1,990 @@
+/* Локальные шрифты */
+@font-face {
+  font-family: 'RalewayBold';
+  src: url('/fonts/Raleway-v4020-Bold.otf') format('opentype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'RalewayMedium';
+  src: url('/fonts/Raleway-v4020-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Основной контейнер */
+.container {
+  background: #E4DEDC;
+  min-height: 100vh;
+  padding: 24px;
+  /* Safe Area отступы - автоматически учитывают notch, панели Telegram и системные зоны */
+  padding-top: calc(24px + var(--safe-area-inset-top, 0px));
+  padding-bottom: calc(80px + var(--safe-area-inset-bottom, 0px));
+  padding-left: calc(24px + var(--safe-area-inset-left, 0px));
+  padding-right: calc(24px + var(--safe-area-inset-right, 0px));
+  color: var(--text-main);
+  font-family: var(--font-body);
+  position: relative;
+}
+
+/* Псевдоэлемент для заливки фона до самого верха */
+.container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  height: calc(200px + var(--safe-area-inset-top, 0px));
+  background: #E4DEDC;
+  z-index: -1;
+}
+
+/* Ограничения ширины псевдоэлемента под разные экраны */
+@media (min-width: 768px) {
+  .container::before {
+    max-width: 600px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container::before {
+    max-width: 800px;
+  }
+}
+
+/* Блок автора */
+.authorSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 24px;
+  min-height: 300px;
+}
+
+/* Блок автора с обратным порядком (фото справа) */
+.authorSectionReverse {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  gap: 24px;
+  min-height: 300px;
+}
+
+/* Контейнер изображения автора */
+.authorImageContainer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Изображение автора */
+.authorImage {
+  width: 280px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 0;
+}
+
+/* Контент автора */
+.authorContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* Контент автора слева (для обратного блока) */
+.authorContentLeft {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: left;
+}
+
+/* Заголовок автора */
+.authorTitle {
+  font-family: 'RalewayBold', sans-serif;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #082445;
+  margin: 0 0 16px 0;
+  text-transform: none;
+}
+
+/* Текст автора */
+.authorText {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: #082445;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Описание метода */
+.methodDescription {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+/* Заголовок метода */
+.methodHeader {
+  margin-top: 40px;
+  margin-bottom: 24px;
+}
+
+/* Блоки с пунктами */
+.methodPoints {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+  margin-bottom: 40px;
+}
+
+.pointCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 0;
+}
+
+.pointIcon {
+  flex-shrink: 0;
+  margin-top: 4px;
+}
+
+.pointIconImage {
+  width: 40px;
+  height: 40px;
+}
+
+.pointText {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  color: #082445;
+  margin: 0;
+  line-height: 1.4;
+}
+
+/* Текст метода */
+.methodText {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: #082445;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.methodText:last-child {
+  margin-bottom: 0;
+}
+
+/* Блок статистики с синим фоном */
+.statsSection {
+  background: #082445;
+  margin: 40px -24px;
+  padding: 20px 24px;
+  border-radius: 0;
+}
+
+/* Текст статистики */
+.statsText {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 24px;
+  font-weight: 300;
+  color: #FFFFFF;
+  margin: 0;
+  line-height: 1.4;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Блок с дополнительным текстом */
+.additionalDescription {
+  margin-top: 40px;
+}
+
+/* Дополнительный текст */
+.additionalText {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: #082445;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.additionalText:last-child {
+  margin-bottom: 0;
+}
+
+/* Блок тест-драйва */
+.testDriveSection {
+  background: #D9CECA;
+  margin: 0 -24px 40px -24px;
+  padding: 20px 24px;
+  border-radius: 0;
+}
+
+.testDriveText {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 22px;
+  font-weight: 300;
+  color: #082445;
+  margin: 0 0 16px 0;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.testDriveText:last-child {
+  margin-bottom: 0;
+}
+
+.testDriveLink {
+  color: #082445;
+  text-decoration: underline;
+  font-weight: 400;
+}
+
+/* Кнопки видеохостингов */
+.videoHostingButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 32px;
+  margin-bottom: 40px;
+}
+
+.hostingButton {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60px;
+}
+
+.hostingImage {
+  width: 100%;
+  height: auto;
+  max-width: 170px;
+  min-width: 100px;
+}
+
+/* Изображение на всю ширину */
+.fullWidthImageSection {
+  margin: 40px -24px 40px -24px;
+  padding: 0;
+}
+
+.fullWidthImage {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* Заголовок доступных курсов */
+.availableCoursesHeader {
+  margin-top: 40px;
+  margin-bottom: 24px;
+}
+
+.availableCoursesTitle {
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 24px;
+  font-weight: 500;
+  color: #082445;
+  text-transform: uppercase;
+  text-align: left;
+  margin: 0;
+}
+
+/* Сетка доступных курсов */
+.availableCoursesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 24px;
+  margin-bottom: 40px;
+}
+
+.courseCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 0;
+}
+
+.courseLink {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  color: #082445;
+  text-decoration: underline;
+  line-height: 1.4;
+  margin: 0;
+}
+
+/* Кнопка назад на главную */
+.backToHomeContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+.backToHomeLink {
+  display: inline-block;
+  width: 60%;
+  max-width: 300px;
+  min-width: 120px;
+  transition: opacity 0.2s ease;
+}
+
+.backToHomeLink:hover {
+  opacity: 0.8;
+}
+
+.backToHomeImage {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+  
+/* Основной отступ снизу для контента */
+.container > *:last-child {
+  margin-bottom: 40px;
+}
+
+/* Ограничения ширины контейнера */
+@media (min-width: 768px) {
+  .container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+  }
+}
+
+/* Адаптивные отступы для контента */
+@media (max-width: 480px) {
+  .authorSection {
+    gap: 8px;
+    min-height: 160px;
+  }
+  
+  .authorSectionReverse {
+    gap: 8px;
+    min-height: 160px;
+  }
+  
+  .authorTitle {
+    font-size: 28px;
+  }
+  
+  .authorImageContainer {
+    width: 140px;
+    height: 180px;
+  }
+  
+  .authorImage {
+    width: 140px;
+    height: 180px;
+  }
+  
+  .authorText {
+    font-size: 17px;
+  }
+  
+  .methodDescription {
+    margin-top: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .methodHeader {
+    margin-top: 32px;
+    margin-bottom: 20px;
+  }
+  
+  .methodPoints {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 20px;
+    margin-bottom: 32px;
+  }
+  
+  .pointCard {
+    gap: 8px;
+  }
+  
+  .pointIconImage {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .pointText {
+    font-size: 14px;
+  }
+  
+  .methodText {
+    font-size: 17px;
+    margin: 0 0 12px 0;
+  }
+  
+  .statsSection {
+    margin: 24px -24px;
+    padding: 12px 24px;
+  }
+  
+  .statsText {
+    font-size: 18px;
+  }
+  
+  .additionalDescription {
+    margin-top: 24px;
+  }
+  
+  .additionalText {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+  
+  .additionalText:last-child {
+    margin-bottom: 0;
+  }
+  
+  .videoHostingButtons {
+    gap: 5px;
+    margin-top: 24px;
+    margin-bottom: 32px;
+  }
+  
+  .hostingButton {
+    min-height: 52px;
+  }
+  
+  .hostingImage {
+    max-width: 130px;
+    min-width: 80px;
+  }
+  
+  .fullWidthImageSection {
+    margin: 32px -24px 32px -24px;
+  }
+  
+  .availableCoursesHeader {
+    margin-top: 24px;
+    margin-bottom: 16px;
+  }
+  
+  .availableCoursesTitle {
+    font-size: 18px;
+  }
+  
+  .availableCoursesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+    margin-bottom: 32px;
+  }
+  
+  .courseCard {
+    gap: 10px;
+  }
+  
+    .courseLink {
+    font-size: 14px;
+  }
+  
+  .backToHomeContainer {
+    margin-top: 16px;
+    margin-bottom: 8px;
+  }
+    
+  .testDriveSection {
+    margin: 0 -24px 32px -24px;
+    padding: 16px 24px;
+  }
+  
+  .testDriveText {
+    font-size: 17px;
+    margin-bottom: 12px;
+  }
+  
+  .container > *:last-child {
+    margin-bottom: 32px;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .authorSection {
+    gap: 12px;
+    min-height: 180px;
+  }
+  
+  .authorSectionReverse {
+    gap: 12px;
+    min-height: 180px;
+  }
+  
+  .authorTitle {
+    font-size: 36px;
+  }
+  
+  .authorImageContainer {
+    width: 160px;
+    height: 200px;
+  }
+  
+  .authorImage {
+    width: 160px;
+    height: 200px;
+  }
+  
+    .authorText {
+    font-size: 18px;
+  }
+  
+  .methodDescription {
+    margin-top: 32px;
+    margin-bottom: 48px;
+  }
+  
+  .methodHeader {
+    margin-top: 36px;
+    margin-bottom: 20px;
+  }
+  
+  .methodPoints {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-top: 22px;
+    margin-bottom: 36px;
+  }
+  
+  .pointCard {
+    gap: 12px;
+  }
+  
+  .pointIconImage {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .pointText {
+    font-size: 14px;
+  }
+  
+  .methodText {
+    font-size: 18px;
+    margin: 0 0 14px 0;
+  }
+  
+  .statsSection {
+    margin: 32px -24px;
+    padding: 15px 24px;
+  }
+  
+  .statsText {
+    font-size: 20px;
+  }
+  
+  .additionalDescription {
+    margin-top: 32px;
+  }
+  
+  .additionalText {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+  
+  .additionalText:last-child {
+    margin-bottom: 0;
+  }
+  
+  .videoHostingButtons {
+    gap: 6px;
+    margin-top: 28px;
+    margin-bottom: 36px;
+  }
+  
+  .hostingButton {
+    min-height: 56px;
+  }
+  
+  .hostingImage {
+    max-width: 150px;
+    min-width: 90px;
+  }
+  
+  .fullWidthImageSection {
+    margin: 36px -24px 36px -24px;
+  }
+  
+  .availableCoursesHeader {
+    margin-top: 28px;
+    margin-bottom: 18px;
+  }
+  
+  .availableCoursesTitle {
+    font-size: 20px;
+  }
+  
+  .availableCoursesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 18px;
+    margin-bottom: 36px;
+  }
+  
+  .courseCard {
+    gap: 12px;
+  }
+  
+    .courseLink {
+    font-size: 15px;
+  }
+  
+  .backToHomeContainer {
+    margin-top: 18px;
+    margin-bottom: 10px;
+  }
+    
+  .testDriveSection {
+    margin: 0 -24px 48px -24px;
+    padding: 18px 24px;
+  }
+  
+  .testDriveText {
+    font-size: 18px;
+    margin-bottom: 14px;
+  }
+  
+  .container > *:last-child {
+    margin-bottom: 48px;
+  }
+}
+
+@media (min-width: 768px) {
+  .authorSection {
+    gap: 24px;
+    min-height: 280px;
+  }
+  
+  .authorSectionReverse {
+    gap: 24px;
+    min-height: 280px;
+  }
+  
+  .authorTitle {
+    font-size: 42px;
+  }
+  
+  .authorImageContainer {
+    width: 240px;
+    height: 280px;
+  }
+  
+  .authorImage {
+    width: 240px;
+    height: 280px;
+  }
+  
+  .authorText {
+    font-size: 23px;
+  }
+  
+  .methodDescription {
+    margin-top: 40px;
+    margin-bottom: 48px;
+  }
+  
+  .methodHeader {
+    margin-top: 40px;
+    margin-bottom: 24px;
+  }
+  
+  .methodPoints {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+    margin-bottom: 40px;
+  }
+  
+  .pointCard {
+    gap: 14px;
+  }
+  
+  .pointIconImage {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .pointText {
+    font-size: 18px;
+  }
+  
+  .methodText {
+    font-size: 23px;
+    margin: 0 0 16px 0;
+  }
+  
+  .statsSection {
+    margin: 40px -24px;
+    padding: 18px 24px;
+  }
+  
+  .statsText {
+    font-size: 22px;
+  }
+  
+  .additionalDescription {
+    margin-top: 40px;
+  }
+  
+  .additionalText {
+    font-size: 23px;
+    margin-bottom: 16px;
+  }
+  
+  .additionalText:last-child {
+    margin-bottom: 0;
+  }
+  
+  .videoHostingButtons {
+    gap: 6px;
+    margin-top: 32px;
+    margin-bottom: 40px;
+  }
+  
+  .hostingButton {
+    min-height: 60px;
+  }
+  
+  .hostingImage {
+    max-width: 170px;
+    min-width: 100px;
+  }
+  
+  .fullWidthImageSection {
+    margin: 40px -24px 40px -24px;
+  }
+  
+  .availableCoursesHeader {
+    margin-top: 32px;
+    margin-bottom: 20px;
+  }
+  
+  .availableCoursesTitle {
+    font-size: 22px;
+  }
+  
+  .availableCoursesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 20px;
+    margin-bottom: 40px;
+  }
+  
+  .courseCard {
+    gap: 14px;
+  }
+  
+    .courseLink {
+    font-size: 16px;
+  }
+  
+  .backToHomeContainer {
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+    
+  .testDriveSection {
+    margin: 0 -24px 48px -24px;
+    padding: 20px 24px;
+  }
+  
+  .testDriveText {
+    font-size: 23px;
+    margin-bottom: 16px;
+  }
+  
+  .container > *:last-child {
+    margin-bottom: 48px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .authorSection {
+    gap: 24px;
+    min-height: 300px;
+  }
+  
+  .authorSectionReverse {
+    gap: 24px;
+    min-height: 300px;
+  }
+  
+  .authorTitle {
+    font-size: 48px;
+  }
+  
+  .authorImageContainer {
+    width: 280px;
+    height: 300px;
+  }
+  
+  .authorImage {
+    width: 280px;
+    height: 300px;
+  }
+  
+  .authorText {
+    font-size: 24px;
+  }
+  
+  .methodDescription {
+    margin-top: 40px;
+    margin-bottom: 56px;
+  }
+  
+  .methodHeader {
+    margin-top: 40px;
+    margin-bottom: 24px;
+  }
+  
+  .methodPoints {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+    margin-top: 28px;
+    margin-bottom: 48px;
+  }
+  
+  .pointCard {
+    gap: 16px;
+  }
+  
+  .pointIconImage {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .pointText {
+    font-size: 19px;
+  }
+  
+  .methodText {
+    font-size: 24px;
+    margin: 0 0 16px 0;
+  }
+  
+  .statsSection {
+    margin: 40px -24px;
+    padding: 20px 24px;
+  }
+  
+  .statsText {
+    font-size: 24px;
+  }
+  
+  .additionalDescription {
+    margin-top: 40px;
+  }
+  
+  .additionalText {
+    font-size: 24px;
+    margin-bottom: 18px;
+  }
+  
+  .additionalText:last-child {
+    margin-bottom: 0;
+  }
+  
+  .videoHostingButtons {
+    gap: 8px;
+    margin-top: 40px;
+    margin-bottom: 48px;
+  }
+  
+  .hostingButton {
+    min-height: 80px;
+  }
+  
+  .hostingImage {
+    max-width: 220px;
+    min-width: 130px;
+  }
+  
+  .fullWidthImageSection {
+    margin: 48px -24px 48px -24px;
+  }
+  
+  .availableCoursesHeader {
+    margin-top: 40px;
+    margin-bottom: 24px;
+  }
+  
+  .availableCoursesTitle {
+    font-size: 24px;
+  }
+  
+  .availableCoursesGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+    margin-bottom: 48px;
+  }
+  
+  .courseCard {
+    gap: 16px;
+  }
+  
+    .courseLink {
+    font-size: 18px;
+  }
+  
+  .backToHomeContainer {
+    margin-top: 24px;
+    margin-bottom: 12px;
+  }
+    
+  .testDriveSection {
+    margin: 0 -24px 56px -24px;
+    padding: 24px 24px;
+  }
+  
+  .testDriveText {
+    font-size: 24px;
+    margin-bottom: 18px;
+  }
+  
+  .container > *:last-child {
+    margin-bottom: 56px;
+  }
+} 

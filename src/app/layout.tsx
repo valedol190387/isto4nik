@@ -28,8 +28,8 @@ import 'normalize.css/normalize.css';
 import './_assets/globals.css';
 
 export const metadata: Metadata = {
-  title: 'Ayuna Beauty',
-  description: 'ЗДОРОВЬЕ = красота 🕊️',
+  title: 'Источник',
+  description: 'Сообщество Теребениных',
 };
 
 export default async function RootLayout({ children }: PropsWithChildren) {

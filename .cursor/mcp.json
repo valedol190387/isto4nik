@@ -9,15 +9,15 @@
       "args": [
         "/Users/valentin/.mcp-servers/selfhosted-supabase-mcp/dist/index.js",
         "--url",
-        "https://supabase.ayunabackoffice.ru",
+        "https://supabase.istochnikbackoffice.ru",
         "--anon-key",
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc1MzA5MzAyMCwiZXhwIjo0OTA4NzY2NjIwLCJyb2xlIjoiYW5vbiJ9.eYGnezoHGSZAfNI3xUr_wMeRjbTlyG9wbd3aGRarNaY",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc1NDEzNTgyMCwiZXhwIjo0OTA5ODA5NDIwLCJyb2xlIjoiYW5vbiJ9.wMRiOXMk23wfbDJr3y4DcWlTzG2PEc1v3UlX6_VrzbU",
         "--service-key",
-        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc1MzA5MzAyMCwiZXhwIjo0OTA4NzY2NjIwLCJyb2xlIjoic2VydmljZV9yb2xlIn0.l616HtP-TvBn1mvcRfMOmm6410uHIJmoRyAyWPw873A",
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsImlhdCI6MTc1NDEzNTgyMCwiZXhwIjo0OTA5ODA5NDIwLCJyb2xlIjoic2VydmljZV9yb2xlIn0.5wZYu52nx53Y4mLNSL4maX0AgpKxYCeViZkscoHEL8Y",
         "--db-url",
-        "postgresql://postgres:IgQ4XFyCUWmmdq471014wBvUfKIhjSXe@185.207.0.55:5432/postgres",
+        "postgresql://postgres:yJ6MjDEYEkAtPonEN6tVA6lnVaqjXQwi@5.35.87.78:5432/postgres",
         "--jwt-secret",
-        "5M9EgWiWNvOPjA7gK3gsRrfztpwKdSG4"
+        "PLREW3f7lEbm8bXlE5fHZqQQuo4S5fhZ"
       ]
     },
     "Figma": {

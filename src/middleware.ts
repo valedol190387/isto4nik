@@ -23,7 +23,7 @@ function getTelegramIdFromHeaders(request: NextRequest): string | null {
 // Проверка статуса подписки на сервере
 async function checkSubscriptionStatus(telegramId: string): Promise<boolean> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'http://localhost:3000';
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
     const response = await fetch(`${baseUrl}/api/users?telegram_id=${telegramId}`, {
       headers: {
         'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,

@@ -1,4 +1,23 @@
-/* Основной контейнер - точно как на reviews */
+/* FAQ Page Styles - isto4nik Theme */
+
+/* Шрифты для FAQ */
+@font-face {
+  font-family: 'RalewayMedium';
+  src: url('/fonts/Raleway-v4020-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Основной контейнер */
 .container {
   background: var(--bg-primary);
   min-height: 100vh;
@@ -9,7 +28,8 @@
   padding-left: calc(16px + var(--safe-area-inset-left, 0px));
   padding-right: calc(16px + var(--safe-area-inset-right, 0px));
   color: var(--text-main);
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
   position: relative;
 }
 
@@ -29,21 +49,90 @@
 .headerIcon {
   width: 24px;
   height: 24px;
-  color: var(--accent-blue);
+  color: #082445;
   filter: drop-shadow(var(--shadow-medium));
 }
 
 .headerTitle {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-main);
   margin: 0;
-  font-family: Montserrat !important;
+  font-family: 'RalewayMedium', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* Контент */
 .content {
   position: relative;
+}
+
+/* Loading State */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 20px;
+  color: var(--text-secondary);
+  gap: 16px;
+  text-align: center;
+}
+
+.loadingIcon {
+  width: 48px;
+  height: 48px;
+  color: #082445;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading p {
+  font-size: 14px;
+  margin: 0;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+}
+
+/* Empty State */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 20px;
+  text-align: center;
+  color: var(--text-secondary);
+  gap: 16px;
+  background: #E4DEDC;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+}
+
+.emptyState svg {
+  color: var(--text-hint);
+  opacity: 0.5;
+}
+
+.emptyState h3 {
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin: 0;
+  font-family: 'RalewayMedium', sans-serif;
+  text-transform: uppercase;
+}
+
+.emptyState p {
+  font-size: 14px;
+  margin: 0;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
 }
 
 /* Адаптивность */
@@ -61,7 +150,7 @@
   
   .headerTitle {
     font-size: 18px;
-    font-family: Montserrat !important;
+    font-family: 'RalewayMedium', sans-serif;
   }
 }
 
@@ -86,66 +175,6 @@
   
   .headerTitle {
     font-size: 24px;
-    font-family: Montserrat !important;
+    font-family: 'RalewayMedium', sans-serif;
   }
 }
-
-/* Loading State */
-.loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 64px 20px;
-  color: var(--text-secondary);
-  gap: 16px;
-  text-align: center;
-}
-
-.loadingIcon {
-  width: 32px;
-  height: 32px;
-  color: var(--accent-blue);
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.loading p {
-  font-size: 14px;
-  margin: 0;
-  font-family: var(--font-body);
-}
-
-/* Empty State */
-.emptyState {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 64px 20px;
-  text-align: center;
-  color: var(--text-secondary);
-  gap: 16px;
-}
-
-.emptyState svg {
-  color: var(--text-hint);
-}
-
-.emptyState h3 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-main);
-  margin: 0;
-  font-family: Montserrat !important;
-}
-
-.emptyState p {
-  font-size: 14px;
-  margin: 0;
-  font-family: var(--font-body);
-} 

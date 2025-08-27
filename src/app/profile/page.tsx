@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check, Loader2 } from 'lucide-react';
+import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check, Loader2, Shield } from 'lucide-react';
 import { Page } from '@/components/Page';
 import { Payment, User as DbUser } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
@@ -178,7 +178,7 @@ export default function ProfilePage() {
       const userInfo = user ? `${user.first_name} ${user.last_name || ''}`.trim() : 'Неизвестный пользователь';
       
       // Отправляем сообщение на webhook
-      const response = await fetch('https://n8n.ayunabackoffice.ru/webhook/zabota', {
+      const response = await fetch('https://n8n.istochnikbackoffice.ru/webhook/zabota', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -321,79 +321,43 @@ export default function ProfilePage() {
   };
 
   const copySystemInfo = () => {
-    const info = getDetailedSystemInfo();
+    const nav = navigator;
+    const screen = window.screen;
+    const connection = (nav as any).connection;
     
     const systemInfo = `
 === ДИАГНОСТИЧЕСКАЯ ИНФОРМАЦИЯ ===
 
-БАЗОВАЯ ИНФОРМАЦИЯ О СИСТЕМЕ:
-Браузер: ${info.userAgent}
-Платформа: ${info.platform}
-Язык: ${info.language}
-Языки: ${info.languages}
-Куки включены: ${info.cookieEnabled ? 'Да' : 'Нет'}
-Онлайн: ${info.onLine ? 'Да' : 'Нет'}
+СИСТЕМНАЯ ИНФОРМАЦИЯ:
+Браузер: ${nav.userAgent}
+Платформа: ${nav.platform}
+Язык: ${nav.language}
+Часовой пояс: ${Intl.DateTimeFormat().resolvedOptions().timeZone}
+Смещение времени: ${new Date().getTimezoneOffset()} мин
 
 ЭКРАН И ДИСПЛЕЙ:
-Разрешение экрана: ${info.screenWidth}x${info.screenHeight}
-Доступное разрешение: ${info.screenAvailWidth}x${info.screenAvailHeight}
-Глубина цвета: ${info.screenColorDepth} бит
-Пиксельная плотность: ${info.devicePixelRatio}
-Ориентация: ${info.screenOrientation}
-
-ОКНО БРАУЗЕРА:
-Размер окна: ${info.windowWidth}x${info.windowHeight}
-Внешний размер: ${info.windowOuterWidth}x${info.windowOuterHeight}
+Разрешение экрана: ${screen.width}x${screen.height}
+Доступное разрешение: ${screen.availWidth}x${screen.availHeight}
+Пиксельная плотность: ${window.devicePixelRatio}
+Размер окна: ${window.innerWidth}x${window.innerHeight}
 
 СЕТЕВОЕ СОЕДИНЕНИЕ:
-Тип соединения: ${info.connectionType}
-Скорость загрузки: ${info.connectionDownlink} Mbps
-RTT: ${info.connectionRtt} ms
-Экономия трафика: ${info.connectionSaveData ? 'Да' : 'Нет'}
+Онлайн статус: ${nav.onLine ? 'Да' : 'Нет'}
+Тип соединения: ${connection?.effectiveType || 'Неизвестно'}
+Скорость загрузки: ${connection?.downlink ? connection.downlink + ' Mbps' : 'Неизвестно'}
+RTT: ${connection?.rtt ? connection.rtt + ' ms' : 'Неизвестно'}
 
-ПАМЯТЬ (JavaScript):
-Используется: ${typeof info.memoryUsedJSHeapSize === 'number' ? Math.round(info.memoryUsedJSHeapSize / 1024 / 1024) + ' MB' : info.memoryUsedJSHeapSize}
-Всего доступно: ${typeof info.memoryTotalJSHeapSize === 'number' ? Math.round(info.memoryTotalJSHeapSize / 1024 / 1024) + ' MB' : info.memoryTotalJSHeapSize}
-Лимит: ${typeof info.memoryJSHeapSizeLimit === 'number' ? Math.round(info.memoryJSHeapSizeLimit / 1024 / 1024) + ' MB' : info.memoryJSHeapSizeLimit}
+ВОЗМОЖНОСТИ:
+Touch поддержка: ${'ontouchstart' in window ? 'Да' : 'Нет'}
+Cookies включены: ${nav.cookieEnabled ? 'Да' : 'Нет'}
+LocalStorage: ${typeof localStorage !== 'undefined' ? 'Да' : 'Нет'}
+WebGL: ${window.WebGLRenderingContext ? 'Да' : 'Нет'}
 
-ВРЕМЯ И ЛОКАЦИЯ:
-Текущее время: ${info.timestamp}
-Часовой пояс: ${info.timezone}
-Смещение: ${info.timezoneOffset} минут
-Текущий URL: ${info.currentUrl}
-Источник перехода: ${info.referrer}
-
-TELEGRAM WEBAPP ДЕТАЛИ:
-Платформа: ${info.tgPlatform}
-Версия: ${info.tgVersion}
-Цветовая схема: ${info.tgColorScheme}
-Развернуто: ${info.tgIsExpanded}
-Высота viewport: ${info.tgViewportHeight}
-Стабильная высота: ${info.tgViewportStableHeight}
-Цвет заголовка: ${info.tgHeaderColor}
-Цвет фона: ${info.tgBackgroundColor}
-Подтверждение закрытия: ${info.tgIsClosingConfirmationEnabled}
-Вертикальные свайпы: ${info.tgIsVerticalSwipesEnabled}
-Init Data: ${info.tgInitData}
-${info.tgInitDataUnsafe !== 'Нет' ? 'Init Data (детали): ' + info.tgInitDataUnsafe : ''}
-Параметры темы: ${info.tgThemeParams}
-
-SAFE AREA ОТСТУПЫ:
-Сверху: ${info.safeAreaTop}
-Снизу: ${info.safeAreaBottom}
-Слева: ${info.safeAreaLeft}
-Справа: ${info.safeAreaRight}
-
-ПОДДЕРЖИВАЕМЫЕ ВОЗМОЖНОСТИ:
-Touch поддержка: ${info.touchSupport ? 'Да' : 'Нет'}
-WebGL: ${info.webGL ? 'Да' : 'Нет'}
-WebGL2: ${info.webGL2 ? 'Да' : 'Нет'}
-WebRTC: ${info.webRTC ? 'Да' : 'Нет'}
-LocalStorage: ${info.localStorage ? 'Да' : 'Нет'}
-SessionStorage: ${info.sessionStorage ? 'Да' : 'Нет'}
-IndexedDB: ${info.indexedDB ? 'Да' : 'Нет'}
-Service Worker: ${info.serviceWorker ? 'Да' : 'Нет'}
-WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
+ПОЛЬЗОВАТЕЛЬ:
+User ID: ${user?.id || 'Неизвестно'}
+Username: ${user?.username || 'Неизвестно'}
+Текущий URL: ${window.location.href}
+Время загрузки: ${new Date().toISOString()}
 
 === КОНЕЦ ДИАГНОСТИЧЕСКОЙ ИНФОРМАЦИИ ===
     `.trim();
@@ -449,11 +413,14 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
 
         {/* Статус подписки */}
         <div className={styles.subscriptionCard}>
-          <h3 className={styles.sectionTitle}>СТАТУС ПОДПИСКИ</h3>
+          <div className={styles.sectionHeader}>
+            <Shield className={styles.sectionIcon} />
+            <h3 className={styles.sectionTitle}>СТАТУС ПОДПИСКИ</h3>
+          </div>
           {loadingUserData ? (
             <div className={styles.subscriptionLoading}>
               <Loader2 className={styles.loadingSpinner} />
-              <span>Загружаем статус подписки...</span>
+              <span>Загружаем подписку...</span>
             </div>
           ) : (
             <div className={styles.subscriptionStatus}>
@@ -480,10 +447,10 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
             ) : (
               <>
                 <p className={styles.subscriptionText}>
-                  Подписка неактивна. Для получения доступа к материалам обратитесь к боту "Плоский живот с Аюной".
+                  Подписка неактивна. Для получения доступа к материалам обратитесь к боту "Источник".
                 </p>
                 <a 
-                  href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot?start=start" 
+                  href="https://t.me/istochnik_clubbot?start=closedclub" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className={styles.botButton}
@@ -570,29 +537,37 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
                 Скопируйте данный текст в случае проблем с приложением и предоставьте службе заботы
               </p>
               
-                             <div className={styles.systemInfo}>
-                <p><strong>Системная информация:</strong></p>
+              <div className={styles.systemInfo}>
+                <p><strong>СИСТЕМНАЯ ИНФОРМАЦИЯ:</strong></p>
                 <p><strong>Браузер:</strong> {navigator.userAgent}</p>
                 <p><strong>Платформа:</strong> {navigator.platform}</p>
                 <p><strong>Язык:</strong> {navigator.language}</p>
+                <p><strong>Часовой пояс:</strong> {Intl.DateTimeFormat().resolvedOptions().timeZone}</p>
+                <p><strong>Смещение времени:</strong> {new Date().getTimezoneOffset()} мин</p>
+                <br />
+                <p><strong>ЭКРАН И ДИСПЛЕЙ:</strong></p>
                 <p><strong>Разрешение экрана:</strong> {typeof window !== 'undefined' ? `${window.screen.width}x${window.screen.height}` : 'Неизвестно'}</p>
-                <p><strong>Время:</strong> {new Date().toISOString()}</p>
+                <p><strong>Доступное разрешение:</strong> {typeof window !== 'undefined' ? `${window.screen.availWidth}x${window.screen.availHeight}` : 'Неизвестно'}</p>
+                <p><strong>Пиксельная плотность:</strong> {typeof window !== 'undefined' ? window.devicePixelRatio : 'Неизвестно'}</p>
+                <p><strong>Размер окна:</strong> {typeof window !== 'undefined' ? `${window.innerWidth}x${window.innerHeight}` : 'Неизвестно'}</p>
                 <br />
-                <p><strong>Telegram WebApp:</strong></p>
-                <p><strong>Telegram Platform:</strong> {typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.platform || 'Неизвестно'}</p>
-                <p><strong>Theme Scheme:</strong> {typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.colorScheme || 'Неизвестно'}</p>
-                <p><strong>Is Expanded:</strong> {typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.isExpanded ? 'Да' : 'Нет'}</p>
-                <p><strong>Viewport Height:</strong> {typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.viewportHeight || 'Неизвестно'}</p>
-                <p><strong>Init Data:</strong> {typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initData ? 'Присутствует' : 'Нет'}</p>
-                <p><strong>Start Param:</strong> {typeof window !== 'undefined' && (window as any).Telegram?.WebApp?.initDataUnsafe?.start_param || 'Нет'}</p>
+                <p><strong>СЕТЕВОЕ СОЕДИНЕНИЕ:</strong></p>
+                <p><strong>Онлайн статус:</strong> {navigator.onLine ? 'Да' : 'Нет'}</p>
+                <p><strong>Тип соединения:</strong> {(navigator as any).connection?.effectiveType || 'Неизвестно'}</p>
+                <p><strong>Скорость загрузки:</strong> {(navigator as any).connection?.downlink ? `${(navigator as any).connection.downlink} Mbps` : 'Неизвестно'}</p>
+                <p><strong>RTT:</strong> {(navigator as any).connection?.rtt ? `${(navigator as any).connection.rtt} ms` : 'Неизвестно'}</p>
                 <br />
+                <p><strong>ВОЗМОЖНОСТИ:</strong></p>
+                <p><strong>Touch поддержка:</strong> {'ontouchstart' in window ? 'Да' : 'Нет'}</p>
+                <p><strong>Cookies включены:</strong> {navigator.cookieEnabled ? 'Да' : 'Нет'}</p>
+                <p><strong>LocalStorage:</strong> {typeof localStorage !== 'undefined' ? 'Да' : 'Нет'}</p>
+                <p><strong>WebGL:</strong> {typeof window !== 'undefined' && window.WebGLRenderingContext ? 'Да' : 'Нет'}</p>
+                <br />
+                <p><strong>ПОЛЬЗОВАТЕЛЬ:</strong></p>
                 <p><strong>User ID:</strong> {user?.id || 'Неизвестно'}</p>
                 <p><strong>Username:</strong> {user?.username || 'Неизвестно'}</p>
-                <p><strong>Database Status:</strong> Активный</p>
-                
-
-                
-
+                <p><strong>Текущий URL:</strong> {typeof window !== 'undefined' ? window.location.href : 'Неизвестно'}</p>
+                <p><strong>Время загрузки:</strong> {new Date().toISOString()}</p>
               </div>
               
               <button className={`${styles.copyButton} ${copiedSystemInfo ? styles.copied : ''}`} onClick={copySystemInfo}>
@@ -626,7 +601,7 @@ WebAssembly: ${info.webAssembly ? 'Да' : 'Нет'}
               {loadingPayments ? (
                 <div className={styles.paymentsLoading}>
                   <Clock className={styles.loadingIcon} />
-                  <p>Загружаем историю платежей...</p>
+                  <p>Загружаем платежи...</p>
                 </div>
               ) : payments.length > 0 ? (
                 payments.map((payment) => (

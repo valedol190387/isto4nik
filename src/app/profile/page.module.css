@@ -1,3 +1,20 @@
+/* Шрифты для профиля */
+@font-face {
+  font-family: 'RalewayMedium';
+  src: url('/fonts/Raleway-v4020-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Основной контейнер - точно как на reviews */
 .container {
   background: var(--bg-primary);
@@ -9,7 +26,8 @@
   padding-left: calc(16px + var(--safe-area-inset-left, 0px));
   padding-right: calc(16px + var(--safe-area-inset-right, 0px));
   color: var(--text-main);
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
   position: relative;
 }
 
@@ -29,21 +47,21 @@
 .headerIcon {
   width: 24px;
   height: 24px;
-  color: var(--accent-blue);
+  color: #082445;
   filter: drop-shadow(var(--shadow-medium));
 }
 
 .headerTitle {
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-main);
   margin: 0;
-  font-family: var(--font-body);
+  font-family: 'RalewayMedium', sans-serif;
 }
 
 /* Карточка пользователя */
 .userCard {
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   padding: 24px;
   margin-bottom: 20px;
@@ -57,7 +75,7 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background: var(--accent-blue);
+  background: #082445;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -83,9 +101,9 @@
 }
 
 .userName {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 24px;
-  font-weight: 700;
+  font-weight: 500;
   color: var(--text-main);
   margin: 0 0 8px 0;
   text-transform: uppercase;
@@ -99,10 +117,10 @@
 }
 
 .userIdText {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 16px;
-  font-weight: 500;
-  color: var(--accent-blue);
+  font-weight: 300;
+  color: #082445;
   margin: 0;
 }
 
@@ -121,7 +139,7 @@
 
 .copyIdButton:hover {
   background: var(--border-light);
-  color: var(--accent-blue);
+  color: #082445;
 }
 
 /* Состояние скопировано для маленькой кнопки */
@@ -130,9 +148,9 @@
 }
 
 .userDetails {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 300;
   color: var(--text-secondary);
   margin: 2px 0;
 }
@@ -174,9 +192,9 @@
 }
 
 .endDateText {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 300;
   color: #22c55e;
 }
 
@@ -186,6 +204,9 @@
   gap: 12px;
   padding: 20px 0;
   justify-content: center;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+  color: var(--text-secondary);
 }
 
 .loadingSpinner {
@@ -200,21 +221,46 @@
   to { transform: rotate(360deg); }
 }
 
+.paymentsLoading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 20px;
+  justify-content: center;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+  color: var(--text-secondary);
+}
+
 /* Карточка подписки */
 .subscriptionCard {
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   padding: 20px;
   margin-bottom: 20px;
   border: 1px solid var(--border-light);
 }
 
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sectionIcon {
+  width: 20px;
+  height: 20px;
+  color: #082445;
+  flex-shrink: 0;
+}
+
 .sectionTitle {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 16px;
   font-weight: 500;
-  margin: 0 0 16px 0;
-  color: var(--accent-blue);
+  margin: 0;
+  color: #082445;
   text-transform: uppercase;
 }
 
@@ -224,9 +270,9 @@
 }
 
 .subscriptionText {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 16px;
-  font-weight: 400;
+  font-weight: 300;
   color: var(--text-secondary);
   margin: 0 0 16px 0;
   line-height: 1.5;
@@ -240,9 +286,9 @@
   border: none;
   border-radius: 12px;
   padding: 12px 24px;
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
   display: inline-block;
@@ -276,14 +322,14 @@
 .supportIcon {
   width: 20px;
   height: 20px;
-  color: var(--accent-blue);
+  color: #082445;
 }
 
 .supportTitle {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 16px;
   font-weight: 500;
-  color: var(--accent-blue);
+  color: #082445;
   text-transform: uppercase;
 }
 
@@ -299,8 +345,9 @@
   padding: 12px;
   border: 1px solid var(--border-medium);
   border-radius: 8px;
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 14px;
+  font-weight: 300;
   color: var(--text-main);
   background: white;
   resize: vertical;
@@ -309,7 +356,7 @@
 }
 
 .supportTextarea:focus {
-  border-color: var(--accent-blue);
+  border-color: #082445;
 }
 
 .supportTextarea::placeholder {
@@ -317,14 +364,14 @@
 }
 
 .sendButton {
-  background: var(--accent-blue);
+  background: #082445;
   color: white;
   border: none;
   border-radius: 8px;
   padding: 12px 20px;
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -334,7 +381,7 @@
 }
 
 .sendButton:hover:not(:disabled) {
-  background: #1e2d34;
+  background: #0a2a52;
   transform: translateY(-1px);
 }
 
@@ -374,7 +421,7 @@
 
 /* Аккордеон */
 .accordion {
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   margin-bottom: 16px;
   border: 1px solid var(--border-light);
@@ -397,15 +444,15 @@
 .accordionIcon {
   width: 20px;
   height: 20px;
-  color: var(--accent-blue);
+  color: #082445;
   flex-shrink: 0;
 }
 
 .accordionTitle {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 16px;
   font-weight: 500;
-  color: var(--accent-blue);
+  color: #082445;
   text-transform: uppercase;
   flex: 1;
 }
@@ -424,9 +471,9 @@
 
 /* Системная информация */
 .systemNote {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 14px;
-  font-weight: 400;
+  font-weight: 300;
   color: var(--text-secondary);
   margin: 0 0 16px 0;
   font-style: italic;
@@ -444,9 +491,9 @@
 }
 
 .systemTitle {
-  font-family: var(--font-heading);
+  font-family: 'RalewayMedium', sans-serif;
   font-size: 14px;
-  font-weight: 600;
+  font-weight: 500;
   color: var(--text-main);
   margin: 16px 0 8px 0;
 }
@@ -460,31 +507,32 @@
   font-size: 14px;
   color: var(--text-secondary);
   word-break: break-all;
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
 }
 
 .infoNote {
   background: rgba(52, 74, 84, 0.1);
-  border-left: 3px solid var(--accent-blue);
+  border-left: 3px solid #082445;
   padding: 8px 12px;
   margin-top: 16px;
   border-radius: 4px;
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 12px;
+  font-weight: 300;
   color: var(--text-secondary);
   font-style: italic;
 }
 
 .copyButton {
-  background: var(--accent-blue);
+  background: #082445;
   color: white;
   border: none;
   border-radius: 8px;
   padding: 8px 16px;
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -493,7 +541,7 @@
 }
 
 .copyButton:hover {
-  background: #1e2d34;
+  background: #0a2a52;
 }
 
 /* Состояние скопировано для большой кнопки */
@@ -527,17 +575,17 @@
 }
 
 .paymentMethod {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 300;
   color: var(--text-main);
   margin-bottom: 4px;
 }
 
 .paymentDate {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 12px;
-  font-weight: 400;
+  font-weight: 300;
   color: var(--text-secondary);
 }
 
@@ -546,17 +594,17 @@
 }
 
 .amount {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 300;
   color: var(--text-main);
   margin-bottom: 4px;
 }
 
 .status {
-  font-family: var(--font-body);
+  font-family: 'GilroyLight', sans-serif;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 300;
   color: #10b981;
 }
 

@@ -168,6 +168,11 @@ export function Root({ children }: { children: React.ReactNode }) {
       <RootInner>{children}</RootInner>
     </ErrorBoundary>
   ) : (
-    <div className="root__loading">Loading</div>
+    <div className="root__loading">
+      <div className="root__loadingContent">
+        <div className="root__loadingIcon"></div>
+        <p>Загружаем приложение...</p>
+      </div>
+    </div>
   );
 }

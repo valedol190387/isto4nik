@@ -370,7 +370,7 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
               </p>
               
               <a
-                href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot?start=start"
+                href="https://t.me/istochnik_clubbot?start=closedclub"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.subscribeButton}

@@ -29,35 +29,42 @@ import styles from './page.module.css';
 const highlights = [
   { id: 1, image: '/images/starthere.webp', route: '/start-here' },
   { id: 2, image: '/images/about.webp', route: '/about' },
-  { id: 3, image: '/images/review.webp', route: '/reviews' },
+  { id: 3, image: '/images/zabota.webp', route: 'https://t.me/care_service_soul_therapy_bot' },
   { id: 4, image: '/images/faq.webp', route: '/faq' },
+  { id: 5, image: '/images/review.webp', route: '/reviews' },
 ];
 
 // Данные курсов с изображениями
 const courses = [
   { 
-    id: 'intro-training', 
-    image: '/images/ploskii.webp',
+    id: 'mini-courses', 
+    image: '/images/materials.webp',
     type: 'full-width',
-    route: '/courses/intro-training'
+    route: '/courses/mini-courses'
   },
   { 
-    id: 'flat-belly', 
-    image: '/images/jivot.webp',
+    id: 'questions', 
+    image: '/images/questions.webp',
     type: 'square',
-    route: '/courses/flat-belly'
+    route: '/courses/questions'
   },
   { 
-    id: 'anti-swelling', 
-    image: '/images/oteki.webp',
+    id: 'speeches', 
+    image: '/images/speeches.webp',
     type: 'square',
-    route: '/courses/anti-swelling'
+    route: '/courses/speeches'
   },
   { 
-    id: 'author', 
-    image: '/images/autor.webp',
-    type: 'tall',
-    route: '/author'
+    id: 'dialogs', 
+    image: '/images/dialogs.webp',
+    type: 'square',
+    route: '/courses/dialogs'
+  },
+  { 
+    id: 'opinion', 
+    image: '/images/opinion.webp',
+    type: 'square',
+    route: '/courses/opinion'
   },
 ];
 
@@ -65,7 +72,6 @@ export default function Home() {
   const [currentDot, setCurrentDot] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [userData, setUserData] = useState<DbUser | null>(null);
-  const [loadingUserData, setLoadingUserData] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [chatLink, setChatLink] = useState<string | null>(null);
   const router = useRouter();
@@ -76,8 +82,8 @@ export default function Home() {
   // Получаем пользователя из Telegram
   const user = useSignal(initData.user);
   
-  // 3 точки для навигации
-  const dotsCount = 3;
+  // 4 точки для навигации (5 хайлайтов)
+  const dotsCount = 4;
 
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
@@ -95,7 +101,6 @@ export default function Home() {
 
   // Функция для загрузки данных пользователя из базы данных
   const loadUserData = async () => {
-    setLoadingUserData(true);
     try {
       const telegramId = user?.id?.toString() || getTelegramId();
       
@@ -115,8 +120,6 @@ export default function Home() {
     } catch (error) {
       console.error('Ошибка при загрузке данных пользователя:', error);
       setUserData(null);
-    } finally {
-      setLoadingUserData(false);
     }
   };
 
@@ -237,6 +240,31 @@ export default function Home() {
             onScroll={handleScroll}
           >
             {highlights.map((highlight) => {
+              // Проверяем, является ли ссылка внешней
+              const isExternalLink = highlight.route.startsWith('http');
+              
+              if (isExternalLink) {
+                return (
+                  <a 
+                    key={highlight.id} 
+                    href={highlight.route} 
+                    className={styles.highlightCard}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <div className={styles.highlightContent}>
+                      <Image
+                        src={highlight.image}
+                        alt=""
+                        fill
+                        className={styles.highlightImage}
+                        sizes="120px"
+                      />
+                    </div>
+                  </a>
+                );
+              }
+
               return (
                 <Link key={highlight.id} href={highlight.route} className={styles.highlightCard}>
                   <div className={styles.highlightContent}>
@@ -295,45 +323,23 @@ export default function Home() {
             );
           })}
           
-          {/* Сетка для остальных курсов */}
+          {/* Сетка для остальных курсов - теперь 2x2 */}
           <div className={styles.coursesGrid}>
-            {/* Левая колонка - два квадратных курса */}
-            <div className={styles.leftColumn}>
-              {courses.filter(course => course.type === 'square').map((course) => {
-                return (
-                  <Link key={course.id} href={course.route} className={styles.courseCardSquare}>
-                    <div className={styles.courseContent}>
-                      <Image
-                        src={course.image}
-                        alt=""
-                        fill
-                        className={styles.courseImage}
-                        sizes="(max-width: 768px) 50vw, 200px"
-                      />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-
-            {/* Правая колонка - автор программы */}
-            <div className={styles.rightColumn}>
-              {courses.filter(course => course.type === 'tall').map((course) => {
-                return (
-                  <Link key={course.id} href={course.route} className={styles.courseCardTall}>
-                    <div className={styles.courseContent}>
-                      <Image
-                        src={course.image}
-                        alt=""
-                        fill
-                        className={styles.courseImage}
-                        sizes="(max-width: 768px) 50vw, 200px"
-                      />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
+            {courses.filter(course => course.type === 'square').map((course) => {
+              return (
+                <Link key={course.id} href={course.route} className={styles.courseCardSquare}>
+                  <div className={styles.courseContent}>
+                    <Image
+                      src={course.image}
+                      alt=""
+                      fill
+                      className={styles.courseImage}
+                      sizes="(max-width: 768px) 50vw, 200px"
+                    />
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
 
@@ -392,15 +398,15 @@ export default function Home() {
                 <Lock size={48} />
               </div>
               
-              <h3 className={styles.modalTitle}>Доступ к чату клуба</h3>
+              <h3 className={styles.modalTitle}>Доступ к чату сообещства</h3>
               
               <p className={styles.modalText}>
-                Для доступа к чату клуба необходима активная подписка. 
-                Получите доступ ко всем материалам и начните свой путь к здоровью!
+                Для доступа к чату сообщества необходима активная подписка. 
+                Получите доступ ко всем материалам и начните свой путь к изучению материалов!
               </p>
               
               <a 
-                href="https://t.me/Ploskiy_zhivot_s_Ayunoy_bot?start=start"
+                href="https://t.me/istochnik_clubbot?start=closedclub"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={styles.modalButton}

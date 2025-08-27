@@ -1,3 +1,22 @@
+/* Review Card Component - isto4nik Theme */
+
+/* Шрифты для ReviewCard */
+@font-face {
+  font-family: 'RalewayMedium';
+  src: url('/fonts/Raleway-v4020-Medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'GilroyLight';
+  src: url('/fonts/Gilroy-Light.otf') format('opentype');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* Карточка отзыва в стиле проекта */
 .reviewCard {
   text-decoration: none;
@@ -9,7 +28,7 @@
 }
 
 .reviewCard:hover {
-  transform: scale(1.02);
+  transform: translateY(-1px);
   box-shadow: var(--shadow-glow);
 }
 
@@ -20,23 +39,10 @@
 .reviewContent {
   position: relative;
   padding: 20px;
-  background: var(--bg-card);
+  background: #E4DEDC;
   border-radius: 16px;
   border: 1px solid var(--border-light);
-  backdrop-filter: blur(20px);
   overflow: hidden;
-}
-
-.reviewContent::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: var(--gradient-primary);
-  opacity: 0.1;
-  z-index: 0;
 }
 
 /* Заголовок с аватаром */
@@ -51,15 +57,16 @@
 
 /* Аватар */
 .avatar {
-  width: 58px; /* Увеличил на 20% (48px * 1.2 = 57.6px ≈ 58px) */
-  height: 58px; /* Увеличил на 20% */
+  width: 58px;
+  height: 58px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-main);
-  font-weight: 700;
-  font-size: 19px; /* Увеличил шрифт пропорционально (16px * 1.2 = 19.2px ≈ 19px) */
+  color: white;
+  font-weight: 500;
+  font-size: 19px;
+  font-family: 'RalewayMedium', sans-serif;
   flex-shrink: 0;
   border: 2px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
@@ -74,7 +81,7 @@
   border-radius: 50%;
 }
 
-.avatarBlue { background: linear-gradient(135deg, var(--accent-blue), #2c3e46); }
+.avatarBlue { background: linear-gradient(135deg, #082445, #0a2a52); }
 .avatarPurple { background: linear-gradient(135deg, hsl(240 80% 65%), hsl(240 80% 55%)); }
 .avatarPink { background: linear-gradient(135deg, hsl(320 70% 60%), hsl(320 70% 50%)); }
 .avatarOrange { background: linear-gradient(135deg, hsl(25 95% 60%), hsl(25 95% 50%)); }
@@ -91,17 +98,18 @@
 .customerName {
   font-size: 18px !important;
   font-weight: 500 !important;
-  font-family: var(--font-heading) !important;
+  font-family: 'RalewayMedium', sans-serif !important;
   color: var(--text-main);
   margin: 0 0 4px 0;
   z-index: 1;
   position: relative;
+  text-transform: uppercase;
 }
 
 .customerDescription {
   font-size: 14px !important;
   font-weight: 300 !important;
-  font-family: 'Montserrat', sans-serif !important;
+  font-family: 'GilroyLight', sans-serif !important;
   color: var(--text-secondary);
   margin: 0;
   z-index: 1;
@@ -112,7 +120,7 @@
 .reviewText {
   font-size: 16px !important;
   font-weight: 300 !important;
-  font-family: 'Montserrat', sans-serif !important;
+  font-family: 'GilroyLight', sans-serif !important;
   line-height: 1.5;
   color: var(--text-main);
   margin: 0 0 16px 0;
@@ -132,23 +140,23 @@
 .starIcon {
   width: 24px;
   height: 24px;
-  color: #2C3F48;
-  fill: #2C3F48;
-  filter: drop-shadow(0 0 4px rgba(44, 63, 72, 0.5));
+  color: #082445;
+  fill: #082445;
+  filter: drop-shadow(0 0 4px rgba(8, 36, 69, 0.5));
 }
 
 .ratingValue {
   font-size: 18px !important;
-  font-weight: 400 !important;
-  font-family: Montserrat !important;
-  color: #2C3F48 !important;
+  font-weight: 300 !important;
+  font-family: 'GilroyLight', sans-serif !important;
+  color: #082445 !important;
 }
 
 .ratingMax {
   font-size: 18px !important;
-  font-weight: 400 !important;
-  font-family: Montserrat !important;
-  color: #2C3F48 !important;
+  font-weight: 300 !important;
+  font-family: 'GilroyLight', sans-serif !important;
+  color: #082445 !important;
 }
 
 /* Адаптивность */
@@ -163,30 +171,89 @@
   }
   
   .avatar {
-    width: 53px; /* Увеличил на 20% (44px * 1.2 = 52.8px ≈ 53px) */
-    height: 53px; /* Увеличил на 20% */
-    font-size: 17px; /* Увеличил шрифт пропорционально (14px * 1.2 = 16.8px ≈ 17px) */
+    width: 53px;
+    height: 53px;
+    font-size: 17px;
   }
   
   .customerName {
     font-size: 16px !important;
     font-weight: 500 !important;
-    font-family: var(--font-heading) !important;
+    font-family: 'RalewayMedium', sans-serif !important;
   }
   
   .customerDescription {
-    font-size: 14px !important;
+    font-size: 13px !important;
     font-weight: 300 !important;
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: 'GilroyLight', sans-serif !important;
   }
   
   .reviewText {
     font-size: 14px !important;
     font-weight: 300 !important;
-    font-family: 'Montserrat', sans-serif !important;
-  }
-  
-  .reviewTextContainer {
+    font-family: 'GilroyLight', sans-serif !important;
     margin-bottom: 12px;
   }
-} 
+  
+  .starIcon {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .ratingValue {
+    font-size: 16px !important;
+  }
+  
+  .ratingMax {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .reviewHeader {
+    gap: 14px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .reviewContent {
+    padding: 24px;
+  }
+  
+  .reviewHeader {
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 22px;
+  }
+  
+  .customerName {
+    font-size: 20px !important;
+  }
+  
+  .customerDescription {
+    font-size: 15px !important;
+  }
+  
+  .reviewText {
+    font-size: 17px !important;
+    margin-bottom: 20px;
+  }
+  
+  .starIcon {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .ratingValue {
+    font-size: 20px !important;
+  }
+  
+  .ratingMax {
+    font-size: 20px !important;
+  }
+}
