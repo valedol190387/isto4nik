@@ -7,6 +7,9 @@ import { FAQ } from '@/types/database';
 import styles from './page.module.css';
 import { MessageCircle, Loader2 } from 'lucide-react';
 
+// Отключаем статическую генерацию для этой страницы
+export const dynamic = 'force-dynamic';
+
 export default function FAQPage() {
   const [faqs, setFaqs] = useState<FAQ[]>([]);
   const [loading, setLoading] = useState(true);
