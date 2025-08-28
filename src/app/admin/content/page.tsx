@@ -12,12 +12,14 @@ interface Material {
   title: string;
   description: string;
   url: string;
+  group: string;                     // Обязательное поле: группа материала  
   section_key: string;
   tags: string[];
   is_active: boolean;
   display_order: number;
   is_embedded_video: boolean;        // Новое поле: галочка "встроенное видео"
   video_embed_code: string | null;   // Новое поле: код для вставки видео из Kinescope
+  pic_url: string | null;            // Новое поле: URL изображения для превью  
   created_at: string;
   updated_at: string;
 }
@@ -26,50 +28,54 @@ interface MaterialForm {
   title: string;
   description: string;
   url: string;
+  group: string;                     // Обязательное поле: группа материала
   section_key: string;
   tags: string[];
   is_active: boolean;
   display_order: number;
   is_embedded_video: boolean;        // Новое поле: галочка "встроенное видео"
   video_embed_code: string;          // Новое поле: код для вставки видео из Kinescope
+  pic_url: string;                   // Новое поле: URL изображения для превью
 }
 
 const initialForm: MaterialForm = {
   title: '',
   description: '',
   url: '',
-  section_key: 'course_flat_belly',
+  group: 'Общие материалы',          // Дефолтная группа
+  section_key: 'materials',
   tags: [],
   is_active: true,
   display_order: 1,
   is_embedded_video: false,          // По умолчанию обычная ссылка
-  video_embed_code: ''               // Пустой код видео
+  video_embed_code: '',              // Пустой код видео
+  pic_url: ''                        // URL изображения для превью
 };
 
-// Доступные разделы
+// Доступные разделы - ОБНОВЛЕННЫЕ под новую структуру
 const sectionOptions = [
-  { value: 'course_flat_belly', label: 'Курс: Плоский живот' },
-  { value: 'course_anti_swelling', label: 'Курс: Отёки' },
-  { value: 'course_bloom', label: 'Курс: Расцветай' },
-  { value: 'useful', label: 'Рельеф и гибкость' },
-  { value: 'workouts', label: 'Для лица' },
-  { value: 'guides', label: 'Стопы' },
-  { value: 'motivation', label: 'BodyFlow' },
-  { value: 'nutrition', label: 'Осанка' }
+  { value: 'materials', label: 'Мини-курсы' },
+  { value: 'dialogs', label: 'Диалоги' },
+  { value: 'questions', label: 'Решаем запросы' },
+  { value: 'speeches', label: 'Разговор у источника' },
+  { value: 'opinion', label: 'Мнение' }
 ];
 
-// Предустановленные теги
+// Предустановленные теги - ОБНОВЛЕННЫЕ под новую структуру
 const predefinedTags = [
-  'плоский живот', 'пресс', 'похудение', 'отеки', 'лимфодренаж', 'детокс',
-  'расцветай', 'красота', 'уверенность', 'здоровье', 'советы',
-  'рельеф', 'гибкость', 'тонус', 'укрепление',
-  'для лица', 'лицо', 'массаж лица', 'фейсбилдинг', 'омоложение',
-  'стопы', 'ноги', 'плоскостопие', 'профилактика', 'здоровье ног',
-  'bodyflow', 'мобильность', 'движение', 'плавность', 'поток',
-  'осанка', 'спина', 'позвоночник', 'выравнивание', 'правильная осанка',
-  'утро', 'зарядка', 'энергия', 'йога', 'релакс', 
-  'кардио', 'интенсив', 'силовые', 'руки', 
-  'растяжка', 'медитация', 'дыхание'
+  // Для мини-курсов
+  'мини-курс', 'быстро', 'эффективно', 'практика', 'обучение', 
+  'здоровье', 'красота', 'фигура', 'питание', 'упражнения',
+  // Для диалогов  
+  'диалог', 'вопрос-ответ', 'общение', 'разговор', 'беседа',
+  // Для решения запросов
+  'решение', 'проблема', 'запрос', 'ответ', 'помощь', 'совет',
+  // Для выступлений
+  'выступление', 'лекция', 'презентация', 'источник', 'знания',
+  // Для мнений  
+  'мнение', 'экспертиза', 'анализ', 'оценка', 'рекомендация',
+  // Общие теги
+  'терапия души', 'психология', 'самопомощь', 'развитие', 'мотивация'
 ];
 
 export default function AdminContent() {
@@ -81,9 +87,10 @@ export default function AdminContent() {
   const [saving, setSaving] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [showPreview, setShowPreview] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['course_flat_belly']));
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['materials']));
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const [linkCopiedFor, setLinkCopiedFor] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const router = useRouter();
 
   const ITEMS_PER_PAGE = 15;
@@ -122,7 +129,13 @@ export default function AdminContent() {
 
     try {
       const method = editingMaterial ? 'PUT' : 'POST';
-      const materialData = editingMaterial ? { ...form, id: editingMaterial.id } : form;
+      const materialData = editingMaterial 
+        ? { 
+            ...form, 
+            id: editingMaterial.id,
+            oldPicUrl: editingMaterial.pic_url // Для удаления старого изображения
+          } 
+        : form;
 
       const response = await fetch('/api/admin/materials', {
         method,
@@ -156,12 +169,14 @@ export default function AdminContent() {
       title: material.title,
       description: material.description,
       url: material.url,
+      group: material.group,
       section_key: material.section_key,
       tags: material.tags,
       is_active: material.is_active,
       display_order: material.display_order,
       is_embedded_video: material.is_embedded_video,
-      video_embed_code: material.video_embed_code || ''
+      video_embed_code: material.video_embed_code || '',
+      pic_url: material.pic_url || ''
     });
     setShowPreview(false);
     setShowForm(true);
@@ -186,6 +201,36 @@ export default function AdminContent() {
       }
     } catch (error) {
       console.error('Error deleting material:', error);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('promopic', file);
+
+      const response = await fetch('/api/upload/promopic', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setForm({ ...form, pic_url: data.imageUrl });
+      } else {
+        alert(`Ошибка загрузки: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error uploading promo image:', error);
+      alert('Ошибка загрузки файла');
+    } finally {
+      setUploadingImage(false);
     }
   };
 
@@ -420,6 +465,18 @@ export default function AdminContent() {
                                 <div className={styles.materialInfo}>
                                   <h3 className={styles.materialTitle}>{material.title}</h3>
                                   <p className={styles.materialDescription}>{material.description}</p>
+                                  {material.pic_url && (
+                                    <div className={styles.materialImage}>
+                                      <img 
+                                        src={material.pic_url} 
+                                        alt={material.title}
+                                        className={styles.materialPreviewImage}
+                                        onError={(e) => {
+                                          e.currentTarget.style.display = 'none';
+                                        }}
+                                      />
+                                    </div>
+                                  )}
                                   <div className={styles.materialMeta}>
                                     <div className={styles.materialDate}>
                                       Добавлено {formatDate(material.created_at)}
@@ -605,16 +662,7 @@ export default function AdminContent() {
                       ↵
                     </button>
                   </div>
-                  <div className={styles.htmlTags}>
-                    <span className={styles.htmlTag}>&lt;b&gt;жирный&lt;/b&gt;</span>
-                    <span className={styles.htmlTag}>&lt;i&gt;курсив&lt;/i&gt;</span>
-                    <span className={styles.htmlTag}>&lt;u&gt;подчеркнутый&lt;/u&gt;</span>
-                    <span className={styles.htmlTag}>&lt;h3&gt;заголовок&lt;/h3&gt;</span>
-                    <span className={styles.htmlTag}>&lt;p&gt;абзац&lt;/p&gt;</span>
-                    <span className={styles.htmlTag}>&lt;br&gt; - перенос</span>
-                    <span className={styles.htmlTag}>&lt;ul&gt;&lt;li&gt;список&lt;/li&gt;&lt;/ul&gt;</span>
-                    <span className={styles.htmlTag}>&lt;a href=""&gt;ссылка&lt;/a&gt;</span>
-                  </div>
+
                 </div>
               </div>
 
@@ -667,7 +715,47 @@ export default function AdminContent() {
                     </p>
                   </div>
                 )}
-                
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Изображение для превью</label>
+                <div className={styles.imageUploadContainer}>
+                  {form.pic_url && (
+                    <div className={styles.currentImage}>
+                      <img 
+                        src={form.pic_url} 
+                        alt="Текущее изображение"
+                        className={styles.currentImagePreview}
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setForm({ ...form, pic_url: '' })}
+                        className={styles.removeImageBtn}
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleImageUpload}
+                    disabled={uploadingImage}
+                    className={styles.fileInput}
+                  />
+                  {uploadingImage && (
+                    <p className={styles.uploadingText}>Загрузка изображения...</p>
+                  )}
+                </div>
+                <p className={styles.fieldHint}>
+                  Загрузите изображение для превью материала (соотношение 2:1). Форматы: JPEG, PNG, WebP. Максимум 5MB.
+                </p>
+              </div>
+
+              <div className={styles.formRow}>
                 <div className={styles.formGroup}>
                   <label>Раздел</label>
                   <select

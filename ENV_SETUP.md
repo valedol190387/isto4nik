@@ -17,6 +17,10 @@ NEXT_PUBLIC_SUPABASE_URL=your-supabase-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
+# Admin Panel Authentication
+ADMIN_USERNAME=Isto4nik
+ADMIN_PASSWORD=Isto4nik2024_$ecur3!
+
 # NextAuth Configuration  
 NEXTAUTH_URL=http://localhost:3000
 

@@ -115,7 +115,7 @@ function RootInner({ children }: { children: any }) {
     initTelegramFeatures();
   }, []);
 
-  // Убрали автоматическую регистрацию отсюда - теперь она происходит в useCourseAccess
+  // Автоматическая регистрация пользователей теперь не используется
 
   // Устанавливаем Safe Area отступы: комбинируем системные safe area + content safe area от Telegram
   useEffect(() => {

@@ -28,6 +28,7 @@ export interface Material {
   title: string;
   description: string | null;
   url: string;
+  group: string;                       // Обязательное поле: группа материала
   section_key: string;
   tags: string[];
   is_favorite: boolean;
@@ -40,19 +41,6 @@ export interface Material {
   updated_at: string;
 }
 
-export interface CourseAccess {
-  stomach: boolean;       // course_flat_belly
-  swelling: boolean;      // course_anti_swelling  
-  blossom: boolean;       // course_bloom
-  flexibility: boolean;   // useful (Рельеф и гибкость)
-  face: boolean;          // workouts (Для лица)
-  foot: boolean;          // guides (Стопы)
-  bodyflow: boolean;      // motivation (BodyFlow)
-  posture: boolean;       // nutrition (Осанка)
-  
-  // Index signature для совместимости с Record<string, boolean>
-  [key: string]: boolean;
-}
 
 export interface User {
   id: number;
@@ -87,7 +75,6 @@ export interface User {
   istochnik: string | null;
   forma_oplaty: string | null;
   total_payments: number;
-  course_access: CourseAccess | null;
   created_at: string;
   updated_at: string;
 }
@@ -103,29 +90,40 @@ export interface Payment {
   id: number;
   telegram_id: string;
   payment_callback: {
+    // Основные поля из реальной структуры данных
+    sum?: string;                    // Сумма платежа (основное поле)
+    payment_status?: string;         // Статус платежа (success, failed, etc.)
+    currency?: string;               // Валюта
+    date?: string;                   // Дата платежа
+    order_id?: string;              // ID заказа
+    order_num?: string;             // Номер заказа
+    payment_type?: string;          // Тип платежа
+    customer_email?: string;        // Email клиента
+    customer_phone?: string;        // Телефон клиента
+    customer_extra?: string;        // Дополнительная информация
+    commission?: string;            // Комиссия
+    commission_sum?: string;        // Сумма комиссии
+    
+    // Поля подписки
+    'subscription[id]'?: string;
+    'subscription[cost]'?: string;
+    'subscription[name]'?: string;
+    'subscription[type]'?: string;
+    'subscription[active]'?: string;
+    
+    // Поля продуктов
+    'products[0][sum]'?: string;
+    'products[0][name]'?: string;
+    'products[0][price]'?: string;
+    'products[0][quantity]'?: string;
+    
+    // Наследованные поля для совместимости
     TransactionId?: string;
-    Amount?: string;
-    Currency?: string;
-    PaymentAmount?: string;
-    PaymentCurrency?: string;
-    OperationType?: string;
-    InvoiceId?: string;
-    AccountId?: string;
-    SubscriptionId?: string;
-    Name?: string;
-    Email?: string;
-    DateTime?: string;
-    IpAddress?: string;
-    IpCountry?: string;
-    IpCity?: string;
-    CardFirstSix?: string;
-    CardLastFour?: string;
-    CardType?: string;
-    Issuer?: string;
-    Description?: string;
-    Status?: string;
-    GatewayName?: string;
-    PaymentMethod?: string;
+    Amount?: string;                 // Для обратной совместимости
+    PaymentAmount?: string;          // Для обратной совместимости
+    Status?: string;                 // Для обратной совместимости
+    
+    // Универсальное поле для любых дополнительных данных
     [key: string]: any;
   };
   created_at: string;

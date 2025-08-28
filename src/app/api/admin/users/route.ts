@@ -115,21 +115,21 @@ export async function GET(request: NextRequest) {
             if (typeof parsed === 'string') {
               parsed = JSON.parse(parsed);
             }
-            amount = parseFloat(parsed.Amount || parsed.PaymentAmount || 0);
-            status = parsed.Status;
+            amount = parseFloat(parsed.sum || parsed.Amount || parsed.PaymentAmount || 0);
+            status = parsed.payment_status || parsed.Status;
           } catch (e) {
             console.error('Error parsing payment_callback:', e);
           }
         } else {
           // Если это уже объект
-          amount = parseFloat(payment.payment_callback.Amount || payment.payment_callback.PaymentAmount || 0);
-          status = payment.payment_callback.Status;
+          amount = parseFloat(payment.payment_callback.sum || payment.payment_callback.Amount || payment.payment_callback.PaymentAmount || 0);
+          status = payment.payment_callback.payment_status || payment.payment_callback.Status;
         }
       }
       
       // Учитываем все платежи с положительной суммой
       // Исключаем только явно неуспешные статусы
-      if (telegramId && amount > 0 && status !== 'Failed' && status !== 'Cancelled') {
+      if (telegramId && amount > 0 && status !== 'failed' && status !== 'Failed' && status !== 'Cancelled' && status !== 'cancelled') {
         paymentsByUser[telegramId] = (paymentsByUser[telegramId] || 0) + amount;
       }
     });

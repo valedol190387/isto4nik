@@ -270,14 +270,6 @@ export default function AdminDashboard() {
             </div>
           </a>
 
-          <a href="/admin/course-access" className={styles.actionCard}>
-            <Star className={styles.actionIcon} />
-            <div className={styles.actionContent}>
-              <h3>Доступы к курсам</h3>
-              <p>Управление доступами пользователей к курсам</p>
-            </div>
-          </a>
-
           <a href="/admin/schedule" className={styles.actionCard}>
             <Calendar className={styles.actionIcon} />
             <div className={styles.actionContent}>

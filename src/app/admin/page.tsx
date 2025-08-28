@@ -16,13 +16,28 @@ export default function AdminLogin() {
     setLoading(true);
     setError('');
 
-    // Простая проверка логина/пароля
-    if (username === 'admin' && password === 'admin') {
-      // Сохраняем состояние авторизации в localStorage
-      localStorage.setItem('adminAuth', 'true');
-      router.push('/admin/dashboard');
-    } else {
-      setError('Неверный логин или пароль');
+    try {
+      // Отправляем данные на сервер для проверки
+      const response = await fetch('/api/admin/auth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Сохраняем состояние авторизации в localStorage
+        localStorage.setItem('adminAuth', 'true');
+        router.push('/admin/dashboard');
+      } else {
+        setError(data.error || 'Неверный логин или пароль');
+      }
+    } catch (error) {
+      console.error('Auth error:', error);
+      setError('Ошибка соединения с сервером');
     }
     
     setLoading(false);

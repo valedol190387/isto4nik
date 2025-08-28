@@ -222,7 +222,10 @@ export default function AdminFAQ() {
               
               <div className={styles.faqContent}>
                 <h3 className={styles.faqQuestion}>{faq.question}</h3>
-                <p className={styles.faqAnswer}>{faq.answer}</p>
+                <div 
+                  className={styles.faqAnswer}
+                  dangerouslySetInnerHTML={{ __html: faq.answer.replace(/\n/g, '<br />') }}
+                />
               </div>
               
               <div className={styles.faqFooter}>
@@ -299,6 +302,9 @@ export default function AdminFAQ() {
                     rows={5}
                     required
                   />
+                  <div className={styles.fieldHint}>
+                    Переносы строк сохраняются и отображаются корректно
+                  </div>
                 </label>
               </div>
 

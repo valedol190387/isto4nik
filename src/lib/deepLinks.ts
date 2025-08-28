@@ -75,6 +75,6 @@ export function getStartParam(): string | null {
  * Формат: https://t.me/botname/app?startapp=materials_64
  */
 export function createMaterialShareLink(materialId: string | number): string {
-  const BOT_USERNAME = 'Ploskiy_zhivot_s_Ayunoy_bot';
+  const BOT_USERNAME = 'istochnik_clubbot';
   return `https://t.me/${BOT_USERNAME}/app?startapp=materials_${materialId}`;
 }

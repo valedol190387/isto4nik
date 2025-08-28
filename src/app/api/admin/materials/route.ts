@@ -1,5 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
+import { deletePromoImage, isValidPromoImageUrl } from '@/lib/s3';
 
 // GET - получить все материалы для админки
 export async function GET() {
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const materialData = await request.json();
-    const { id, display_order, section_key } = materialData;
+    const { id, display_order, section_key, oldPicUrl } = materialData;
 
     if (!id) {
       return NextResponse.json(
@@ -107,6 +108,14 @@ export async function PUT(request: Request) {
         );
       }
     }
+
+    // Если изображение изменилось, удаляем старое
+    if (oldPicUrl && oldPicUrl !== materialData.pic_url && isValidPromoImageUrl(oldPicUrl)) {
+      await deletePromoImage(oldPicUrl);
+    }
+
+    // Удаляем oldPicUrl из данных для обновления
+    delete materialData.oldPicUrl;
 
     // Добавляем временную метку обновления
     materialData.updated_at = new Date().toISOString();
@@ -144,6 +153,18 @@ export async function DELETE(request: Request) {
       );
     }
 
+    // Сначала получаем данные материала для удаления промо-картинки
+    const { data: material, error: fetchError } = await supabase
+      .from('materials')
+      .select('pic_url')
+      .eq('id', id)
+      .single();
+
+    if (fetchError) {
+      throw fetchError;
+    }
+
+    // Удаляем материал из БД
     const { error } = await supabase
       .from('materials')
       .delete()
@@ -151,6 +172,11 @@ export async function DELETE(request: Request) {
 
     if (error) {
       throw error;
+    }
+
+    // Удаляем промо-картинку из S3, если она есть
+    if (material?.pic_url && isValidPromoImageUrl(material.pic_url)) {
+      await deletePromoImage(material.pic_url);
     }
 
     return NextResponse.json({ success: true });

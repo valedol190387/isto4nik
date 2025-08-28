@@ -3,7 +3,7 @@
  * Используется для быстрого шаринга ссылок на конкретные материалы
  */
 
-const BOT_USERNAME = 'Ploskiy_zhivot_s_Ayunoy_bot';
+const BOT_USERNAME = 'istochnik_clubbot';
 
 /**
  * Создание прямой ссылки на материал (без UTM меток)
@@ -64,9 +64,9 @@ export async function copyLinkToClipboard(link: string): Promise<boolean> {
 export const linkExamples = {
   // Простая ссылка на материал
   simple: createMaterialShareLink(64),
-  // https://t.me/Ploskiy_zhivot_s_Ayunoy_bot/app?startapp=materials_64
+  // https://t.me/istochnik_clubbot/app?startapp=materials_64
   
   // Ссылка с UTM метками
   withUtm: createMaterialLinkWithUtm(64, 'admin_share', 'manual', 'december2024'),
-  // https://t.me/Ploskiy_zhivot_s_Ayunoy_bot/app?startapp=materials_64_admin_share_manual_december2024
+  // https://t.me/istochnik_clubbot/app?startapp=materials_64_admin_share_manual_december2024
 };

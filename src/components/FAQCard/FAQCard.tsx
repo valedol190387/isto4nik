@@ -34,7 +34,10 @@ export function FAQCard({ question, answer }: FAQCardProps) {
         id={`faq-answer-${question}`}
         aria-hidden={!open}
       >
-        <div className={styles.answer}>{answer}</div>
+        <div 
+          className={styles.answer}
+          dangerouslySetInnerHTML={{ __html: answer.replace(/\n/g, '<br />') }}
+        />
       </div>
     </div>
   );

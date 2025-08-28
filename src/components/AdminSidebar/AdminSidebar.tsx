@@ -61,12 +61,6 @@ const sidebarItems: SidebarItem[] = [
     title: 'FAQ',
     icon: <MessageCircle size={20} />,
     path: '/admin/faq'
-  },
-  {
-    id: 'course-access',
-    title: 'Доступы к курсам',
-    icon: <Users size={20} />,
-    path: '/admin/course-access'
   }
 ];
 

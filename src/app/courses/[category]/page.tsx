@@ -6,7 +6,6 @@ import { Page } from '@/components/Page';
 import { Star, ExternalLink, Loader2, FileText } from 'lucide-react';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
-import { useCourseAccess } from '@/hooks/useCourseAccess';
 import styles from './page.module.css';
 
 // Mapping категорий к section_key в таблице materials
@@ -43,9 +42,6 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
 
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
-  
-  // Получаем доступы к курсам из БД
-  const { access: courseAccess, loading: accessLoading } = useCourseAccess();
 
   // Получаем конфигурацию текущей категории
   const categoryConfig = CATEGORY_MAPPING[resolvedParams.category];
@@ -176,7 +172,7 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     );
   }
 
-  if (loading || accessLoading) {
+  if (loading) {
     return (
       <div className={styles.loading}>
         <div className={styles.loadingContent}>
