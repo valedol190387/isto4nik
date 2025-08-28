@@ -1,6 +1,7 @@
 'use client';
 
 import { Page } from '@/components/Page';
+import { ScrollSpacer } from '@/components/ScrollSpacer';
 import Image from 'next/image';
 import styles from './page.module.css';
 
@@ -102,6 +103,9 @@ export default function AboutPage() {
           </a>
         </div>
       </div>
+      
+      {/* Предотвращаем закрытие TMA при свайпе на страницах с коротким контентом */}
+      <ScrollSpacer />
     </Page>
   );
 } 

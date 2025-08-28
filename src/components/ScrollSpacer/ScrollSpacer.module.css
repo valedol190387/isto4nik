@@ -1,0 +1,11 @@
+/* Невидимый элемент для обеспечения скрола */
+.scrollSpacer {
+  width: 100%;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  /* Убираем из accessibility tree */
+  visibility: hidden;
+  /* Не влияет на layout других элементов */
+  flex-shrink: 0;
+}

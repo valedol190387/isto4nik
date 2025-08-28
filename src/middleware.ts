@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // Защищенные маршруты
-const PROTECTED_ROUTES = ['/materials', '/calendar', '/favorites'];
+const PROTECTED_ROUTES = ['/calendar', '/favorites'];
 
 // Функция для получения telegram_id из заголовков
 function getTelegramIdFromHeaders(request: NextRequest): string | null {
@@ -49,5 +49,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/materials/:path*', '/calendar/:path*', '/favorites/:path*']
+  matcher: ['/calendar/:path*', '/favorites/:path*']
 }; 

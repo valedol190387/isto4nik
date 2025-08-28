@@ -75,39 +75,60 @@ class SearchService {
       route: '/about'
     },
     {
-      title: 'Вводная тренировка',
-      content: 'Базовые упражнения и техники для начала пути к красоте и здоровью.',
-      route: '/courses/intro-training'
+      title: 'ДИАЛОГИ',
+      content: 'Вопросы и ответы, диалоги с экспертами по красоте и здоровью.',
+      route: '/courses/dialogs'
     },
     {
-      title: 'Плоский живот',
-      content: 'Эффективная программа для достижения плоского живота. Упражнения и советы по питанию.',
-      route: '/courses/flat-belly'
+      title: 'Решаем запросы',
+      content: 'Ответы на частые вопросы, решение проблем и запросов по программе.',
+      route: '/courses/questions'
     },
     {
-      title: 'Против отеков',
-      content: 'Борьба с отеками и задержкой жидкости. Специальные техники и упражнения.',
-      route: '/courses/anti-swelling'
+      title: 'Разговор у источника',
+      content: 'Выступления экспертов, лекции и презентации по темам красоты и здоровья.',
+      route: '/courses/speeches'
     },
     {
-      title: 'Материалы',
-      content: 'Полезные материалы, видео, методички и руководства по красоте и здоровью.',
-      route: '/materials'
+      title: 'Мнение',
+      content: 'Экспертные мнения, советы и рекомендации от специалистов.',
+      route: '/courses/opinion'
     },
+    {
+      title: 'Мини-курсы',
+      content: 'Краткие обучающие курсы, полезные материалы, видео и руководства по красоте и здоровью.',
+      route: '/courses/mini-courses'
+    },
+
     {
       title: 'Избранное',
       content: 'Ваши избранные материалы и курсы для быстрого доступа.',
       route: '/favorites'
     },
     {
-      title: 'Профиль',
-      content: 'Личный кабинет пользователя. Настройки и персональная информация.',
-      route: '/profile'
+      title: 'Ресурсы',
+      content: 'Дополнительные ресурсы, полезные ссылки и материалы.',
+      route: '/resources'
+    },
+    {
+      title: 'Отзывы',
+      content: 'Отзывы и рекомендации от участников программы.',
+      route: '/reviews'
     },
     {
       title: 'Календарь',
-      content: 'Расписание занятий и планирование тренировок.',
+      content: 'Расписание занятий, события и важные даты программы.',
       route: '/calendar'
+    },
+    {
+      title: 'Профиль',
+      content: 'Личный профиль, настройки аккаунта и информация о подписке.',
+      route: '/profile'
+    },
+    {
+      title: 'FAQ',
+      content: 'Часто задаваемые вопросы и ответы по программе.',
+      route: '/faq'
     }
   ];
 
@@ -209,7 +230,7 @@ class SearchService {
             title: material.title,
             content: `${material.title} ${material.description || ''} ${material.tags ? material.tags.join(' ') : ''}`,
             type: 'material',
-            route: '/materials'
+            route: `/materials/${material.id}`
           });
         });
       } else {
@@ -281,7 +302,7 @@ class SearchService {
         title: material.title,
         content: `${material.title} ${material.description} ${material.tags.join(' ')}`,
         type: 'material',
-        route: '/materials'
+        route: `/materials/${material.id}`
       });
     });
   }

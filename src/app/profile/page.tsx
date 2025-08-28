@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check, Loader2, Shield } from 'lucide-react';
 import { Page } from '@/components/Page';
+import { ScrollSpacer } from '@/components/ScrollSpacer';
 import { Payment, User as DbUser } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import Link from 'next/link';
@@ -40,6 +41,14 @@ export default function ProfilePage() {
   // Состояние для копирования
   const [copiedId, setCopiedId] = useState(false);
   const [copiedSystemInfo, setCopiedSystemInfo] = useState(false);
+  
+  // Состояние для геолокации
+  const [locationData, setLocationData] = useState<{
+    ip?: string;
+    country?: string;
+    region?: string;
+    city?: string;
+  } | null>(null);
   
   // Получаем пользователя из Telegram
   const user = useSignal(initData.user);
@@ -103,11 +112,47 @@ export default function ProfilePage() {
     }
   };
 
+  // Функция для загрузки геолокации
+  const loadLocationData = async () => {
+    try {
+      // Используем бесплатный API для получения IP и местоположения
+      const response = await fetch('https://ipapi.co/json/');
+      if (response.ok) {
+        const data = await response.json();
+        setLocationData({
+          ip: data.ip,
+          country: data.country_name,
+          region: data.region,
+          city: data.city
+        });
+      }
+    } catch (error) {
+      console.error('Ошибка получения геоданных:', error);
+      // В случае ошибки можно попробовать альтернативный API
+      try {
+        const response = await fetch('https://ip-api.com/json/');
+        if (response.ok) {
+          const data = await response.json();
+          setLocationData({
+            ip: data.query,
+            country: data.country,
+            region: data.regionName,
+            city: data.city
+          });
+        }
+      } catch (error) {
+        console.error('Ошибка получения геоданных из альтернативного API:', error);
+      }
+    }
+  };
+
   // Вызываем загрузку данных пользователя при монтировании
   useEffect(() => {
     if (user?.id) {
       loadUserData();
     }
+    // Загружаем геоданные при загрузке компонента
+    loadLocationData();
   }, [user?.id]);
 
   // Форматирование даты
@@ -353,10 +398,13 @@ Cookies включены: ${nav.cookieEnabled ? 'Да' : 'Нет'}
 LocalStorage: ${typeof localStorage !== 'undefined' ? 'Да' : 'Нет'}
 WebGL: ${window.WebGLRenderingContext ? 'Да' : 'Нет'}
 
-ПОЛЬЗОВАТЕЛЬ:
-User ID: ${user?.id || 'Неизвестно'}
-Username: ${user?.username || 'Неизвестно'}
-Текущий URL: ${window.location.href}
+МЕСТОПОЛОЖЕНИЕ:
+IP-адрес: ${locationData?.ip || 'Определяется...'}
+Страна: ${locationData?.country || 'Определяется...'}
+Регион: ${locationData?.region || 'Определяется...'}
+Город: ${locationData?.city || 'Определяется...'}
+
+СИСТЕМА:
 Время загрузки: ${new Date().toISOString()}
 
 === КОНЕЦ ДИАГНОСТИЧЕСКОЙ ИНФОРМАЦИИ ===
@@ -563,10 +611,13 @@ Username: ${user?.username || 'Неизвестно'}
                 <p><strong>LocalStorage:</strong> {typeof localStorage !== 'undefined' ? 'Да' : 'Нет'}</p>
                 <p><strong>WebGL:</strong> {typeof window !== 'undefined' && window.WebGLRenderingContext ? 'Да' : 'Нет'}</p>
                 <br />
-                <p><strong>ПОЛЬЗОВАТЕЛЬ:</strong></p>
-                <p><strong>User ID:</strong> {user?.id || 'Неизвестно'}</p>
-                <p><strong>Username:</strong> {user?.username || 'Неизвестно'}</p>
-                <p><strong>Текущий URL:</strong> {typeof window !== 'undefined' ? window.location.href : 'Неизвестно'}</p>
+                <p><strong>МЕСТОПОЛОЖЕНИЕ:</strong></p>
+                <p><strong>IP-адрес:</strong> {locationData?.ip || 'Определяется...'}</p>
+                <p><strong>Страна:</strong> {locationData?.country || 'Определяется...'}</p>
+                <p><strong>Регион:</strong> {locationData?.region || 'Определяется...'}</p>
+                <p><strong>Город:</strong> {locationData?.city || 'Определяется...'}</p>
+                <br />
+                <p><strong>СИСТЕМА:</strong></p>
                 <p><strong>Время загрузки:</strong> {new Date().toISOString()}</p>
               </div>
               
@@ -628,6 +679,9 @@ Username: ${user?.username || 'Неизвестно'}
           )}
         </div>
       </div>
+      
+      {/* Предотвращаем закрытие TMA при свайпе на страницах с коротким контентом */}
+      <ScrollSpacer />
     </Page>
   );
 } 
