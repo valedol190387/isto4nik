@@ -134,6 +134,18 @@ export default function Home() {
     }
   };
 
+  // Обработчик клика по блокам материалов/курсов
+  const handleCourseClick = (e: React.MouseEvent, route: string) => {
+    if (!isSubscriptionActive) {
+      e.preventDefault();
+      setShowSubscriptionModal(true);
+    } else {
+      // Если подписка активна, используем программный переход
+      e.preventDefault();
+      router.push(route);
+    }
+  };
+
   // Инициализация поискового индекса в фоне
   useEffect(() => {
     // Запускаем индексацию в фоне для быстрого поиска
@@ -309,7 +321,12 @@ export default function Home() {
           {/* Вводная тренировка - полная ширина */}
           {courses.filter(course => course.type === 'full-width').map((course) => {
             return (
-              <Link key={course.id} href={course.route} className={styles.courseCardFullWidth}>
+              <a 
+                key={course.id} 
+                href="#"
+                className={styles.courseCardFullWidth}
+                onClick={(e) => handleCourseClick(e, course.route)}
+              >
                 <div className={styles.courseContent}>
                   <Image
                     src={course.image}
@@ -318,8 +335,18 @@ export default function Home() {
                     className={styles.courseImage}
                     sizes="(max-width: 768px) 100vw, 600px"
                   />
+                  {/* Блокировка при отсутствии подписки */}
+                  {!isSubscriptionActive && (
+                    <div className={styles.courseGlassOverlay}>
+                      <div className={styles.courseLockContainer}>
+                        <div className={`${styles.courseLockIcon} ${styles.pulsingLock}`}>
+                          <Lock size={24} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </Link>
+              </a>
             );
           })}
           
@@ -327,7 +354,12 @@ export default function Home() {
           <div className={styles.coursesGrid}>
             {courses.filter(course => course.type === 'square').map((course) => {
               return (
-                <Link key={course.id} href={course.route} className={styles.courseCardSquare}>
+                <a 
+                  key={course.id} 
+                  href="#"
+                  className={styles.courseCardSquare}
+                  onClick={(e) => handleCourseClick(e, course.route)}
+                >
                   <div className={styles.courseContent}>
                     <Image
                       src={course.image}
@@ -336,8 +368,18 @@ export default function Home() {
                       className={styles.courseImage}
                       sizes="(max-width: 768px) 50vw, 200px"
                     />
+                    {/* Блокировка при отсутствии подписки */}
+                    {!isSubscriptionActive && (
+                      <div className={styles.courseGlassOverlay}>
+                        <div className={styles.courseLockContainer}>
+                          <div className={`${styles.courseLockIcon} ${styles.pulsingLock}`}>
+                            <Lock size={20} />
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </Link>
+                </a>
               );
             })}
           </div>
@@ -398,11 +440,11 @@ export default function Home() {
                 <Lock size={48} />
               </div>
               
-              <h3 className={styles.modalTitle}>Доступ к чату сообещства</h3>
+              <h3 className={styles.modalTitle}>Требуется активная подписка</h3>
               
               <p className={styles.modalText}>
-                Для доступа к чату сообщества необходима активная подписка. 
-                Получите доступ ко всем материалам и начните свой путь к изучению материалов!
+                Для доступа к материалам и чату сообщества необходима активная подписка. 
+                Получите полный доступ ко всем материалам и присоединяйтесь к нашему сообществу!
               </p>
               
               <a 
