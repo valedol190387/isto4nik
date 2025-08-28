@@ -393,10 +393,8 @@
 
 /* Чат клуба с Snake Border эффектом */
 .clubChatSection {
-  margin-bottom: calc(18px + var(--safe-area-inset-bottom, 0px));
+  margin-bottom: 24px;
   width: 100%;
-  /* Дополнительный отступ снизу для защиты от навигации Telegram */
-  padding-bottom: var(--safe-area-inset-bottom, 0px);
 }
 
 .clubChatCard {
