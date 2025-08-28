@@ -21,6 +21,13 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 ADMIN_USERNAME=Isto4nik
 ADMIN_PASSWORD=Isto4nik2024Strong
 
+# S3 Storage Configuration (для загрузки файлов)
+S3_ACCESS_KEY_ID=your-s3-access-key
+S3_SECRET_ACCESS_KEY=your-s3-secret-key
+S3_BUCKET_NAME=your-s3-bucket-name
+S3_REGION=ru1
+S3_ENDPOINT=https://s3.ru1.storage.beget.cloud
+
 # NextAuth Configuration  
 NEXTAUTH_URL=http://localhost:3000
 

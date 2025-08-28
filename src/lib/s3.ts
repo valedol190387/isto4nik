@@ -1,18 +1,23 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 
-// Конфигурация S3 клиента - НОВОЕ ХРАНИЛИЩЕ
+// Конфигурация S3 клиента - БЕЗОПАСНО ЧЕРЕЗ ENV ПЕРЕМЕННЫЕ
 const s3Client = new S3Client({
-  region: 'ru1', // Регион для s3.ru1.storage.beget.cloud
-  endpoint: 'https://s3.ru1.storage.beget.cloud',
+  region: process.env.S3_REGION || 'ru1',
+  endpoint: process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud',
   credentials: {
-    accessKeyId: 'GWC29Y2ODJZZ1GXQJJ1V',
-    secretAccessKey: 'qerCqawZ9sEmBFA9kooDylJAaOeD8Mg0rzphnAaG',
+    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
   },
   forcePathStyle: true, // Использовать path style URLs
 });
 
-const BUCKET_NAME = '818c4bb6b83f-gifted-klavdiya';
+// Проверяем наличие обязательных переменных окружения
+if (!process.env.S3_ACCESS_KEY_ID || !process.env.S3_SECRET_ACCESS_KEY || !process.env.S3_BUCKET_NAME) {
+  throw new Error('S3 configuration missing! Please set S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, and S3_BUCKET_NAME environment variables.');
+}
+
+const BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 const AVATARS_FOLDER = 'avatars';
 const PROMOPIC_FOLDER = 'promopic';
 
@@ -55,7 +60,7 @@ export async function uploadAvatar(file: File): Promise<string> {
     await s3Client.send(command);
 
     // Возвращаем публичный URL файла
-    const publicUrl = `https://s3.ru1.storage.beget.cloud/${BUCKET_NAME}/${key}`;
+    const publicUrl = `${process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud'}/${BUCKET_NAME}/${key}`;
     return publicUrl;
   } catch (error) {
     console.error('Error uploading file to S3:', error);
@@ -119,7 +124,7 @@ export async function uploadPromoImage(file: File): Promise<string> {
     await s3Client.send(command);
 
     // Возвращаем публичный URL файла
-    const publicUrl = `https://s3.ru1.storage.beget.cloud/${BUCKET_NAME}/${key}`;
+    const publicUrl = `${process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud'}/${BUCKET_NAME}/${key}`;
     return publicUrl;
   } catch (error) {
     console.error('Error uploading promo image to S3:', error);
@@ -150,11 +155,11 @@ export async function deletePromoImage(imageUrl: string): Promise<void> {
 
 // Функция для проверки валидности URL промо-картинки
 export function isValidPromoImageUrl(url: string): boolean {
-  return url.startsWith(`https://s3.ru1.storage.beget.cloud/${BUCKET_NAME}/${PROMOPIC_FOLDER}/`);
+  return url.startsWith(`${process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud'}/${BUCKET_NAME}/${PROMOPIC_FOLDER}/`);
 }
 
 // Функция для проверки валидности URL аватара
 export function isValidAvatarUrl(url: string): boolean {
-  return url.startsWith(`https://s3.ru1.storage.beget.cloud/${BUCKET_NAME}/${AVATARS_FOLDER}/`) ||
+  return url.startsWith(`${process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud'}/${BUCKET_NAME}/${AVATARS_FOLDER}/`) ||
          url.startsWith(`https://s3.ru1.storage.beget.cloud/57698b39f785-thoughtful-ansel/avatars/`); // Совместимость со старыми URL
 } 
