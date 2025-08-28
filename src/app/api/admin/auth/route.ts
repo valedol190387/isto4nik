@@ -8,16 +8,6 @@ export async function POST(request: NextRequest) {
     const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
     const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'admin';
 
-    // Добавляем логирование для отладки (временно)
-    console.log('Admin auth attempt:', {
-      receivedUsername: username,
-      expectedUsername: ADMIN_USERNAME,
-      receivedPasswordLength: password?.length,
-      expectedPasswordLength: ADMIN_PASSWORD?.length,
-      usernameMatch: username === ADMIN_USERNAME,
-      passwordMatch: password === ADMIN_PASSWORD
-    });
-
     // Проверяем учетные данные
     if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
       return NextResponse.json({
