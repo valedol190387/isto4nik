@@ -19,7 +19,7 @@ SUPABASE_SERVICE_ROLE_KEY=your-service-role-key
 
 # Admin Panel Authentication
 ADMIN_USERNAME=Isto4nik
-ADMIN_PASSWORD=Isto4nik2024_$ecur3!
+ADMIN_PASSWORD=Isto4nik2024Strong
 
 # NextAuth Configuration  
 NEXTAUTH_URL=http://localhost:3000
