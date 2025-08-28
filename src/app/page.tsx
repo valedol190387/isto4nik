@@ -74,6 +74,7 @@ export default function Home() {
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [chatLink, setChatLink] = useState<string | null>(null);
+  const [channelLink, setChannelLink] = useState<string | null>(null);
   const router = useRouter();
 
 
@@ -82,8 +83,8 @@ export default function Home() {
   // Получаем пользователя из Telegram
   const user = useSignal(initData.user);
   
-  // 4 точки для навигации (5 хайлайтов)
-  const dotsCount = 4;
+  // 3 точки для навигации (4 хайлайта)
+  const dotsCount = 3;
 
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
@@ -187,23 +188,25 @@ export default function Home() {
     handleDeepLink();
   }, [router]);
 
-  // Функция для загрузки защищенной ссылки на чат
-  const loadChatLink = async () => {
+  // Функция для загрузки ссылок из переменных окружения
+  const loadLinks = async () => {
     if (isSubscriptionActive) {
       try {
-        const telegramId = user?.id?.toString() || getTelegramId();
-        const response = await fetch(`/api/secure-links?telegram_id=${telegramId}&type=chat`);
+        const response = await fetch('/api/env-links');
         
         if (response.ok) {
           const data = await response.json();
-          setChatLink(data.link);
+          setChatLink(data.chatLink);
+          setChannelLink(data.channelLink);
         }
       } catch (error) {
-        console.error('Error loading chat link:', error);
+        console.error('Error loading links:', error);
         setChatLink(null);
+        setChannelLink(null);
       }
     } else {
       setChatLink(null);
+      setChannelLink(null);
     }
   };
 
@@ -216,9 +219,9 @@ export default function Home() {
     }
   }, [user?.id]);
 
-  // Загружаем ссылку на чат когда статус подписки меняется
+  // Загружаем ссылки когда статус подписки меняется
   useEffect(() => {
-    loadChatLink();
+    loadLinks();
   }, [isSubscriptionActive, user?.id]);
   
   const scrollToPosition = (dotIndex: number) => {
@@ -408,6 +411,38 @@ export default function Home() {
                   {/* Замок поверх стекла */}
                   <div className={styles.chatLockContainer}>
                     <div className={`${styles.chatLockIcon} ${styles.pulsingLock}`}>
+                      <Lock size={24} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </a>
+        </div>
+
+        {/* Канал сообщества */}
+        <div className={styles.clubChannelSection}>
+          <a 
+            href={isSubscriptionActive && channelLink ? channelLink : "#"}
+            target={isSubscriptionActive && channelLink ? "_blank" : "_self"}
+            rel={isSubscriptionActive && channelLink ? "noopener noreferrer" : ""}
+            className={styles.clubChannelCard}
+            onClick={handleChatClick}
+          >
+            <div className={styles.clubChannelContent}>
+              <Image
+                src="/images/channel.webp"
+                alt=""
+                fill
+                className={styles.clubChannelImage}
+                sizes="(max-width: 768px) 100vw, 600px"
+              />
+              {/* Прозрачное стекло поверх всей кнопки при заблокированном доступе */}
+              {!isSubscriptionActive && (
+                <div className={styles.channelGlassOverlay}>
+                  {/* Замок поверх стекла */}
+                  <div className={styles.channelLockContainer}>
+                    <div className={`${styles.channelLockIcon} ${styles.pulsingLock}`}>
                       <Lock size={24} />
                     </div>
                   </div>

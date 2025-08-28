@@ -25,7 +25,7 @@ export default function ResourcesPage() {
           <div className={styles.authorContent}>
             <h1 className={styles.authorTitle}>
               Елена<br />
-              Теребенина —
+              Теребенина&nbsp;—
             </h1>
             <p className={styles.authorText}>
               ректор Международного университета современной психологии, бизнес-тренер. 
@@ -40,11 +40,11 @@ export default function ResourcesPage() {
           <div className={styles.authorContentLeft}>
             <h1 className={styles.authorTitle}>
               Евгений<br />
-              Теребенин —
+              Теребенин&nbsp;—
             </h1>
             <p className={styles.authorText}>
               психолог, эксперт по развитию практического мировоззрения людей, 
-              член Международной ассоциации психологов и бизнес-тренер
+              член Международной ассоциации психологов и бизнес-тренер.
             </p>
           </div>
           <div className={styles.authorImageContainer}>
@@ -79,7 +79,7 @@ export default function ResourcesPage() {
         {/* Блок статистики с синим фоном */}
         <div className={styles.statsSection}>
           <p className={styles.statsText}>
-            Более 14 000 человек прошли «Терапию Души» и решили свои жизненные запросы.
+            Более 14 000 человек прошли «Терапию Души» и решили свои жизненные запросы
           </p>
         </div>
 
@@ -87,7 +87,7 @@ export default function ResourcesPage() {
         <div className={styles.additionalDescription}>
           <p className={styles.additionalText}>
             Евгений регулярно проводит обучение методу, уже более 
-            1 500 человек практикуют «Терапию Души» по всему миру
+            1 500 человек практикуют «Терапию Души» по всему миру.
           </p>
         </div>
 
@@ -607,14 +607,14 @@ export default function ResourcesPage() {
             >
               На сайте
             </a> Евгения Теребенина - максимально полная информация, <a 
-              href="http://www.terebenin.com/" 
+              href="https://www.terebenin.com/terapia_dushi#!/tab/729746087-2" 
               target="_blank" 
               rel="noopener noreferrer"
               className={styles.testDriveLink}
             >
               расписание групповых терапий
             </a>, <a 
-              href="http://www.terebenin.com/" 
+              href="https://www.terebenin.com" 
               target="_blank" 
               rel="noopener noreferrer"
               className={styles.testDriveLink}

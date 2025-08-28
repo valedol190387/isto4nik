@@ -750,6 +750,149 @@
   }
 }
 
+/* Канал сообщества - идентичен чату */
+.clubChannelSection {
+  margin-bottom: calc(18px + var(--safe-area-inset-bottom, 0px));
+  width: 100%;
+  padding-bottom: var(--safe-area-inset-bottom, 0px);
+}
+
+.clubChannelCard {
+  text-decoration: none;
+  transition: transform 0.3s ease;
+  border-radius: 8px;
+  display: block;
+  width: 100%;
+  position: relative;
+  background: transparent;
+  --snake-angle: 0deg;
+}
+
+.clubChannelCard::before {
+  content: '';
+  position: absolute;
+  display: none;
+}
+
+.clubChannelCard::after {
+  display: none;
+}
+
+.clubChannelCard:hover {
+  transform: scale(1.02);
+  box-shadow: var(--shadow-glow);
+}
+
+.clubChannelCard:active {
+  transform: scale(0.98);
+}
+
+.clubChannelContent {
+  background: #E4DEDC;
+  border-radius: 8px;
+  padding: 16px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  backdrop-filter: blur(20px);
+  position: relative;
+  overflow: hidden;
+  border: none;
+  z-index: 1;
+}
+
+.clubChannelContent::before {
+  display: none;
+}
+
+.clubChannelImage {
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+/* Прозрачное стекло поверх кнопки канала */
+.channelGlassOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to top, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2));
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(3px);
+  border-radius: 8px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.channelLockContainer {
+  position: relative;
+  z-index: 4;
+}
+
+.channelLockIcon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: #082445;
+  border-radius: 12px;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+}
+
+.channelLockIcon:hover {
+  transform: scale(1.1);
+}
+
+.channelLockIcon::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  filter: blur(20px);
+  opacity: 0.4;
+  transform: scale(1.5);
+  background: #082445;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.channelLockIcon.pulsingLock {
+  position: relative;
+}
+
+.channelLockIcon.pulsingLock::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid #082445;
+  border-radius: 12px;
+  animation: pulseRing1 2s ease-in-out infinite;
+  transform: scale(1.25);
+  background: none;
+  pointer-events: none;
+}
+
+.channelLockIcon.pulsingLock::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(8, 36, 69, 0.5);
+  border-radius: 12px;
+  animation: pulseRing2 2s ease-in-out infinite;
+  transform: scale(1.5);
+  background: none;
+  pointer-events: none;
+}
+
 /* Блокировка курсов */
 .courseGlassOverlay {
   position: absolute;

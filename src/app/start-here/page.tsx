@@ -66,7 +66,7 @@ export default function StartHerePage() {
             <p className={styles.blockText}>
               Студенты и сертифицированные специалисты, которые
               пришли за разборами супервизий, кейсов
-              и профессиональным сообществом.
+              и профессиональным сообществом
             </p>
               </div>
             </div>
@@ -93,7 +93,7 @@ export default function StartHerePage() {
               <h3 className={styles.benefitTitle}>ЗАКУЛИСЬЕ МЕТОДА</h3>
             </div>
             <p className={styles.benefitText}>
-              Живые мысли, находки и рабочие процессы Евгения и Елены — без «глянца».
+              Живые мысли, находки и рабочие процессы Евгения и Елены — без «глянца»
             </p>
           </div>
 
@@ -144,7 +144,7 @@ export default function StartHerePage() {
               <h3 className={styles.benefitTitle}>БАЗА ЗНАНИЙ</h3>
             </div>
             <p className={styles.benefitText}>
-              Глоссарий, ответы на частые вопросы, конспекты и лучшие инсайты.
+              Глоссарий, ответы на частые вопросы, конспекты и лучшие инсайты
             </p>
           </div>
 
