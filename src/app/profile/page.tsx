@@ -429,11 +429,11 @@ Username: ${user?.username || 'Неизвестно'}
               }}>
                 {isSubscriptionActive ? 'Активна' : 'Неактивна'}
               </span>
-              {isSubscriptionActive && userData?.end_sub_club && (
+              {isSubscriptionActive && userData?.next_payment_date && (
                 <div className={styles.subscriptionEndDate}>
                   <Clock className={styles.clockIcon} />
                   <span className={styles.endDateText}>
-                    до {formatDateOnly(userData.end_sub_club)}
+                    до {formatDateOnly(userData.next_payment_date)}
                   </span>
                 </div>
               )}
@@ -607,13 +607,13 @@ Username: ${user?.username || 'Неизвестно'}
                 payments.map((payment) => (
                   <div key={payment.id} className={styles.paymentItem}>
                     <div className={styles.paymentInfo}>
-                      <div className={styles.paymentMethod}>{payment.payment_callback.Description || 'Платеж'}</div>
-                      <div className={styles.paymentDate}>{formatDate(payment.payment_callback.DateTime)}</div>
+                      <div className={styles.paymentMethod}>{payment.payment_callback.payment_type || 'Платеж'}</div>
+                      <div className={styles.paymentDate}>{formatDate(payment.payment_callback.date)}</div>
                     </div>
                     <div className={styles.paymentAmount}>
-                      <div className={styles.amount}>{formatAmount(payment.payment_callback.Amount, payment.payment_callback.Currency)}</div>
-                      <div className={styles.status} style={{ color: getStatusColor(payment.payment_callback.Status) }}>
-                        {getStatusText(payment.payment_callback.Status)}
+                      <div className={styles.amount}>{formatAmount(payment.payment_callback.sum, payment.payment_callback.currency)}</div>
+                      <div className={styles.status} style={{ color: getStatusColor(payment.payment_callback.payment_status || payment.payment_callback.Status) }}>
+                        {getStatusText(payment.payment_callback.payment_status || payment.payment_callback.Status)}
                       </div>
                     </div>
                   </div>

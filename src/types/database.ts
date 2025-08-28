@@ -65,6 +65,7 @@ export interface User {
   status: string | null;
   clubtarif: string | null;
   end_sub_club: string | null;
+  next_payment_date: string | null;
   forma_opl: string | null;
   metka: string | null;
   periodtarif: string | null;
