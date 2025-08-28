@@ -29,7 +29,7 @@ import styles from './page.module.css';
 const highlights = [
   { id: 1, image: '/images/starthere.webp', route: '/start-here' },
   { id: 2, image: '/images/about.webp', route: '/about' },
-  { id: 3, image: '/images/zabota.webp', route: 'https://t.me/care_service_soul_therapy_bot' },
+  { id: 3, image: '/images/zabota.webp', route: 'https://t.me/istochnik_clubbot?start=zabota' },
   { id: 4, image: '/images/faq.webp', route: '/faq' },
   { id: 5, image: '/images/review.webp', route: '/reviews' },
 ];

@@ -307,12 +307,12 @@
 }
 
 .selected {
-  background: #ff6b8a;
+  background: #082445;
   color: white;
 }
 
 .hasEvent {
-  background: #ffd700;
+  background: #D9CECA;
   color: #082445;
   font-weight: 500;
 }
