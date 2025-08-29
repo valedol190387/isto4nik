@@ -41,7 +41,7 @@ interface Analytics {
   }>;
   topPayingUsers: Array<{
     telegram_id: string;
-    name: string;
+    name_from_ml: string;
     total_payments: number;
     last_payment: number;
   }>;
@@ -342,7 +342,7 @@ export default function AdminUsersPage() {
                 <div key={user.telegram_id} className={styles.topUserCard}>
                   <div className={styles.topUserRank}>#{index + 1}</div>
                   <div className={styles.topUserInfo}>
-                    <div className={styles.topUserName}>{user.name}</div>
+                    <div className={styles.topUserName}>{user.name_from_ml}</div>
                     <div className={styles.topUserTelegram}>{user.telegram_id}</div>
                   </div>
                   <div className={styles.topUserPayment}>

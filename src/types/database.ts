@@ -46,13 +46,12 @@ export interface User {
   id: number;
   telegram_id: number;
   salebot_id: string | null;
-  tg_username: string | null;
-  name: string | null;
+  username: string | null;
+  name_from_ml: string | null;
   mail: string | null;
   phone: string | null;
   status: string | null;
   clubtarif: string | null;
-  end_sub_club: string | null;
   next_payment_date: string | null;
   forma_opl: string | null;
   metka: string | null;

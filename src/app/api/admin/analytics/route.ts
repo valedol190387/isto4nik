@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
         const totalPayments = paymentsByUser[user.telegram_id.toString()] || 0;
         return {
           telegram_id: user.telegram_id.toString(),
-          name: user.name_from_ml || user.username || 'Без имени',
+          name_from_ml: user.name_from_ml || user.username || 'Без имени',
           total_payments: totalPayments,
           last_payment: totalPayments // В данной структуре нет отдельного поля для последнего платежа
         };

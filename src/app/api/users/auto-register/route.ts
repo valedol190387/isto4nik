@@ -41,7 +41,7 @@ export async function POST(request: Request) {
       // 🚫 СУЩЕСТВУЮЩИЙ ПОЛЬЗОВАТЕЛЬ - НЕ ТРОГАЕМ UTM МЕТКИ
       console.log('👤 User already exists, preserving UTM params:', {
         telegram_id: existingUser.telegram_id,
-        name: existingUser.name,
+        name: existingUser.name_from_ml,
         existing_utm: {
           utm_1: existingUser.utm_1,
           utm_2: existingUser.utm_2,
@@ -131,7 +131,7 @@ export async function POST(request: Request) {
 
     console.log('✅ Successfully created new user:', {
       telegram_id: newUser.telegram_id,
-      name: newUser.name,
+      name: newUser.name_from_ml,
       utm_params: {
         utm_1: newUser.utm_1,
         utm_2: newUser.utm_2,
