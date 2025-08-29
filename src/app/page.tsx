@@ -88,32 +88,23 @@ export default function Home() {
 
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
-    console.log('🔍 Getting Telegram ID...');
-    
     // Пробуем получить из Telegram WebApp API
     if (typeof window !== 'undefined') {
       const tg = (window as any).Telegram?.WebApp;
-      console.log('📱 Telegram WebApp object:', tg);
-      console.log('📋 initDataUnsafe:', tg?.initDataUnsafe);
       
       if (tg?.initDataUnsafe?.user?.id) {
         const telegramId = tg.initDataUnsafe.user.id.toString();
-        console.log('✅ Got Telegram ID from WebApp:', telegramId);
         return telegramId;
       }
     }
     
     // Fallback - только для разработки
-    console.log('⚠️ Using fallback Telegram ID: 123456789');
     return '123456789';
   };
 
   // Функция автоматической регистрации пользователя с UTM параметрами  
   const autoRegisterUser = async (telegramId: string, startParam: string | null) => {
     try {
-      console.log('🔄 FRONTEND AUTO-REGISTER VERSION: 2024-08-29-v2 🔄');
-      console.log('🔄 Auto-registering user:', telegramId, 'startParam:', startParam);
-      
       const utmParams = parseUtmFromStartParam(startParam);
       
       const registrationData = {
@@ -135,14 +126,13 @@ export default function Home() {
       const data = await response.json();
       
       if (data.success) {
-        console.log('✅ User auto-registered successfully:', data.user);
         return data.user;
       } else {
-        console.error('❌ Auto-registration failed:', data.error);
+        console.error('Auto-registration failed:', data.error);
         return null;
       }
     } catch (error) {
-      console.error('❌ Error during auto-registration:', error);
+      console.error('Auto-registration error:', error);
       return null;
     }
   };
@@ -150,46 +140,33 @@ export default function Home() {
   // Функция для загрузки данных пользователя из базы данных (с автоматической регистрацией)
   const loadUserData = async () => {
     try {
-      console.log('🔄 Starting loadUserData...');
-      console.log('👤 SDK user object:', user);
-      
       const telegramId = user?.id?.toString() || getTelegramId();
-      console.log('🆔 Using Telegram ID:', telegramId);
       
       // Сначала пытаемся загрузить существующего пользователя
-      console.log('🔍 Checking if user exists in database...');
       const response = await fetch(`/api/users?telegramId=${telegramId}`);
-      console.log('📡 Response status:', response.status);
       
       if (response.ok) {
         // Пользователь найден
         const data: DbUser = await response.json();
         setUserData(data);
-        console.log('👤 Existing user loaded:', data.telegram_id);
         return;
       }
       
       if (response.status === 404) {
         // Пользователь не найден - автоматически регистрируем
-        console.log('🆕 User not found, attempting auto-registration...');
-        
         const startParam = getStartParam();
-        console.log('📝 Start param for registration:', startParam);
-        
         const newUser = await autoRegisterUser(telegramId, startParam);
         
         if (newUser) {
-          console.log('✅ Auto-registration successful!', newUser);
           setUserData(newUser);
         } else {
-          console.log('❌ Auto-registration failed');
           setUserData(null);
         }
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error('❌ Error in loadUserData:', error);
+      console.error('Error in loadUserData:', error);
       setUserData(null);
     }
   };
@@ -235,7 +212,7 @@ export default function Home() {
       // Проверяем, был ли deep link уже обработан в этой сессии
       const deepLinkProcessed = sessionStorage.getItem('deepLinkProcessed');
       if (deepLinkProcessed) {
-        console.log('🔄 Deep link already processed in this session, skipping');
+        // Deep link already processed in this session, skipping
         return;
       }
 
@@ -243,7 +220,7 @@ export default function Home() {
       const deepLinkResult = checkDeepLink(startParam);
       
       if (deepLinkResult.isDeepLink && deepLinkResult.type === 'materials' && deepLinkResult.materialId) {
-        console.log('🚀 Deep link navigation to material:', deepLinkResult.materialId);
+        // Deep link navigation to material
         
         // Отмечаем что deep link был обработан
         sessionStorage.setItem('deepLinkProcessed', 'true');
