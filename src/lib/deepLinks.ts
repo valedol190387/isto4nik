@@ -40,6 +40,44 @@ export function checkDeepLink(startParam: string | null): DeepLinkResult {
 }
 
 /**
+ * Парсинг UTM параметров из startapp
+ * Поддерживает форматы:
+ * - "utm1_utm2_utm3_utm4_utm5" 
+ * - "materials_64_utm1_utm2_utm3_utm4_utm5"
+ */
+export function parseUtmFromStartParam(startParam: string | null): {
+  utm_1?: string;
+  utm_2?: string;
+  utm_3?: string;
+  utm_4?: string;
+  utm_5?: string;
+} {
+  if (!startParam) {
+    return {};
+  }
+
+  console.log('🏷️ Parsing UTM from startParam:', startParam);
+  
+  const params = startParam.split('_');
+  
+  // Если это deep link на материал, UTM начинается с 3-го параметра
+  const utmStartIndex = params[0] === 'materials' && params[1] ? 2 : 0;
+  
+  const utmParams: any = {};
+  
+  // Парсим до 5 UTM параметров
+  for (let i = 0; i < 5; i++) {
+    const param = params[utmStartIndex + i];
+    if (param && param.trim()) {
+      utmParams[`utm_${i + 1}`] = param;
+    }
+  }
+  
+  console.log('📊 Parsed UTM params:', utmParams);
+  return utmParams;
+}
+
+/**
  * Получение startapp параметра из Telegram WebApp SDK
  */
 export function getStartParam(): string | null {

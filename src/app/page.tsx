@@ -21,7 +21,7 @@ import { SearchModal } from '@/components/SearchModal';
 import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser } from '@/types/database';
-import { checkDeepLink, getStartParam } from '@/lib/deepLinks';
+import { checkDeepLink, getStartParam, parseUtmFromStartParam } from '@/lib/deepLinks';
 
 import styles from './page.module.css';
 
@@ -100,23 +100,74 @@ export default function Home() {
     return '123456789';
   };
 
-  // Функция для загрузки данных пользователя из базы данных
+  // Функция автоматической регистрации пользователя с UTM параметрами  
+  const autoRegisterUser = async (telegramId: string, startParam: string | null) => {
+    try {
+      console.log('🔄 Auto-registering user:', telegramId, 'startParam:', startParam);
+      
+      const utmParams = parseUtmFromStartParam(startParam);
+      
+      const registrationData = {
+        telegram_id: telegramId,
+        name_from_ml: user?.first_name || 'Новый пользователь',
+        username: user?.username || null,
+        start_param: startParam,
+        ...utmParams
+      };
+
+      const response = await fetch('/api/users/auto-register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(registrationData)
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('✅ User auto-registered successfully:', data.user);
+        return data.user;
+      } else {
+        console.error('❌ Auto-registration failed:', data.error);
+        return null;
+      }
+    } catch (error) {
+      console.error('❌ Error during auto-registration:', error);
+      return null;
+    }
+  };
+
+  // Функция для загрузки данных пользователя из базы данных (с автоматической регистрацией)
   const loadUserData = async () => {
     try {
       const telegramId = user?.id?.toString() || getTelegramId();
       
+      // Сначала пытаемся загрузить существующего пользователя
       const response = await fetch(`/api/users?telegramId=${telegramId}`);
       
-      if (!response.ok) {
-        if (response.status === 404) {
-          // Пользователь не найден в базе
-          setUserData(null);
-        } else {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-      } else {
+      if (response.ok) {
+        // Пользователь найден
         const data: DbUser = await response.json();
         setUserData(data);
+        console.log('👤 Existing user loaded:', data.telegram_id);
+        return;
+      }
+      
+      if (response.status === 404) {
+        // Пользователь не найден - автоматически регистрируем
+        console.log('🆕 User not found, attempting auto-registration...');
+        
+        const startParam = getStartParam();
+        const newUser = await autoRegisterUser(telegramId, startParam);
+        
+        if (newUser) {
+          setUserData(newUser);
+        } else {
+          setUserData(null);
+        }
+      } else {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
       console.error('Ошибка при загрузке данных пользователя:', error);
