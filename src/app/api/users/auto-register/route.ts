@@ -8,7 +8,10 @@ import { parseUtmParams } from '@/lib/utm';
  */
 export async function POST(request: Request) {
   try {
+    console.log('🔄 Auto-register API called');
     const body = await request.json();
+    console.log('📦 Request body:', body);
+    
     const { 
       telegram_id, 
       name_from_ml, 
@@ -16,14 +19,18 @@ export async function POST(request: Request) {
       start_param,
       ...otherData 
     } = body;
+    
+    console.log('📋 Parsed data:', { telegram_id, name_from_ml, username, start_param });
 
     if (!telegram_id) {
+      console.log('❌ No telegram_id provided');
       return NextResponse.json({ error: 'Telegram ID is required' }, { status: 400 });
     }
 
     console.log('🔍 Auto-registration request for telegram_id:', telegram_id);
 
     // 1. Проверяем существует ли пользователь
+    console.log('👀 Checking if user exists...');
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
       .select('id, telegram_id, name_from_ml, utm_1, utm_2, utm_3, utm_4, utm_5')
@@ -123,9 +130,11 @@ export async function POST(request: Request) {
 
     if (createError) {
       console.error('❌ Error creating new user:', createError);
+      console.error('📋 Full error object:', JSON.stringify(createError, null, 2));
       return NextResponse.json({ 
         error: 'Failed to create user',
-        details: createError.message 
+        details: createError.message,
+        code: createError.code
       }, { status: 500 });
     }
 

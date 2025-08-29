@@ -313,7 +313,7 @@ export default function ResourcesPage() {
           <p className={styles.additionalText}>
             В{' '}
             <a 
-              href="https://web.telegram.org/a/#-1001969346481" 
+              href="https://t.me/+ZiTCYWOw2T1kZGQy" 
               target="_blank" 
               rel="noopener noreferrer"
               className={styles.testDriveLink}
