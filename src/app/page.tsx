@@ -111,6 +111,7 @@ export default function Home() {
   // Функция автоматической регистрации пользователя с UTM параметрами  
   const autoRegisterUser = async (telegramId: string, startParam: string | null) => {
     try {
+      console.log('🔄 FRONTEND AUTO-REGISTER VERSION: 2024-08-29-v2 🔄');
       console.log('🔄 Auto-registering user:', telegramId, 'startParam:', startParam);
       
       const utmParams = parseUtmFromStartParam(startParam);

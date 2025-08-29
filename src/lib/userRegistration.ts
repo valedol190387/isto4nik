@@ -14,8 +14,8 @@ export interface UserRegistrationResult {
 
 export interface NewUserData {
   telegram_id: string;
-  name: string;
-  tg_username: string | null;
+  name_from_ml: string;
+  username: string | null;
   utm_1: string | null;
   utm_2: string | null;
   utm_3: string | null;
@@ -76,8 +76,8 @@ async function registerUserViaAPI(
       },
       body: JSON.stringify({
         telegram_id: telegramUser.id.toString(),
-        name: formatUserName(telegramUser),
-        tg_username: telegramUser.username || null,
+        name_from_ml: formatUserName(telegramUser),
+        username: telegramUser.username || null,
         start_param: startParam
       })
     });
@@ -145,8 +145,8 @@ export async function checkAndCreateUser(
       const utmParams = parseUtmParams(startParam);
       await sendNewUserWebhook({
         telegram_id: telegramId,
-        name: formatUserName(telegramUser),
-        tg_username: telegramUser.username || null,
+        name_from_ml: formatUserName(telegramUser),
+        username: telegramUser.username || null,
         utm_1: utmParams.utm_1,
         utm_2: utmParams.utm_2,
         utm_3: utmParams.utm_3,

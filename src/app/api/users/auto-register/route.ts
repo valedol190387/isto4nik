@@ -8,6 +8,7 @@ import { parseUtmParams } from '@/lib/utm';
  */
 export async function POST(request: Request) {
   try {
+    console.log('🔄 AUTO-REGISTER API CALLED - VERSION: 2024-08-29-v2 🔄');
     console.log('🔄 Auto-register API called');
     const body = await request.json();
     console.log('📦 Request body:', body);
@@ -71,55 +72,20 @@ export async function POST(request: Request) {
     
     const utmParams = parseUtmParams(start_param || null);
     
+    // ТОЛЬКО реальные поля из таблицы users
     const newUserData = {
       telegram_id: parseInt(telegram_id),
       name_from_ml: name_from_ml || 'Новый пользователь',
       username: username || null,
+      reg_date: new Date().toISOString(), // обязательная дата регистрации
       status: 'Новый пользователь',
-      testing: false,
-      
-      // Основные поля (будут заполняться при покупках)
-      salebot_id: null,
-      mail: null,
-      phone: null,
-      clubtarif: null,
-      next_payment_date: null,
-      forma_opl: null,
-      metka: 'auto_registered',
-      periodtarif: null,
-      srok: null,
-      start_sub_club: null,
-      subscr_id: null,
-      sum: null,
-      delete_club: false,
-      first_monthdate: null,
-      sub_club_stop: null,
-      amo_lead_id: null,
-      amo_client_id: null,
-      istochnik: null,
-      forma_oplaty: null,
       
       // UTM метки из start_param
       utm_1: utmParams.utm_1,
       utm_2: utmParams.utm_2,
       utm_3: utmParams.utm_3,
       utm_4: utmParams.utm_4,
-      utm_5: utmParams.utm_5,
-      
-      // Дефолтные доступы к курсам (НОВЫЕ КЛЮЧИ!)
-      course_access: {
-        stomach: true,        // course_flat_belly - всегда открыт
-        swelling: false,      // course_anti_swelling
-        blossom: false,       // course_bloom  
-        flexibility: false,   // useful (Рельеф и гибкость)
-        face: false,          // workouts (Для лица)
-        foot: false,          // guides (Стопы)
-        bodyflow: false,      // motivation (BodyFlow)
-        posture: false        // nutrition (Осанка)
-      },
-      
-      // Дополнительные данные если переданы
-      ...otherData
+      utm_5: utmParams.utm_5
     };
 
     const { data: newUser, error: createError } = await supabase
