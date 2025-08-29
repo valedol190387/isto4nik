@@ -88,15 +88,23 @@ export default function Home() {
 
   // Получаем Telegram ID пользователя
   const getTelegramId = () => {
+    console.log('🔍 Getting Telegram ID...');
+    
     // Пробуем получить из Telegram WebApp API
     if (typeof window !== 'undefined') {
       const tg = (window as any).Telegram?.WebApp;
+      console.log('📱 Telegram WebApp object:', tg);
+      console.log('📋 initDataUnsafe:', tg?.initDataUnsafe);
+      
       if (tg?.initDataUnsafe?.user?.id) {
-        return tg.initDataUnsafe.user.id.toString();
+        const telegramId = tg.initDataUnsafe.user.id.toString();
+        console.log('✅ Got Telegram ID from WebApp:', telegramId);
+        return telegramId;
       }
     }
     
     // Fallback - только для разработки
+    console.log('⚠️ Using fallback Telegram ID: 123456789');
     return '123456789';
   };
 
@@ -141,10 +149,16 @@ export default function Home() {
   // Функция для загрузки данных пользователя из базы данных (с автоматической регистрацией)
   const loadUserData = async () => {
     try {
+      console.log('🔄 Starting loadUserData...');
+      console.log('👤 SDK user object:', user);
+      
       const telegramId = user?.id?.toString() || getTelegramId();
+      console.log('🆔 Using Telegram ID:', telegramId);
       
       // Сначала пытаемся загрузить существующего пользователя
+      console.log('🔍 Checking if user exists in database...');
       const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      console.log('📡 Response status:', response.status);
       
       if (response.ok) {
         // Пользователь найден
@@ -159,18 +173,22 @@ export default function Home() {
         console.log('🆕 User not found, attempting auto-registration...');
         
         const startParam = getStartParam();
+        console.log('📝 Start param for registration:', startParam);
+        
         const newUser = await autoRegisterUser(telegramId, startParam);
         
         if (newUser) {
+          console.log('✅ Auto-registration successful!', newUser);
           setUserData(newUser);
         } else {
+          console.log('❌ Auto-registration failed');
           setUserData(null);
         }
       } else {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
     } catch (error) {
-      console.error('Ошибка при загрузке данных пользователя:', error);
+      console.error('❌ Error in loadUserData:', error);
       setUserData(null);
     }
   };
