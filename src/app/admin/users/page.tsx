@@ -91,7 +91,7 @@ export default function AdminUsersPage() {
     }, 300); // Задержка 300мс для предотвращения слишком частых запросов
 
     return () => clearTimeout(timeoutId);
-  }, [searchTerm, statusFilter, utm1Filter, utm2Filter, utm3Filter, utm4Filter, utm5Filter, paymentFilter]);
+  }, [searchTerm, statusFilter, utm1Filter, utm2Filter, utm3Filter, utm4Filter, utm5Filter, paymentFilter, dateFrom, dateTo]);
 
   useEffect(() => {
     loadUsers();
@@ -137,6 +137,8 @@ export default function AdminUsersPage() {
       if (utm4Filter) params.append('utm_4', utm4Filter);
       if (utm5Filter) params.append('utm_5', utm5Filter);
       if (paymentFilter !== 'all') params.append('payment_filter', paymentFilter);
+      if (dateFrom) params.append('date_from', dateFrom);
+      if (dateTo) params.append('date_to', dateTo);
 
       const response = await fetch(`/api/admin/users?${params}`);
       const data = await response.json();
@@ -464,15 +466,6 @@ export default function AdminUsersPage() {
                   />
                 </div>
               </div>
-              <button
-                onClick={() => {
-                  setDateFrom('');
-                  setDateTo('');
-                }}
-                className={styles.resetBtn}
-              >
-                Сбросить даты
-              </button>
             </div>
 
             {/* UTM Filters */}
@@ -560,6 +553,8 @@ export default function AdminUsersPage() {
               <button
                 onClick={() => {
                   setSearchTerm('');
+                  setDateFrom('');
+                  setDateTo('');
                   setUtm1Filter('');
                   setUtm2Filter('');
                   setUtm3Filter('');
