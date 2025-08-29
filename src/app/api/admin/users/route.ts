@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
       if (/^\d+$/.test(searchTerm)) {
         query = query.eq('telegram_id', parseInt(searchTerm));
       } else {
-        query = query.or(`name.ilike.%${searchTerm}%,tg_username.ilike.%${searchTerm}%`);
+        query = query.or(`name_from_ml.ilike.%${searchTerm}%,username.ilike.%${searchTerm}%`);
       }
     }
 

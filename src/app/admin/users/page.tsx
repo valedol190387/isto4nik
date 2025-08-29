@@ -8,13 +8,13 @@ import styles from './page.module.css';
 interface User {
   id: number;
   telegram_id: number;
-  tg_username: string | null;
-  name: string | null;
+  username: string | null;
+  name_from_ml: string | null;
   mail: string | null;
   phone: string | null;
   status: string | null;
   sum: number | null;
-  end_sub_club: string | null;
+  next_payment_date: string | null;
   created_at: string;
   utm_1: string | null;
   utm_2: string | null;
@@ -214,13 +214,13 @@ export default function AdminUsersPage() {
       ...allUsers.map(user => {
         return [
           user.telegram_id,
-          `"${user.name || ''}"`,
-          user.tg_username || '',
+          `"${user.name_from_ml || ''}"`,
+          user.username || '',
           user.phone || '',
           user.mail || '',
           user.status || '',
           user.created_at ? new Date(user.created_at).toLocaleDateString('ru-RU') : '',
-          user.end_sub_club ? new Date(user.end_sub_club).toLocaleDateString('ru-RU') : '',
+          user.next_payment_date ? new Date(user.next_payment_date).toLocaleDateString('ru-RU') : '',
           user.total_payments || 0,
           user.utm_1 || '',
           user.utm_2 || '',
@@ -612,10 +612,10 @@ export default function AdminUsersPage() {
                       <td style={{ textAlign: 'left' }}>
                         <div className={styles.userInfo}>
                           <div className={styles.userName}>
-                            {user.name || user.tg_username || 'Без имени'}
+                            {user.name_from_ml || user.username || 'Без имени'}
                           </div>
-                          {user.tg_username && (
-                            <div className={styles.userUsername}>@{user.tg_username}</div>
+                          {user.username && (
+                            <div className={styles.userUsername}>@{user.username}</div>
                           )}
                           {user.phone && (
                             <div className={styles.userPhone}>{user.phone}</div>
@@ -634,7 +634,7 @@ export default function AdminUsersPage() {
                         </span>
                       </td>
                       <td className={styles.dateCell}>{formatDate(user.created_at)}</td>
-                      <td className={styles.dateCell}>{formatDate(user.end_sub_club)}</td>
+                      <td className={styles.dateCell}>{formatDate(user.next_payment_date)}</td>
                       <td>
                         <div className={styles.paymentInfo}>
                           <div className={styles.totalPayment}>

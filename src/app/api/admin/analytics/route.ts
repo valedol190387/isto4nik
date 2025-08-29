@@ -57,12 +57,20 @@ export async function GET(request: NextRequest) {
       console.error('Error fetching payments:', paymentsError);
     }
 
-    // Группируем платежи по telegram_id (все платежи с суммой)
+    // Создаем мапу отфильтрованных пользователей для быстрого поиска
+    const filteredUserIds = new Set(filteredUsers.map((user: User) => user.telegram_id.toString()));
+    
+    // Группируем платежи по telegram_id (только от отфильтрованных пользователей)
     const paymentsByUser: Record<string, number> = {};
     (payments || []).forEach((payment: any) => {
       let amount = 0;
       let status = null;
       const telegramId = payment.telegram_id;
+      
+      // Учитываем только платежи от пользователей из выбранного периода
+      if (!filteredUserIds.has(telegramId?.toString())) {
+        return;
+      }
       
       if (payment.payment_callback) {
         // Если payment_callback - это строка, парсим её
@@ -118,7 +126,7 @@ export async function GET(request: NextRequest) {
         const totalPayments = paymentsByUser[user.telegram_id.toString()] || 0;
         return {
           telegram_id: user.telegram_id.toString(),
-          name: user.name || user.tg_username || 'Без имени',
+          name: user.name_from_ml || user.username || 'Без имени',
           total_payments: totalPayments,
           last_payment: totalPayments // В данной структуре нет отдельного поля для последнего платежа
         };

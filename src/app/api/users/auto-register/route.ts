@@ -11,8 +11,8 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { 
       telegram_id, 
-      name, 
-      tg_username, 
+      name_from_ml, 
+      username, 
       start_param,
       ...otherData 
     } = body;
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     // 1. Проверяем существует ли пользователь
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
-      .select('id, telegram_id, name, utm_1, utm_2, utm_3, utm_4, utm_5')
+      .select('id, telegram_id, name_from_ml, utm_1, utm_2, utm_3, utm_4, utm_5')
       .eq('telegram_id', parseInt(telegram_id))
       .maybeSingle();
 
@@ -66,8 +66,8 @@ export async function POST(request: Request) {
     
     const newUserData = {
       telegram_id: parseInt(telegram_id),
-      name: name || 'Новый пользователь',
-      tg_username: tg_username || null,
+      name_from_ml: name_from_ml || 'Новый пользователь',
+      username: username || null,
       status: 'Новый пользователь',
       testing: false,
       
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
       mail: null,
       phone: null,
       clubtarif: null,
-      end_sub_club: null,
+      next_payment_date: null,
       forma_opl: null,
       metka: 'auto_registered',
       periodtarif: null,
