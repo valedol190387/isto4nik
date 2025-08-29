@@ -1,8 +1,15 @@
 import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { v4 as uuidv4 } from 'uuid';
 
-// Конфигурация S3 клиента - БЕЗОПАСНО ЧЕРЕЗ ENV ПЕРЕМЕННЫЕ
-const s3Client = new S3Client({
+// Проверяем наличие обязательных переменных окружения
+const hasS3Config = process.env.S3_ACCESS_KEY_ID && process.env.S3_SECRET_ACCESS_KEY && process.env.S3_BUCKET_NAME;
+
+if (!hasS3Config) {
+  console.warn('S3 configuration missing');
+}
+
+// Конфигурация S3 клиента - только если есть переменные
+const s3Client = hasS3Config ? new S3Client({
   region: process.env.S3_REGION || 'ru1',
   endpoint: process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud',
   credentials: {
@@ -10,12 +17,7 @@ const s3Client = new S3Client({
     secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
   },
   forcePathStyle: true, // Использовать path style URLs
-});
-
-// Проверяем наличие обязательных переменных окружения
-if (!process.env.S3_ACCESS_KEY_ID || !process.env.S3_SECRET_ACCESS_KEY || !process.env.S3_BUCKET_NAME) {
-  throw new Error('S3 configuration missing! Please set S3_ACCESS_KEY_ID, S3_SECRET_ACCESS_KEY, and S3_BUCKET_NAME environment variables.');
-}
+}) : null;
 
 const BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 const AVATARS_FOLDER = 'avatars';
@@ -27,6 +29,10 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
 // Функция для загрузки аватара
 export async function uploadAvatar(file: File): Promise<string> {
+  if (!s3Client) {
+    throw new Error('S3 не настроен');
+  }
+
   // Валидация типа файла
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     throw new Error('Недопустимый тип файла. Разрешены только: JPEG, PNG, WebP');
@@ -70,6 +76,8 @@ export async function uploadAvatar(file: File): Promise<string> {
 
 // Функция для удаления аватара
 export async function deleteAvatar(avatarUrl: string): Promise<void> {
+  if (!s3Client) return;
+  
   try {
     // Извлекаем ключ из URL
     const urlParts = avatarUrl.split('/');
@@ -91,6 +99,10 @@ export async function deleteAvatar(avatarUrl: string): Promise<void> {
 
 // Функция для загрузки промо-картинки материала
 export async function uploadPromoImage(file: File): Promise<string> {
+  if (!s3Client) {
+    throw new Error('S3 не настроен');
+  }
+
   // Валидация типа файла
   if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
     throw new Error('Недопустимый тип файла. Разрешены только: JPEG, PNG, WebP');
@@ -134,6 +146,8 @@ export async function uploadPromoImage(file: File): Promise<string> {
 
 // Функция для удаления промо-картинки
 export async function deletePromoImage(imageUrl: string): Promise<void> {
+  if (!s3Client) return;
+  
   try {
     // Извлекаем ключ из URL
     const urlParts = imageUrl.split('/');
