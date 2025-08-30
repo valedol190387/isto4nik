@@ -13,7 +13,10 @@ export interface DeepLinkResult {
 
 /**
  * Проверяем, является ли startapp параметр deep link'ом на материал
- * Формат: "materials_64" или "materials_64_utm1_utm2"
+ * Поддерживаемые форматы: 
+ * - "materials_UUID" (новый безопасный формат)
+ * - "materials_UUID_utm1_utm2" (с UTM метками)
+ * - "materials_64" (старый формат для обратной совместимости)
  */
 export function checkDeepLink(startParam: string | null): DeepLinkResult {
   if (!startParam) {
@@ -22,13 +25,20 @@ export function checkDeepLink(startParam: string | null): DeepLinkResult {
   
   const params = startParam.split('_');
   
-  // Проверяем формат: "materials_64"
-  if (params[0] === 'materials' && params[1] && /^\d+$/.test(params[1])) {
-    return {
-      isDeepLink: true,
-      type: 'materials',
-      materialId: params[1]
-    };
+  if (params[0] === 'materials' && params[1]) {
+    // Проверяем UUID формат (8-4-4-4-12)
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    
+    // Или числовой ID (для обратной совместимости)
+    const numericRegex = /^\d+$/;
+    
+    if (uuidRegex.test(params[1]) || numericRegex.test(params[1])) {
+      return {
+        isDeepLink: true,
+        type: 'materials',
+        materialId: params[1]
+      };
+    }
   }
   
   return { isDeepLink: false };
@@ -38,7 +48,8 @@ export function checkDeepLink(startParam: string | null): DeepLinkResult {
  * Парсинг UTM параметров из startapp
  * Поддерживает форматы:
  * - "utm1_utm2_utm3_utm4_utm5" 
- * - "materials_64_utm1_utm2_utm3_utm4_utm5"
+ * - "materials_UUID_utm1_utm2_utm3_utm4_utm5"
+ * - "materials_64_utm1_utm2_utm3_utm4_utm5" (старый формат)
  */
 export function parseUtmFromStartParam(startParam: string | null): {
   utm_1?: string;
@@ -94,11 +105,5 @@ export function getStartParam(): string | null {
   }
 }
 
-/**
- * Создание ссылки на материал для шaring
- * Формат: https://t.me/botname/app?startapp=materials_64
- */
-export function createMaterialShareLink(materialId: string | number): string {
-  const BOT_USERNAME = 'istochnik_clubbot';
-  return `https://t.me/${BOT_USERNAME}/app?startapp=materials_${materialId}`;
-}
+// УДАЛЕНО: дублирующаяся функция createMaterialShareLink
+// Используйте функцию из @/lib/adminLinks вместо этой

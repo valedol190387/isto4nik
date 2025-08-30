@@ -7,16 +7,18 @@ const BOT_USERNAME = 'istochnik_clubbot';
 
 /**
  * Создание прямой ссылки на материал (без UTM меток)
+ * @param materialUuid - UUID материала для безопасного доступа
  */
-export function createMaterialShareLink(materialId: string | number): string {
-  return `https://t.me/${BOT_USERNAME}/app?startapp=materials_${materialId}`;
+export function createMaterialShareLink(materialUuid: string): string {
+  return `https://t.me/${BOT_USERNAME}/app?startapp=materials_${materialUuid}`;
 }
 
 /**
  * Создание ссылки на материал с UTM метками
+ * @param materialUuid - UUID материала для безопасного доступа
  */
 export function createMaterialLinkWithUtm(
-  materialId: string | number,
+  materialUuid: string,
   utmSource: string,
   utmMedium?: string,
   utmCampaign?: string
@@ -24,7 +26,7 @@ export function createMaterialLinkWithUtm(
   const utmParts = [utmSource, utmMedium, utmCampaign].filter(Boolean);
   const utmString = utmParts.length > 0 ? `_${utmParts.join('_')}` : '';
   
-  return `https://t.me/${BOT_USERNAME}/app?startapp=materials_${materialId}${utmString}`;
+  return `https://t.me/${BOT_USERNAME}/app?startapp=materials_${materialUuid}${utmString}`;
 }
 
 /**
@@ -63,10 +65,10 @@ export async function copyLinkToClipboard(link: string): Promise<boolean> {
 // Примеры использования:
 export const linkExamples = {
   // Простая ссылка на материал
-  simple: createMaterialShareLink(64),
-  // https://t.me/istochnik_clubbot/app?startapp=materials_64
+  simple: createMaterialShareLink('550e8400-e29b-41d4-a716-446655440000'),
+  // https://t.me/istochnik_clubbot/app?startapp=materials_550e8400-e29b-41d4-a716-446655440000
   
   // Ссылка с UTM метками
-  withUtm: createMaterialLinkWithUtm(64, 'admin_share', 'manual', 'december2024'),
-  // https://t.me/istochnik_clubbot/app?startapp=materials_64_admin_share_manual_december2024
+  withUtm: createMaterialLinkWithUtm('550e8400-e29b-41d4-a716-446655440000', 'admin_share', 'manual', 'december2024'),
+  // https://t.me/istochnik_clubbot/app?startapp=materials_550e8400-e29b-41d4-a716-446655440000_admin_share_manual_december2024
 };

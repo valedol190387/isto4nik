@@ -19,7 +19,8 @@ interface Material {
   display_order: number;
   is_embedded_video: boolean;        // Новое поле: галочка "встроенное видео"
   video_embed_code: string | null;   // Новое поле: код для вставки видео из Kinescope
-  pic_url: string | null;            // Новое поле: URL изображения для превью  
+  pic_url: string | null;            // Новое поле: URL изображения для превью
+  share_uuid?: string;               // UUID для безопасных ссылок
   created_at: string;
   updated_at: string;
 }
@@ -231,9 +232,11 @@ export default function AdminContent() {
     }
   };
 
-  const handleCopyLink = async (materialId: string, title: string) => {
+  const handleCopyLink = async (materialShareUuid: string, title: string, materialId: string) => {
     try {
-      const link = createMaterialShareLink(materialId);
+      // Используем UUID для безопасной ссылки, fallback на ID если UUID отсутствует
+      const identifier = materialShareUuid || materialId;
+      const link = createMaterialShareLink(identifier);
       const success = await copyLinkToClipboard(link);
       
       if (success) {
@@ -501,7 +504,7 @@ export default function AdminContent() {
                               </div>
                               <div className={styles.materialActions}>
                                 <button
-                                  onClick={() => handleCopyLink(material.id, material.title)}
+                                  onClick={() => handleCopyLink(material.share_uuid || '', material.title, material.id)}
                                   className={`${styles.linkBtn} ${linkCopiedFor === material.id ? styles.linkBtnSuccess : ''}`}
                                   title={linkCopiedFor === material.id ? 'Ссылка скопирована!' : 'Скопировать ссылку на материал'}
                                 >
