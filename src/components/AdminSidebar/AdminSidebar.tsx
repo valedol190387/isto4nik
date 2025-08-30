@@ -12,7 +12,8 @@ import {
   MessageSquare,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 import { useState } from 'react';
 import styles from './AdminSidebar.module.css';
@@ -61,6 +62,12 @@ const sidebarItems: SidebarItem[] = [
     title: 'FAQ',
     icon: <MessageCircle size={20} />,
     path: '/admin/faq'
+  },
+  {
+    id: 'utm-generator',
+    title: 'UTM-генератор',
+    icon: <ExternalLink size={20} />,
+    path: '/admin/utm-generator'
   }
 ];
 
