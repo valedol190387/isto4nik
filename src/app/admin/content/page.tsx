@@ -686,16 +686,15 @@ export default function AdminContent() {
               <div className={styles.formRow}>
                 {/* Поле для ссылки - показывается всегда */}
                 <div className={styles.formGroup}>
-                  <label>Ссылка на материал</label>
+                  <label>Ссылка на материал (необязательно)</label>
                   <input
                     type="url"
                     value={form.url}
                     onChange={(e) => setForm({ ...form, url: e.target.value })}
                     placeholder="https://example.com"
-                    required
                   />
                   <p className={styles.fieldHint}>
-                    Ссылка для кнопки "Перейти к материалу"
+                    Ссылка для кнопки "Перейти к материалу". Если не заполнено, кнопка не отображается
                   </p>
                 </div>
               </div>
