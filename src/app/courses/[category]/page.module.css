@@ -506,7 +506,11 @@
   }
   
   .materialCard .materialContent {
-    height: 140px; /* Уменьшенная высота контентной части для мобильных */
+    height: 150px; /* Увеличенная высота контентной части для мобильных (с учетом отступа под тегами) */
+  }
+  
+  .materialCard .materialFooter {
+    padding-bottom: 16px; /* Увеличенный отступ снизу для тегов в карточках с изображениями на мобильных */
   }
   
   .materialCardCompact {
@@ -559,6 +563,14 @@
 }
 
 @media (max-width: 768px) and (min-width: 481px) {
+  .materialCard .materialContent {
+    height: 145px; /* Промежуточная высота контентной части для средних мобильных экранов */
+  }
+  
+  .materialCard .materialFooter {
+    padding-bottom: 12px; /* Промежуточный отступ снизу для тегов на средних мобильных */
+  }
+  
   .materialCardCompact {
     height: 190px; /* Промежуточная высота для средних мобильных экранов (с учетом отступа под тегами) */
   }
