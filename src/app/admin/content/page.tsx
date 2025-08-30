@@ -672,32 +672,37 @@ export default function AdminContent() {
                     onChange={(e) => setForm({ 
                       ...form, 
                       is_embedded_video: e.target.checked,
-                      // Очищаем поля при переключении типа
-                      url: e.target.checked ? '' : form.url,
+                      // Не очищаем поля - позволяем иметь и видео, и ссылку
                       video_embed_code: e.target.checked ? form.video_embed_code : ''
                     })}
                   />
                   <span className={styles.checkboxText}>Встроенное видео (Kinescope)</span>
                 </label>
                 <p className={styles.fieldHint}>
-                  Если включено, материал будет открываться на отдельной странице с встроенным видео
+                  Если включено, на странице материала будет отображаться встроенное видео дополнительно к ссылке
                 </p>
               </div>
 
               <div className={styles.formRow}>
-                {/* Поле для ссылки ИЛИ кода видео в зависимости от типа */}
-                {!form.is_embedded_video ? (
-                  <div className={styles.formGroup}>
-                    <label>Ссылка</label>
-                    <input
-                      type="url"
-                      value={form.url}
-                      onChange={(e) => setForm({ ...form, url: e.target.value })}
-                      placeholder="https://example.com"
-                      required
-                    />
-                  </div>
-                ) : (
+                {/* Поле для ссылки - показывается всегда */}
+                <div className={styles.formGroup}>
+                  <label>Ссылка на материал</label>
+                  <input
+                    type="url"
+                    value={form.url}
+                    onChange={(e) => setForm({ ...form, url: e.target.value })}
+                    placeholder="https://example.com"
+                    required
+                  />
+                  <p className={styles.fieldHint}>
+                    Ссылка для кнопки "Перейти к материалу"
+                  </p>
+                </div>
+              </div>
+
+              {/* Поле для кода видео - показывается только при включенной галочке */}
+              {form.is_embedded_video && (
+                <div className={styles.formRow}>
                   <div className={styles.formGroup}>
                     <label>Код видео Kinescope</label>
                     <textarea
@@ -711,8 +716,8 @@ export default function AdminContent() {
                       Вставьте полный HTML код для встраивания видео из Kinescope
                     </p>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
 
               <div className={styles.formGroup}>
                 <label>Изображение для превью</label>

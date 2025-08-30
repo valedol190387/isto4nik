@@ -73,6 +73,26 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     return totalLines > 3;
   };
 
+  // Функция для правильного обрезания текста с многоточием в конце
+  const truncateText = (text: string, isCompact: boolean = false) => {
+    if (!text) return { text: '', needsReadMore: false, isHtml: false };
+    
+    const plainText = text.replace(/<[^>]*>/g, '');
+    const maxLength = isCompact ? 200 : 150; // Больше символов для компактных карточек
+    
+    if (plainText.length <= maxLength) {
+      // Если текст короткий, возвращаем с HTML форматированием
+      return { text: text.replace(/\n/g, '<br />'), needsReadMore: false, isHtml: true };
+    }
+    
+    // Если текст длинный, обрезаем и убираем HTML теги
+    const truncated = plainText.substring(0, maxLength);
+    const lastSpaceIndex = truncated.lastIndexOf(' ');
+    const finalText = lastSpaceIndex > -1 ? truncated.substring(0, lastSpaceIndex) : truncated;
+    
+    return { text: finalText + '...', needsReadMore: true, isHtml: false };
+  };
+
   // Загрузка материалов из API и избранных
   useEffect(() => {
     const fetchData = async () => {
@@ -196,16 +216,16 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
 
         {/* Список материалов */}
         <div className={styles.materialsSection}>
-          {materials.length > 0 ? (
+                    {materials.length > 0 ? (
             materials.map((material) => (
               <div 
-                key={material.id} 
-                className={styles.materialCard}
+                key={material.id}
+                className={material.pic_url ? styles.materialCard : styles.materialCardCompact}
                 onClick={() => handleMaterialClick(material)}
               >
-                {/* Изображение с кнопкой избранного */}
-                <div className={styles.materialImageContainer}>
-                  {material.pic_url ? (
+                {/* Изображение с кнопкой избранного - только для материалов с картинкой */}
+                {material.pic_url && (
+                  <div className={styles.materialImageContainer}>
                     <img 
                       src={material.pic_url} 
                       alt={material.title}
@@ -218,58 +238,89 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
                         if (placeholder) placeholder.style.display = 'flex';
                       }}
                     />
-                  ) : null}
-                  <div 
-                    className={styles.materialImagePlaceholder}
-                    style={{ display: material.pic_url ? 'none' : 'flex' }}
-                  >
-                    <FileText className={styles.placeholderIcon} />
+                    <div 
+                      className={styles.materialImagePlaceholder}
+                      style={{ display: 'none' }}
+                    >
+                      <FileText className={styles.placeholderIcon} />
+                    </div>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavorite(material.id);
+                      }}
+                      className={styles.favoriteButtonOverlay}
+                    >
+                      <Star 
+                        className={`${styles.starIcon} ${favorites.has(material.id) ? styles.favoriteActive : ''}`}
+                        fill={favorites.has(material.id) ? 'currentColor' : 'none'}
+                        stroke={favorites.has(material.id) ? '#ffffff' : '#ffffff'}
+                      />
+                    </button>
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      toggleFavorite(material.id);
-                    }}
-                    className={styles.favoriteButtonOverlay}
-                  >
-                    <Star 
-                      className={`${styles.starIcon} ${favorites.has(material.id) ? styles.favoriteActive : ''}`}
-                      fill={favorites.has(material.id) ? 'currentColor' : 'none'}
-                      stroke={favorites.has(material.id) ? '#ffffff' : '#ffffff'}
-                    />
-                  </button>
-                </div>
+                )}
                 
                 {/* Контент материала */}
                 <div className={styles.materialContent}>
                   <div className={styles.materialInfo}>
-                    <h3 className={styles.materialTitle}>{material.title}</h3>
-                    <div
-                      className={styles.materialDescription}
-                      dangerouslySetInnerHTML={{ __html: material.description?.replace(/\n/g, '<br />') || '' }}
-                    />
-                    {material.description && needsReadMore(material.description) && (
-                      <button
-                        className={styles.readMoreButton}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleMaterialClick(material);
-                        }}
-                      >
-                        далее
-                      </button>
-                    )}
-                    {material.tags.length > 0 && (
-                      <div className={styles.materialTags}>
-                        {material.tags.map((tag, index) => (
-                          <span key={index} className={styles.materialTag}>
-                            {tag}
-                          </span>
-                        ))}
+                    <div className={styles.materialMainContent}>
+                      <div className={styles.materialHeader}>
+                        <h3 className={styles.materialTitle}>{material.title}</h3>
+                        {/* Кнопка избранного для компактных карточек */}
+                        {!material.pic_url && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              toggleFavorite(material.id);
+                            }}
+                            className={styles.favoriteButtonInline}
+                          >
+                            <Star 
+                              className={`${styles.starIcon} ${favorites.has(material.id) ? styles.favoriteActive : ''}`}
+                              fill={favorites.has(material.id) ? 'currentColor' : 'none'}
+                              stroke={favorites.has(material.id) ? '#082445' : '#082445'}
+                            />
+                          </button>
+                        )}
                       </div>
-                    )}
+                      <div className={styles.materialDescription}>
+                        {(() => {
+                          const result = truncateText(material.description || '', !material.pic_url);
+                          return (
+                            <>
+                              {result.isHtml ? (
+                                <span dangerouslySetInnerHTML={{ __html: result.text }} />
+                              ) : (
+                                <span>{result.text}</span>
+                              )}
+                              {result.needsReadMore && (
+                                <button
+                                  className={styles.readMoreButtonInline}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleMaterialClick(material);
+                                  }}
+                                >
+                                  далее
+                                </button>
+                              )}
+                            </>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                    <div className={styles.materialFooter}>
+                      {material.tags.length > 0 && (
+                        <div className={styles.materialTags}>
+                          {material.tags.map((tag, index) => (
+                            <span key={index} className={styles.materialTag}>
+                              {tag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                  <ExternalLink className={styles.linkIcon} size={16} />
                 </div>
               </div>
             ))

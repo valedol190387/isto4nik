@@ -30,6 +30,11 @@ import './_assets/globals.css';
 export const metadata: Metadata = {
   title: 'Источник',
   description: 'Сообщество Теребениных',
+  icons: {
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
+    apple: '/favicon.ico',
+  },
 };
 
 export default async function RootLayout({ children }: PropsWithChildren) {

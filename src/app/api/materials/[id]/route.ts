@@ -21,7 +21,6 @@ export async function GET(
       .from('materials')
       .select('*')
       .eq('id', materialId)
-      .eq('is_active', true)
       .single();
 
     if (error) {

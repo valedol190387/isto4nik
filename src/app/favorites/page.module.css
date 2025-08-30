@@ -17,6 +17,14 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'GilroyBold';
+  src: url('/fonts/gilroy-bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 .container {
   background: var(--bg-primary);
   min-height: 100vh;
@@ -113,6 +121,19 @@
   cursor: pointer;
 }
 
+/* Компактная карточка без изображения */
+.materialCardCompact {
+  display: flex;
+  flex-direction: column;
+  background: #E4DEDC;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  overflow: hidden;
+  width: 100%;
+  cursor: pointer;
+  height: 200px; /* Фиксированная высота для компактных карточек */
+}
+
 /* Контейнер изображения с кнопкой избранного */
 .materialImageContainer {
   position: relative;
@@ -183,34 +204,107 @@
   font-weight: 300;
 }
 
+/* Фиксированная высота только для контентной части карточек с изображениями */
+.materialCard .materialContent {
+  height: 180px; /* Фиксированная высота контентной части */
+}
+
+/* Для компактных карточек контент занимает все место */
+.materialCardCompact .materialContent {
+  flex: 1;
+  min-height: 0;
+}
+
 .materialInfo {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* Контейнер для основного контента (заголовок и описание) */
+.materialMainContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Контейнер для нижних элементов (теги, кнопка "далее") */
+.materialFooter {
+  margin-top: auto;
+  padding-bottom: 8px; /* Отступ снизу для тегов */
+}
+
+/* Заголовок материала с кнопкой избранного */
+.materialHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
 }
 
 .materialTitle {
   font-size: 18px;
-  font-weight: 500;
-  margin: 0 0 6px 0;
+  font-weight: 700;
+  margin: 0;
   color: var(--text-main);
   line-height: 1.3;
-  font-family: 'RalewayMedium', sans-serif;
+  font-family: 'GilroyBold', sans-serif;
   text-transform: uppercase;
+  flex: 1;
+}
+
+/* Инлайн кнопка избранного для компактных карточек */
+.favoriteButtonInline {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: 2px solid #082445;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.favoriteButtonInline:hover {
+  background: #082445;
+}
+
+.favoriteButtonInline:hover .starIcon {
+  color: #ffffff !important;
+}
+
+.favoriteButtonInline .starIcon {
+  width: 16px;
+  height: 16px;
+  color: #082445;
+}
+
+.favoriteButtonInline .favoriteActive {
+  fill: #082445;
+  color: #082445;
 }
 
 .materialDescription {
   font-size: 16px;
   color: var(--text-secondary);
-  margin: 0;
+  margin: 6px 0;
   line-height: 1.5;
   font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  flex: 1;
   overflow: hidden;
-  text-overflow: ellipsis;
-  max-height: calc(1.5em * 3); /* 3 строки с учетом line-height */
+  /* Убираем автоматическое многоточие CSS, будем обрабатывать в JS */
+}
+
+/* Описание для компактных карточек */
+.materialCardCompact .materialDescription {
+  /* Убираем line-clamp и для компактных карточек */
 }
 
 /* HTML форматирование в коротком описании */
@@ -265,6 +359,25 @@
   padding: 0;
   margin-top: 4px;
   text-align: left;
+}
+
+/* Инлайн кнопка "далее" */
+.readMoreButtonInline {
+  background: none;
+  border: none;
+  color: #082445;
+  font-size: inherit;
+  font-weight: 300;
+  font-family: 'GilroyLight', sans-serif;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 4px;
+  text-decoration: none;
+  display: inline;
+}
+
+.readMoreButtonInline:hover {
+  text-decoration: underline;
 }
 
 .materialTags {
@@ -367,6 +480,14 @@
     font-size: 18px;
   }
   
+  .materialCard .materialContent {
+    height: 140px; /* Уменьшенная высота контентной части для мобильных */
+  }
+  
+  .materialCardCompact {
+    height: 160px; /* Уменьшенная высота для компактных карточек на мобильных */
+  }
+  
   .materialContent {
     padding: 12px;
   }
@@ -390,6 +511,17 @@
   .favoriteButtonOverlay .starIcon {
     width: 18px;
     height: 18px;
+  }
+  
+  .favoriteButtonInline {
+    width: 28px;
+    height: 28px;
+    border-width: 1.5px;
+  }
+  
+  .favoriteButtonInline .starIcon {
+    width: 14px;
+    height: 14px;
   }
   
   .placeholderIcon {

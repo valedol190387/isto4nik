@@ -43,7 +43,7 @@ export async function GET(request: Request) {
       return NextResponse.json([]);
     }
 
-    // Получаем полную информацию о материалах
+    // Получаем полную информацию о материалах (только активные)
     const { data: materials, error: materialsError } = await supabase
       .from('materials')
       .select(`
@@ -60,6 +60,7 @@ export async function GET(request: Request) {
         created_at
       `)
       .in('id', paginatedIds)
+      .eq('is_active', true)
       .order('display_order', { ascending: true });
 
     if (materialsError) {
