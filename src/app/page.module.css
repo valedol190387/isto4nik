@@ -32,7 +32,7 @@
 
 /* Хайлайты */
 .highlightsSection {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   overflow: visible;
   position: relative;
   width: calc(100% + 60px); /* Увеличиваем ширину секции на 60px (по 30px с каждой стороны) */
@@ -151,7 +151,7 @@
 
 /* Поисковая строка */
 .searchContainer {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .searchBox {
@@ -200,7 +200,7 @@
 
 /* Курсы */
 .coursesSection {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 /* Полноширинный курс */
@@ -393,7 +393,7 @@
 
 /* Чат клуба с Snake Border эффектом */
 .clubChatSection {
-  margin-bottom: 24px;
+  margin-bottom: 16px;
   width: 100%;
 }
 
@@ -750,7 +750,7 @@
 
 /* Канал сообщества - идентичен чату */
 .clubChannelSection {
-  margin-bottom: calc(18px + var(--safe-area-inset-bottom, 0px));
+  margin-bottom: calc(16px + var(--safe-area-inset-bottom, 0px));
   width: 100%;
   padding-bottom: var(--safe-area-inset-bottom, 0px);
 }
