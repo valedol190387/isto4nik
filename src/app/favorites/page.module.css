@@ -258,10 +258,10 @@
 
 /* Инлайн кнопка избранного для компактных карточек */
 .favoriteButtonInline {
-  width: 32px;
-  height: 32px;
-  background: transparent;
-  border: 2px solid #082445;
+  width: 40px;
+  height: 40px;
+  background: #082445;
+  border: none;
   border-radius: 50%;
   cursor: pointer;
   display: flex;
@@ -280,14 +280,14 @@
 }
 
 .favoriteButtonInline .starIcon {
-  width: 16px;
-  height: 16px;
-  color: #082445;
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
 }
 
 .favoriteButtonInline .favoriteActive {
-  fill: #082445;
-  color: #082445;
+  fill: #ffffff;
+  color: #ffffff;
 }
 
 .materialDescription {
@@ -485,7 +485,7 @@
   }
   
   .materialCardCompact {
-    height: 160px; /* Уменьшенная высота для компактных карточек на мобильных */
+    height: 200px; /* Увеличенная высота для компактных карточек на мобильных */
   }
   
   .materialContent {
@@ -514,14 +514,13 @@
   }
   
   .favoriteButtonInline {
-    width: 28px;
-    height: 28px;
-    border-width: 1.5px;
+    width: 36px;
+    height: 36px;
   }
   
   .favoriteButtonInline .starIcon {
-    width: 14px;
-    height: 14px;
+    width: 18px;
+    height: 18px;
   }
   
   .placeholderIcon {
@@ -530,8 +529,10 @@
   }
 }
 
-@media (max-width: 768px) {
-  /* Стили для планшетов - наследуются базовые */
+@media (max-width: 768px) and (min-width: 481px) {
+  .materialCardCompact {
+    height: 180px; /* Промежуточная высота для средних мобильных экранов */
+  }
 }
 
 @media (min-width: 768px) {

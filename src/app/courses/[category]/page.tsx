@@ -73,12 +73,35 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     return totalLines > 3;
   };
 
+  // Состояние для определения размера экрана
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    // Проверяем при загрузке
+    checkScreenSize();
+    
+    // Слушаем изменения размера экрана
+    window.addEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', checkScreenSize);
+  }, []);
+
   // Функция для правильного обрезания текста с многоточием в конце
   const truncateText = (text: string, isCompact: boolean = false) => {
     if (!text) return { text: '', needsReadMore: false, isHtml: false };
     
     const plainText = text.replace(/<[^>]*>/g, '');
-    const maxLength = isCompact ? 200 : 150; // Больше символов для компактных карточек
+    
+    // Адаптивная длина текста в зависимости от типа карточки и размера экрана
+    let maxLength;
+    if (isCompact) {
+      maxLength = isMobile ? 120 : 200; // Меньше текста на мобильных для компактных карточек
+    } else {
+      maxLength = isMobile ? 100 : 150; // Меньше текста на мобильных для обычных карточек
+    }
     
     if (plainText.length <= maxLength) {
       // Если текст короткий, возвращаем с HTML форматированием
@@ -278,7 +301,7 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
                             <Star 
                               className={`${styles.starIcon} ${favorites.has(material.id) ? styles.favoriteActive : ''}`}
                               fill={favorites.has(material.id) ? 'currentColor' : 'none'}
-                              stroke={favorites.has(material.id) ? '#082445' : '#082445'}
+                              stroke={favorites.has(material.id) ? '#ffffff' : '#ffffff'}
                             />
                           </button>
                         )}
