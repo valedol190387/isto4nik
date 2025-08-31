@@ -228,12 +228,12 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  /* Убрали height: 100% чтобы контейнер мог расти под контент */
 }
 
 /* Контейнер для основного контента (заголовок и описание) */
 .materialMainContent {
-  flex: 1;
+  /* Убрали flex: 1 чтобы не поглощать пространство тегов */
   display: flex;
   flex-direction: column;
 }
