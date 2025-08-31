@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Page } from '@/components/Page';
 import { Star, ExternalLink, Loader2, FileText, Filter } from 'lucide-react';
@@ -38,11 +38,19 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
   
   // Состояние для фильтров по тегам
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [showAllTags, setShowAllTags] = useState(false);
+  const [allTags, setAllTags] = useState<string[]>([]);
+  
+  // Ref для infinite scroll
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const ITEMS_PER_PAGE = 40;
 
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
@@ -120,40 +128,111 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     return { text: finalText + '...', needsReadMore: true, isHtml: false };
   };
 
-  // Загрузка материалов из API и избранных
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const telegramId = user?.id?.toString() || getTelegramId();
-        
-        // Загружаем материалы
-        const materialsResponse = await fetch('/api/materials');
-        const materialsData: Material[] = await materialsResponse.json();
-        
-        // Фильтруем материалы по section_key текущей категории
-        const categoryMaterials = materialsData.filter(material => 
-          material.section_key === categoryConfig?.section_key
-        );
-        setMaterials(categoryMaterials);
-        
-        // Загружаем избранные
-        const favoritesResponse = await fetch(`/api/favorites?telegramId=${telegramId}`);
-        const favoritesData: Material[] = await favoritesResponse.json();
-        const favoriteIds = new Set(favoritesData.map(material => material.id));
-        setFavorites(favoriteIds);
-      } catch (error) {
-        console.error('Error loading data:', error);
-      } finally {
-        setLoading(false);
+  // Функция загрузки материалов с пагинацией
+  const loadMaterials = useCallback(async (pageNum: number = 0, tag: string | null = null, append: boolean = false) => {
+    if (!categoryConfig) return;
+    
+    try {
+      const offset = pageNum * ITEMS_PER_PAGE;
+      let url = `/api/materials?section=${categoryConfig.section_key}&limit=${ITEMS_PER_PAGE}&offset=${offset}`;
+      
+      if (tag) {
+        url += `&tag=${encodeURIComponent(tag)}`;
       }
+      
+      const materialsResponse = await fetch(url);
+      const materialsData: Material[] = await materialsResponse.json();
+      
+      // Обновляем состояние материалов
+      if (append && pageNum > 0) {
+        setMaterials(prev => [...prev, ...materialsData]);
+      } else {
+        setMaterials(materialsData);
+      }
+      
+      // Проверяем есть ли еще материалы
+      if (materialsData.length < ITEMS_PER_PAGE) {
+        setHasMore(false);
+      } else {
+        setHasMore(true);
+      }
+      
+      setPage(pageNum);
+      
+    } catch (error) {
+      console.error('Error loading materials:', error);
+    }
+  }, [categoryConfig, ITEMS_PER_PAGE]);
+
+  // Функция загрузки следующей порции материалов
+  const loadMoreMaterials = useCallback(async () => {
+    if (!hasMore || loadingMore || loading) return;
+    
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    
+    await loadMaterials(nextPage, selectedTag, true);
+    setLoadingMore(false);
+  }, [hasMore, loadingMore, loading, page, selectedTag, loadMaterials]);
+
+  // Загружаем избранные материалы
+  const loadFavorites = useCallback(async () => {
+    try {
+      const telegramId = user?.id?.toString() || getTelegramId();
+      const favoritesResponse = await fetch(`/api/favorites?telegramId=${telegramId}`);
+      if (favoritesResponse.ok) {
+        const favoritesData: Material[] = await favoritesResponse.json();
+        setFavorites(new Set(favoritesData.map((f: any) => f.material_id || f.id)));
+      }
+    } catch (error) {
+      console.error('Error loading favorites:', error);
+    }
+  }, [user?.id]);
+
+  // Загружаем теги для фильтров (серверный запрос для получения всех тегов раздела)
+  const loadAllTags = useCallback(async () => {
+    if (!categoryConfig) return;
+    
+    try {
+      // Загружаем все материалы раздела только для получения тегов
+      const response = await fetch(`/api/materials?section=${categoryConfig.section_key}`);
+      const allMaterials: Material[] = await response.json();
+      
+      const tagsSet = new Set<string>();
+      allMaterials.forEach(material => {
+        material.tags?.forEach(tag => tagsSet.add(tag));
+      });
+      
+      setAllTags(Array.from(tagsSet).sort());
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  }, [categoryConfig]);
+
+  // Первоначальная загрузка
+  useEffect(() => {
+    const initializeData = async () => {
+      if (!categoryConfig) {
+        setLoading(false);
+        return;
+      }
+      
+      setLoading(true);
+      setPage(0);
+      setHasMore(true);
+      
+      // Загружаем данные параллельно
+      await Promise.all([
+        loadMaterials(0, selectedTag, false),
+        loadFavorites(),
+        loadAllTags()
+      ]);
+      
+      setLoading(false);
     };
 
-    if (categoryConfig) {
-      fetchData();
-    } else {
-      setLoading(false);
-    }
-  }, [resolvedParams.category, categoryConfig, user?.id]);
+    initializeData();
+  }, [resolvedParams.category, categoryConfig]);
 
   const toggleFavorite = async (materialId: number) => {
     const telegramId = user?.id?.toString() || getTelegramId();
@@ -202,19 +281,39 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     window.location.href = `/materials/${material.id}`;
   };
 
-  // Получаем уникальные теги для текущего раздела
-  const allTags = materials.flatMap(material => material.tags || []);
-  const uniqueTags = [...new Set(allTags)].filter(Boolean).sort();
-  
-  // Показываем только 5-6 популярных тегов, остальные под кнопкой "все теги"
+  // Обработка фильтрации по тегам (серверная)
+  const handleTagFilter = useCallback(async (tag: string | null) => {
+    setSelectedTag(tag);
+    setLoading(true);
+    setPage(0);
+    setHasMore(true);
+    
+    await loadMaterials(0, tag, false);
+    setLoading(false);
+  }, [loadMaterials]);
+
+  // Intersection Observer для infinite scroll
+  useEffect(() => {
+    if (!loadMoreRef.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !loading && !loadingMore) {
+          loadMoreMaterials();
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
+
+    observer.observe(loadMoreRef.current);
+
+    return () => observer.disconnect();
+  }, [hasMore, loading, loadingMore, loadMoreMaterials]);
+
+  // Показываем только 5 популярных тегов, остальные под кнопкой "все теги" 
   const maxVisibleTags = 5;
-  const visibleTags = showAllTags ? uniqueTags : uniqueTags.slice(0, maxVisibleTags);
-  const hasMoreTags = uniqueTags.length > maxVisibleTags;
-  
-  // Фильтрация материалов по выбранному тегу
-  const filteredMaterials = selectedTag 
-    ? materials.filter(material => material.tags?.includes(selectedTag))
-    : materials;
+  const visibleTags = showAllTags ? allTags : allTags.slice(0, maxVisibleTags);
+  const hasMoreTags = allTags.length > maxVisibleTags;
 
   // Если категория не найдена
   if (!categoryConfig) {
@@ -256,7 +355,7 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
         </div>
 
         {/* Фильтры по тегам */}
-        {uniqueTags.length > 0 && (
+        {allTags.length > 0 && (
           <div className={styles.filtersCard}>
             <div className={styles.sectionHeader}>
               <Filter className={styles.sectionIcon} />
@@ -264,7 +363,7 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
             </div>
             <div className={styles.filterButtons}>
               <button
-                onClick={() => setSelectedTag(null)}
+                onClick={() => handleTagFilter(null)}
                 className={`${styles.filterButton} ${!selectedTag ? styles.filterButtonActive : ''}`}
               >
                 Все
@@ -272,7 +371,7 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
               {visibleTags.map((tag: string) => (
                 <button
                   key={tag}
-                  onClick={() => setSelectedTag(tag)}
+                  onClick={() => handleTagFilter(tag)}
                   className={`${styles.filterButton} ${selectedTag === tag ? styles.filterButtonActive : ''}`}
                 >
                   {tag}
@@ -294,13 +393,13 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
         {/* Счетчик материалов с учетом фильтрации */}
         {selectedTag && (
           <div className={styles.filterInfo}>
-            <p>Найдено материалов: {filteredMaterials.length}</p>
+            <p>Найдено материалов: {materials.length}{hasMore ? '+' : ''}</p>
           </div>
         )}
 
         <div className={styles.materialsSection}>
-                    {filteredMaterials.length > 0 ? (
-            filteredMaterials.map((material) => (
+                    {materials.length > 0 ? (
+            materials.map((material) => (
               <div 
                 key={material.id}
                 className={material.pic_url ? styles.materialCard : styles.materialCardCompact}
@@ -407,6 +506,13 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
                 </div>
               </div>
             ))
+          ) : loading ? (
+            <div className={styles.loading}>
+              <div className={styles.loadingContent}>
+                <Loader2 className={styles.loadingIcon} />
+                <p>Загружаем материалы...</p>
+              </div>
+            </div>
           ) : (
             <div className={styles.emptyState}>
               <FileText className={styles.emptyIcon} size={48} />
@@ -419,6 +525,21 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
                   : 'В этом разделе пока нет материалов'
                 }
               </p>
+            </div>
+          )}
+          
+          {/* Invisible trigger element for infinite scroll */}
+          {hasMore && materials.length > 0 && (
+            <div 
+              ref={loadMoreRef}
+              className={styles.loadTrigger}
+            >
+              {loadingMore && (
+                <div className={styles.loadingMore}>
+                  <Loader2 className={styles.loadingIcon} />
+                  <p>Загружаем еще материалы...</p>
+                </div>
+              )}
             </div>
           )}
         </div>

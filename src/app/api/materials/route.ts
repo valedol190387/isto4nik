@@ -6,6 +6,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const sectionKey = searchParams.get('section');
     const tag = searchParams.get('tag');
+    const limit = parseInt(searchParams.get('limit') || '0'); // 0 = без лимита (обратная совместимость)
+    const offset = parseInt(searchParams.get('offset') || '0');
 
     let query = supabase
       .from('materials')
@@ -21,6 +23,11 @@ export async function GET(request: Request) {
     // Фильтрация по тегу
     if (tag) {
       query = query.contains('tags', `["${tag}"]`);
+    }
+
+    // Пагинация (только если указан limit > 0)
+    if (limit > 0) {
+      query = query.range(offset, offset + limit - 1);
     }
 
     const { data: materials, error } = await query;
