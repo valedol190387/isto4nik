@@ -139,7 +139,7 @@
   overflow: hidden;
   width: 100%;
   cursor: pointer;
-  min-height: 200px; /* Минимальная высота, но может увеличиваться под контент */
+  /* Убираем min-height - карточка растет под весь контент */
 }
 
 /* Контейнер изображения с кнопкой избранного */
@@ -205,30 +205,40 @@
 .materialContent {
   padding: 16px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  flex-direction: column; /* Делаем вертикальной чтобы не было проблем с высотой */
   text-align: left;
   font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
 }
 
-/* Адаптивная высота для контентной части карточек с изображениями */
+/* Полностью адаптивная высота для контентной части карточек с изображениями */
 .materialCard .materialContent {
-  min-height: 180px; /* Минимальная высота, но может увеличиваться под контент */
+  padding: 16px;
+  display: flex;
+  flex-direction: column; /* Вертикальный layout для всех карточек */
+  text-align: left;  
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+  /* Убираем все ограничения по высоте - карточка растет под весь контент */
 }
 
-/* Для компактных карточек контент занимает все место */
+/* Для компактных карточек контент растет под контент */
 .materialCardCompact .materialContent {
-  flex: 1;
-  min-height: 0;
+  padding: 16px;
+  display: flex;
+  flex-direction: column; /* Вертикальный layout для компактных карточек */
+  text-align: left;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+  /* Убираем flex: 1 и min-height - пусть растет естественно */
 }
 
 .materialInfo {
-  flex: 1;
+  /* Убираем flex: 1 - пусть растет естественно под контент */
   min-width: 0;
   display: flex;
   flex-direction: column;
-  /* Убрали height: 100% чтобы контейнер мог расти под контент */
+  width: 100%; /* Занимаем всю ширину */
 }
 
 /* Контейнер для основного контента (заголовок и описание) */
@@ -240,10 +250,10 @@
 
 /* Контейнер для нижних элементов (теги, кнопка "далее") */
 .materialFooter {
-  margin-top: auto;
+  margin-top: 12px; /* Простой отступ вместо margin-top: auto */
   padding-bottom: 8px; /* Отступ снизу для тегов */
   flex-shrink: 0; /* Не сжиматься когда места мало */
-  min-height: 40px; /* Минимальная высота для отображения тегов */
+  /* Убираем min-height - пусть занимает сколько нужно */
 }
 
 /* Заголовок материала с кнопкой избранного */
@@ -507,7 +517,7 @@
   }
   
   .materialCard .materialContent {
-    height: 150px; /* Увеличенная высота контентной части для мобильных (с учетом отступа под тегами) */
+    /* Убираем фиксированную высоту на мобильных - карточки адаптивные */
   }
   
   .materialCard .materialFooter {
@@ -515,7 +525,7 @@
   }
   
   .materialCardCompact {
-    height: 210px; /* Увеличенная высота для компактных карточек на мобильных (с учетом отступа под тегами) */
+    /* Убираем фиксированную высоту на мобильных - карточки адаптивные */
   }
   
   .materialContent {
@@ -561,7 +571,7 @@
 
 @media (max-width: 768px) and (min-width: 481px) {
   .materialCard .materialContent {
-    height: 145px; /* Промежуточная высота контентной части для средних мобильных экранов */
+    /* Убираем фиксированную высоту на планшетах - карточки адаптивные */
   }
   
   .materialCard .materialFooter {
@@ -569,7 +579,7 @@
   }
   
   .materialCardCompact {
-    height: 190px; /* Промежуточная высота для средних мобильных экранов (с учетом отступа под тегами) */
+    /* Убираем фиксированную высоту на планшетах - карточки адаптивные */
   }
 }
 

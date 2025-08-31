@@ -89,7 +89,7 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
-  // Функция для правильного обрезания текста с многоточием в конце
+  // Функция для правильного обрезания текста с многоточием в конце  
   const truncateText = (text: string, isCompact: boolean = false) => {
     if (!text) return { text: '', needsReadMore: false, isHtml: false };
     
