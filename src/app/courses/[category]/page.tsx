@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Page } from '@/components/Page';
-import { Star, ExternalLink, Loader2, FileText } from 'lucide-react';
+import { Star, ExternalLink, Loader2, FileText, Filter } from 'lucide-react';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import styles from './page.module.css';
@@ -39,6 +39,10 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   const [materials, setMaterials] = useState<Material[]>([]);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
+  
+  // Состояние для фильтров по тегам
+  const [selectedTag, setSelectedTag] = useState<string | null>(null);
+  const [showAllTags, setShowAllTags] = useState(false);
 
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
@@ -198,6 +202,20 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     window.location.href = `/materials/${material.id}`;
   };
 
+  // Получаем уникальные теги для текущего раздела
+  const allTags = materials.flatMap(material => material.tags || []);
+  const uniqueTags = [...new Set(allTags)].filter(Boolean).sort();
+  
+  // Показываем только 5-6 популярных тегов, остальные под кнопкой "все теги"
+  const maxVisibleTags = 5;
+  const visibleTags = showAllTags ? uniqueTags : uniqueTags.slice(0, maxVisibleTags);
+  const hasMoreTags = uniqueTags.length > maxVisibleTags;
+  
+  // Фильтрация материалов по выбранному тегу
+  const filteredMaterials = selectedTag 
+    ? materials.filter(material => material.tags?.includes(selectedTag))
+    : materials;
+
   // Если категория не найдена
   if (!categoryConfig) {
     return (
@@ -237,10 +255,52 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
           </div>
         </div>
 
+        {/* Фильтры по тегам */}
+        {uniqueTags.length > 0 && (
+          <div className={styles.filtersCard}>
+            <div className={styles.sectionHeader}>
+              <Filter className={styles.sectionIcon} />
+              <h3 className={styles.filtersTitle}>Фильтры</h3>
+            </div>
+            <div className={styles.filterButtons}>
+              <button
+                onClick={() => setSelectedTag(null)}
+                className={`${styles.filterButton} ${!selectedTag ? styles.filterButtonActive : ''}`}
+              >
+                Все
+              </button>
+              {visibleTags.map((tag: string) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTag(tag)}
+                  className={`${styles.filterButton} ${selectedTag === tag ? styles.filterButtonActive : ''}`}
+                >
+                  {tag}
+                </button>
+              ))}
+              {hasMoreTags && (
+                <button
+                  onClick={() => setShowAllTags(!showAllTags)}
+                  className={`${styles.filterButton} ${styles.showAllButton}`}
+                >
+                  {showAllTags ? 'Скрыть' : 'Все теги'}
+                </button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Список материалов */}
+        {/* Счетчик материалов с учетом фильтрации */}
+        {selectedTag && (
+          <div className={styles.filterInfo}>
+            <p>Найдено материалов: {filteredMaterials.length}</p>
+          </div>
+        )}
+
         <div className={styles.materialsSection}>
-                    {materials.length > 0 ? (
-            materials.map((material) => (
+                    {filteredMaterials.length > 0 ? (
+            filteredMaterials.map((material) => (
               <div 
                 key={material.id}
                 className={material.pic_url ? styles.materialCard : styles.materialCardCompact}
@@ -350,9 +410,14 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
           ) : (
             <div className={styles.emptyState}>
               <FileText className={styles.emptyIcon} size={48} />
-              <h3 className={styles.emptyTitle}>Материалы не найдены</h3>
+              <h3 className={styles.emptyTitle}>
+                {selectedTag ? `Нет материалов с тегом "${selectedTag}"` : 'Материалы не найдены'}
+              </h3>
               <p className={styles.emptyDescription}>
-                В этом разделе пока нет материалов
+                {selectedTag 
+                  ? 'Попробуйте выбрать другой тег или сбросить фильтр.'
+                  : 'В этом разделе пока нет материалов'
+                }
               </p>
             </div>
           )}

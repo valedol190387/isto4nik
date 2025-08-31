@@ -497,6 +497,99 @@
   height: 16px;
 }
 
+/* Filters - взято из календаря */
+.filtersCard {
+  background: #E4DEDC;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: var(--shadow-light);
+  border: 1px solid var(--border-light);
+  margin-bottom: 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sectionIcon {
+  width: 20px;
+  height: 20px;
+  color: #082445;
+}
+
+.filtersTitle {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-main);
+  font-family: 'GilroyBold', sans-serif;
+  text-transform: uppercase;
+}
+
+.filterButtons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filterButton {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-medium);
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--text-secondary);
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+  text-transform: lowercase;
+}
+
+.filterButton:hover {
+  background: var(--border-light);
+}
+
+.filterButtonActive {
+  background: #082445;
+  color: white;
+  border-color: #082445;
+}
+
+.filterButtonActive:hover {
+  background: #0a2a52;
+  opacity: 1;
+}
+
+.showAllButton {
+  background: var(--border-medium) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-medium) !important;
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.showAllButton:hover {
+  background: var(--border-light) !important;
+  text-decoration: none;
+}
+
+.filterInfo {
+  text-align: center;
+  margin: 8px 0;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-family: 'GilroyLight', sans-serif;
+  font-weight: 300;
+}
+
+.filterInfo p {
+  margin: 0;
+}
+
 /* Responsive Design */
 @media (max-width: 480px) {
   .container {
@@ -566,6 +659,30 @@
   .placeholderIcon {
     width: 40px;
     height: 40px;
+  }
+  
+  /* Фильтры на мобильных */
+  .filtersCard {
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .filtersTitle {
+    font-size: 16px;
+  }
+  
+  .filterButtons {
+    gap: 6px;
+  }
+  
+  .filterButton {
+    padding: 6px 12px;
+    font-size: 13px;
+  }
+  
+  .sectionIcon {
+    width: 18px;
+    height: 18px;
   }
 }
 
