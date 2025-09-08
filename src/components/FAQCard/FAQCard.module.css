@@ -63,7 +63,7 @@
   flex: 1;
   text-align: left;
   color: var(--text-main) !important;
-  font-size: 22px !important;
+  font-size: 20px !important;
   font-weight: 500 !important;
   font-family: 'RalewayMedium', sans-serif !important;
   text-transform: uppercase;
@@ -108,7 +108,7 @@
   }
   
   .question {
-    font-size: 20px !important;
+    font-size: 18px !important;
     font-family: 'RalewayMedium', sans-serif !important;
     font-weight: 500 !important;
   }
@@ -139,7 +139,7 @@
   }
   
   .question {
-    font-size: 24px !important;
+    font-size: 22px !important;
   }
   
   .answer {

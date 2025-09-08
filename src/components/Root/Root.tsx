@@ -23,7 +23,6 @@ import { AppRoot } from '@telegram-apps/telegram-ui';
 
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { ErrorPage } from '@/components/ErrorPage';
-import { useDidMount } from '@/hooks/useDidMount';
 import { setLocale } from '@/core/i18n/locale';
 import TelegramStickyApp from '@/components/TelegramStickyApp';
 
@@ -155,7 +154,6 @@ function RootInner({ children }: { children: any }) {
  */
 export function Root({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const didMount = useDidMount();
 
   // Для админки используем упрощенную версию без Telegram SDK
   if (pathname.startsWith('/admin')) {
@@ -163,16 +161,9 @@ export function Root({ children }: { children: React.ReactNode }) {
   }
 
   // Для пользовательской части используем полную версию с Telegram
-  return didMount ? (
+  return (
     <ErrorBoundary fallback={ErrorPage}>
       <RootInner>{children}</RootInner>
     </ErrorBoundary>
-  ) : (
-    <div className="root__loading">
-      <div className="root__loadingContent">
-        <div className="root__loadingIcon"></div>
-        <p>Загружаем приложение...</p>
-      </div>
-    </div>
   );
 }

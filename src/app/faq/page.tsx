@@ -45,8 +45,10 @@ export default function FAQPage() {
         <div className={styles.content}>
           {loading ? (
             <div className={styles.loading}>
-              <Loader2 className={styles.loadingIcon} />
-              <p>Загружаем вопросы и ответы...</p>
+              <div className={styles.loadingContent}>
+                <Loader2 className={styles.loadingIcon} />
+                <p>Загружаем вопросы и ответы...</p>
+              </div>
             </div>
           ) : (
             <div>

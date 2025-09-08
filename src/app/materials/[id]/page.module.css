@@ -384,12 +384,16 @@
 
 /* Состояния загрузки и ошибки */
 .loading {
-  min-height: 100vh;
-  background: var(--bg-primary);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: calc(16px + var(--safe-area-inset-top, 0px)) calc(16px + var(--safe-area-inset-right, 0px)) calc(120px + var(--safe-area-inset-bottom, 0px)) calc(16px + var(--safe-area-inset-left, 0px));
+  background: #EDEDEA;
+  z-index: 9999;
 }
 
 .error {
@@ -402,7 +406,7 @@
 
 .loadingContent {
   text-align: center;
-  color: var(--text-secondary);
+  color: #6b7280;
   font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
 }
@@ -415,15 +419,17 @@
 .loadingIcon {
   width: 48px;
   height: 48px;
-  color: var(--accent-blue);
-  animation: spin 1s linear infinite;
   margin: 0 auto 16px;
+  border: 2px solid transparent;
+  border-top: 2px solid #082445;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
 
 .loading p {
-  color: var(--text-secondary);
-  font-family: var(--font-montserrat);
-  font-size: 14px;
+  color: #6b7280;
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 16px;
   margin: 0;
 }
 
