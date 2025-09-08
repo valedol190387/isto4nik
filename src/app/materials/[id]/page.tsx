@@ -15,6 +15,8 @@ export default function MaterialViewPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
 
   const materialId = params.id as string;
   
@@ -34,6 +36,35 @@ export default function MaterialViewPage() {
     // Fallback - только для разработки
     return '123456789';
   };
+
+  // Детекция мобильного устройства
+  useEffect(() => {
+    const detectMobileDevice = () => {
+      const hasTouchScreen = 'ontouchstart' in window;
+      const isSmallScreen = window.innerWidth < 1024;
+      const isMobile = hasTouchScreen || isSmallScreen;
+      
+      
+      setIsMobileDevice(isMobile);
+    };
+
+    // Проверяем при загрузке
+    detectMobileDevice();
+    
+    // Слушаем изменения размера экрана
+    window.addEventListener('resize', detectMobileDevice);
+    return () => window.removeEventListener('resize', detectMobileDevice);
+  }, []);
+
+  // Автоматическое скрытие подсказки через 5 секунд
+  useEffect(() => {
+    if (showSwipeHint) {
+      const timer = setTimeout(() => {
+        setShowSwipeHint(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSwipeHint]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,6 +132,19 @@ export default function MaterialViewPage() {
       }
     } catch (error) {
       console.error('Error updating favorite:', error);
+    }
+  };
+
+  // Обработка клика на кнопку перехода к материалу
+  const handleMaterialClick = (url: string) => {
+    // Открываем ссылку
+    window.open(url, '_blank', 'noopener,noreferrer');
+    
+    // Показываем подсказку только на мобильных устройствах для телеграм ссылок
+    if (url.includes('t.me') && isMobileDevice) {
+      setTimeout(() => {
+        setShowSwipeHint(true);
+      }, 1000);
     }
   };
 
@@ -215,19 +259,97 @@ export default function MaterialViewPage() {
           {/* Кнопка перехода к материалу */}
           {material.url && (
             <div className={styles.actionSection}>
-              <a 
-                href={material.url} 
-                target="_blank" 
-                rel="noopener noreferrer"
+              <button 
+                onClick={() => handleMaterialClick(material.url)}
                 className={styles.primaryButton}
               >
                 <ExternalLink size={20} />
                 <span>Перейти к материалу</span>
-              </a>
+              </button>
             </div>
           )}
         </main>
       </div>
+      
+      {/* Анимация подсказки свайпа для телеграм ссылок - только на мобильных */}
+      {showSwipeHint && isMobileDevice && (
+        <>
+          <style>{`
+            @keyframes customBounce {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-10px); }
+            }
+          `}</style>
+          <div 
+            style={{
+              position: 'fixed',
+              top: 'calc(env(safe-area-inset-top, 0px) + 120px)',
+              left: '16px',
+              right: '16px',
+              backgroundColor: 'rgba(8, 36, 69, 0.95)',
+              padding: '20px 16px',
+              borderRadius: '16px',
+              zIndex: 9999,
+              boxShadow: '0 4px 20px rgba(8,36,69,0.4)',
+              animation: 'customBounce 2s ease-in-out infinite'
+            }}
+          >
+            <div 
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px'
+              }}
+            >
+              <span 
+                style={{
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  lineHeight: '1.3',
+                  letterSpacing: '0.5px'
+                }}
+              >
+                НЕ ОТКРЫЛОСЬ?<br/>СВЕРНИ ПРИЛОЖЕНИЕ НАЖАВ НА
+              </span>
+              <svg 
+                width="40" 
+                height="40" 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ 
+                  filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.4))'
+                }}
+              >
+                <path 
+                  d="M6 9L12 15L18 9" 
+                  stroke="white" 
+                  strokeWidth="4" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span 
+                style={{
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  lineHeight: '1.3',
+                  letterSpacing: '0.5px'
+                }}
+              >
+                Или потяни вниз за это сообщение
+              </span>
+            </div>
+          </div>
+        </>
+      )}
+      
     </Page>
   );
 } 
