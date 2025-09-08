@@ -96,7 +96,7 @@
 }
 
 .customerName {
-  font-size: 18px !important;
+  font-size: 22px !important;
   font-weight: 500 !important;
   font-family: 'RalewayMedium', sans-serif !important;
   color: var(--text-main);
@@ -107,7 +107,7 @@
 }
 
 .customerDescription {
-  font-size: 14px !important;
+  font-size: 18px !important;
   font-weight: 300 !important;
   font-family: 'GilroyLight', sans-serif !important;
   color: var(--text-secondary);
@@ -118,7 +118,7 @@
 
 /* Текст отзыва */
 .reviewText {
-  font-size: 16px !important;
+  font-size: 20px !important;
   font-weight: 300 !important;
   font-family: 'GilroyLight', sans-serif !important;
   line-height: 1.5;
@@ -146,14 +146,14 @@
 }
 
 .ratingValue {
-  font-size: 18px !important;
+  font-size: 22px !important;
   font-weight: 300 !important;
   font-family: 'GilroyLight', sans-serif !important;
   color: #082445 !important;
 }
 
 .ratingMax {
-  font-size: 18px !important;
+  font-size: 22px !important;
   font-weight: 300 !important;
   font-family: 'GilroyLight', sans-serif !important;
   color: #082445 !important;
@@ -177,19 +177,19 @@
   }
   
   .customerName {
-    font-size: 16px !important;
+    font-size: 20px !important;
     font-weight: 500 !important;
     font-family: 'RalewayMedium', sans-serif !important;
   }
   
   .customerDescription {
-    font-size: 13px !important;
+    font-size: 17px !important;
     font-weight: 300 !important;
     font-family: 'GilroyLight', sans-serif !important;
   }
   
   .reviewText {
-    font-size: 14px !important;
+    font-size: 18px !important;
     font-weight: 300 !important;
     font-family: 'GilroyLight', sans-serif !important;
     margin-bottom: 12px;
@@ -201,11 +201,11 @@
   }
   
   .ratingValue {
-    font-size: 16px !important;
+    font-size: 20px !important;
   }
   
   .ratingMax {
-    font-size: 16px !important;
+    font-size: 20px !important;
   }
 }
 
@@ -232,15 +232,15 @@
   }
   
   .customerName {
-    font-size: 20px !important;
+    font-size: 24px !important;
   }
   
   .customerDescription {
-    font-size: 15px !important;
+    font-size: 19px !important;
   }
   
   .reviewText {
-    font-size: 17px !important;
+    font-size: 21px !important;
     margin-bottom: 20px;
   }
   
@@ -250,10 +250,10 @@
   }
   
   .ratingValue {
-    font-size: 20px !important;
+    font-size: 24px !important;
   }
   
   .ratingMax {
-    font-size: 20px !important;
+    font-size: 24px !important;
   }
 }

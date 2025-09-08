@@ -133,7 +133,7 @@
 .finalText {
   font-family: Montserrat;
   font-style: normal;
-  font-size: 18px;
+  font-size: 26px;
   font-weight: 400;
   line-height: 1.5;
   color: #2C3F48;
@@ -199,7 +199,7 @@
 /* Текст правила */
 .reasonText {
   font-family: 'GilroyLight', sans-serif;
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 300;
   color: #2C3F48;
   line-height: 1.4;

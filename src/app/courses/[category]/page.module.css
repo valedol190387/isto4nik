@@ -60,7 +60,7 @@
 }
 
 .headerTitle {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 500;
   color: var(--text-main);
   margin: 0;
@@ -266,7 +266,7 @@
 }
 
 .materialTitle {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   margin: 0;
   color: var(--text-main);
@@ -311,7 +311,7 @@
 }
 
 .materialDescription {
-  font-size: 16px;
+  font-size: 20px;
   color: var(--text-secondary);
   margin: 6px 0;
   line-height: 1.5;
@@ -522,7 +522,7 @@
 
 .filtersTitle {
   margin: 0;
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   color: var(--text-main);
   font-family: 'GilroyBold', sans-serif;
@@ -637,7 +637,7 @@
   }
 
   .headerTitle {
-    font-size: 18px;
+    font-size: 22px;
   }
   
   .materialCard .materialContent {
@@ -657,11 +657,11 @@
   }
   
   .materialTitle {
-    font-size: 16px;
+    font-size: 20px;
   }
   
   .materialDescription {
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 300;
   }
   
@@ -699,7 +699,7 @@
   }
   
   .filtersTitle {
-    font-size: 16px;
+    font-size: 20px;
   }
   
   .filterButtons {

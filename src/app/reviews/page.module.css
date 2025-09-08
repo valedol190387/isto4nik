@@ -54,7 +54,7 @@
 }
 
 .headerTitle {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 500;
   color: var(--text-main);
   margin: 0;
@@ -79,7 +79,7 @@
 }
 
 .statsText {
-  font-size: 18px !important;
+  font-size: 22px !important;
   font-weight: 300 !important;
   font-family: 'GilroyLight', sans-serif !important;
   color: #082445 !important;
@@ -155,7 +155,7 @@
 }
 
 .errorTitle {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 500;
   color: var(--text-main);
   margin: 0 0 8px 0;
@@ -164,7 +164,7 @@
 }
 
 .errorText {
-  font-size: 14px;
+  font-size: 18px;
   color: var(--text-secondary);
   text-align: left;
   line-height: 1.5;
@@ -201,7 +201,7 @@
 }
 
 .emptyTitle {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 500;
   color: var(--text-main);
   margin: 0 0 8px 0;
@@ -210,7 +210,7 @@
 }
 
 .emptyText {
-  font-size: 14px;
+  font-size: 18px;
   color: var(--text-secondary);
   text-align: center;
   line-height: 1.5;
@@ -282,7 +282,7 @@
 }
 
 .loadMoreText {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 500;
   font-family: 'RalewayMedium', sans-serif;
   color: var(--text-main);
@@ -297,7 +297,7 @@
 }
 
 .counterText {
-  font-size: 13px;
+  font-size: 17px;
   color: var(--text-secondary);
   text-align: center;
   font-weight: 300;
@@ -318,7 +318,7 @@
   }
   
   .headerTitle {
-    font-size: 18px;
+    font-size: 22px;
     font-family: 'RalewayMedium', sans-serif;
   }
   
@@ -377,7 +377,7 @@
   }
   
   .loadMoreText {
-    font-size: 16px;
+    font-size: 20px;
   }
   
   .reviewsCounter {
@@ -386,7 +386,7 @@
   }
   
   .counterText {
-    font-size: 12px;
+    font-size: 16px;
   }
 }
 
@@ -410,7 +410,7 @@
   }
   
   .headerTitle {
-    font-size: 24px;
+    font-size: 28px;
     font-family: 'RalewayMedium', sans-serif;
   }
   

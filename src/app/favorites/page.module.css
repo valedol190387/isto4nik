@@ -60,7 +60,7 @@
 }
 
 .headerTitle {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 500;
   color: var(--text-main);
   margin: 0;
@@ -131,7 +131,7 @@
   overflow: hidden;
   width: 100%;
   cursor: pointer;
-  height: 200px; /* Фиксированная высота для компактных карточек */
+  /* Убираем фиксированную высоту - карточка растет под весь контент */
 }
 
 /* Контейнер изображения с кнопкой избранного */
@@ -204,15 +204,14 @@
   font-weight: 300;
 }
 
-/* Фиксированная высота только для контентной части карточек с изображениями */
+/* Адаптивная высота для контентной части карточек с изображениями */
 .materialCard .materialContent {
-  height: 180px; /* Фиксированная высота контентной части */
+  /* Убираем фиксированную высоту - контент растет под весь текст */
 }
 
-/* Для компактных карточек контент занимает все место */
+/* Для компактных карточек контент растет адаптивно */
 .materialCardCompact .materialContent {
-  flex: 1;
-  min-height: 0;
+  /* Убираем flex: 1 и min-height - пусть растет естественно */
 }
 
 .materialInfo {
@@ -232,8 +231,9 @@
 
 /* Контейнер для нижних элементов (теги, кнопка "далее") */
 .materialFooter {
-  margin-top: auto;
+  margin-top: 12px; /* Простой отступ вместо margin-top: auto */
   padding-bottom: 8px; /* Отступ снизу для тегов */
+  flex-shrink: 0; /* Не сжиматься когда места мало */
 }
 
 /* Заголовок материала с кнопкой избранного */
@@ -246,7 +246,7 @@
 }
 
 .materialTitle {
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   margin: 0;
   color: var(--text-main);
@@ -291,7 +291,7 @@
 }
 
 .materialDescription {
-  font-size: 16px;
+  font-size: 20px;
   color: var(--text-secondary);
   margin: 6px 0;
   line-height: 1.5;
@@ -352,7 +352,7 @@
   background: none;
   border: none;
   color: #082445;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 300;
   font-family: 'GilroyLight', sans-serif;
   cursor: pointer;
@@ -412,6 +412,7 @@
   color: var(--text-secondary);
   font-family: 'GilroyLight', sans-serif;
   font-weight: 300;
+  font-size: 18px;
 }
 
 .loadingMoreIcon {
@@ -441,7 +442,7 @@
 
 .emptyTitle {
   font-family: 'RalewayMedium', sans-serif;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 500;
   margin: 0 0 8px 0;
   color: var(--text-main);
@@ -449,7 +450,7 @@
 }
 
 .emptyDescription {
-  font-size: 14px;
+  font-size: 18px;
   color: var(--text-secondary);
   margin: 0;
   line-height: 1.4;
@@ -477,11 +478,11 @@
   }
 
   .headerTitle {
-    font-size: 18px;
+    font-size: 22px;
   }
   
   .materialCard .materialContent {
-    height: 150px; /* Увеличенная высота контентной части для мобильных (с учетом отступа под тегами) */
+    /* Убираем фиксированную высоту на мобильных - карточки адаптивные */
   }
   
   .materialCard .materialFooter {
@@ -489,7 +490,7 @@
   }
   
   .materialCardCompact {
-    height: 210px; /* Увеличенная высота для компактных карточек на мобильных (с учетом отступа под тегами) */
+    /* Убираем фиксированную высоту на мобильных - карточки адаптивные */
   }
   
   .materialContent {
@@ -497,11 +498,11 @@
   }
   
   .materialTitle {
-    font-size: 16px;
+    font-size: 20px;
   }
   
   .materialDescription {
-    font-size: 14px;
+    font-size: 18px;
     font-weight: 300;
   }
   
@@ -535,7 +536,7 @@
 
 @media (max-width: 768px) and (min-width: 481px) {
   .materialCard .materialContent {
-    height: 145px; /* Промежуточная высота контентной части для средних мобильных экранов */
+    /* Убираем фиксированную высоту на планшетах - карточки адаптивные */
   }
   
   .materialCard .materialFooter {
@@ -543,7 +544,7 @@
   }
   
   .materialCardCompact {
-    height: 190px; /* Промежуточная высота для средних мобильных экранов (с учетом отступа под тегами) */
+    /* Убираем фиксированную высоту на планшетах - карточки адаптивные */
   }
 }
 
@@ -567,7 +568,7 @@
   }
   
   .headerTitle {
-    font-size: 24px;
+    font-size: 28px;
   }
   
   .materialsSection {
