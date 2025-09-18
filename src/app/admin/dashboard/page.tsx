@@ -96,7 +96,7 @@ export default function AdminDashboard() {
         <div className={styles.headerContent}>
           <div className={styles.headerLeft}>
             <h1 className={styles.title}>Панель администратора</h1>
-            <p className={styles.subtitle}>Добро пожаловать в систему управления контентом Вера Атара</p>
+            <p className={styles.subtitle}>Добро пожаловать в систему управления контентом</p>
           </div>
           <div className={styles.headerRight}>
             <div className={styles.systemStatus}>
