@@ -30,7 +30,7 @@ export function FAQCard({ question, answer }: FAQCardProps) {
       </button>
       <div
         className={styles.answerWrapper}
-        style={{ maxHeight: open ? 500 : 0 }}
+        style={{ maxHeight: open ? '1000px' : 0 }}
         id={`faq-answer-${question}`}
         aria-hidden={!open}
       >
