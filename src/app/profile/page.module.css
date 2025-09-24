@@ -241,6 +241,14 @@
   border: 1px solid var(--border-light);
 }
 
+.giftCard {
+  background: #E4DEDC;
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border-light);
+}
+
 .sectionHeader {
   display: flex;
   align-items: center;
@@ -275,6 +283,21 @@
   font-weight: 300;
   color: var(--text-secondary);
   margin: 0 0 16px 0;
+  line-height: 1.5;
+}
+
+.giftContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.giftText {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 20px;
+  font-weight: 300;
+  color: var(--text-secondary);
+  margin: 0;
   line-height: 1.5;
 }
 
@@ -641,7 +664,8 @@
   }
 
   .subscriptionCard,
-  .supportCard {
+  .supportCard,
+  .giftCard {
     padding: 16px;
   }
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check, Loader2, Shield } from 'lucide-react';
+import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check, Loader2, Shield, Gift } from 'lucide-react';
 import { Page } from '@/components/Page';
 import { ScrollSpacer } from '@/components/ScrollSpacer';
 import { Payment, User as DbUser } from '@/types/database';
@@ -510,7 +510,27 @@ IP-адрес: ${locationData?.ip || 'Определяется...'}
           </div>
         </div>
 
-        
+        {/* Подарок другу */}
+        <div className={styles.giftCard}>
+          <div className={styles.sectionHeader}>
+            <Gift className={styles.sectionIcon} />
+            <h3 className={styles.sectionTitle}>Подарок другу в «Источник»</h3>
+          </div>
+          <div className={styles.giftContent}>
+            <p className={styles.giftText}>
+              Вы дарите доступ в сообщество. После оплаты мы выдадим персональную ссылку — отправьте её другу и он присоединится.
+            </p>
+            <a
+              href="https://t.me/istochnik_clubbot?start=presentbuy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.botButton}
+            >
+              Подарить доступ
+            </a>
+          </div>
+        </div>
+
 
         {/* Нужна помощь */}
         <div className={styles.accordion}>
