@@ -9,11 +9,15 @@ export async function GET(request: Request) {
     const limit = parseInt(searchParams.get('limit') || '0'); // 0 = без лимита (обратная совместимость)
     const offset = parseInt(searchParams.get('offset') || '0');
 
+    // Для мини-курсов (section_key = 'materials') сортируем по возрастанию,
+    // для остальных разделов - по убыванию (новые сначала)
+    const isAscending = sectionKey === 'materials';
+
     let query = supabase
       .from('materials')
       .select('*')
       .eq('is_active', true)
-      .order('display_order', { ascending: true });
+      .order('display_order', { ascending: isAscending });
 
     // Фильтрация по разделу
     if (sectionKey) {

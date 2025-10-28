@@ -8,13 +8,27 @@ export async function GET() {
     const { data: materials, error } = await supabase
       .from('materials')
       .select('*')
-      .order('display_order', { ascending: true });
+      .order('section_key', { ascending: true })
+      .order('display_order', { ascending: false });
 
     if (error) {
       throw error;
     }
 
-    return NextResponse.json({ success: true, materials });
+    // Сортируем мини-курсы (section_key = 'materials') в обратном порядке
+    const sortedMaterials = materials?.map(m => m).sort((a, b) => {
+      if (a.section_key === b.section_key) {
+        if (a.section_key === 'materials') {
+          // Для мини-курсов сортируем по возрастанию
+          return a.display_order - b.display_order;
+        }
+        // Для остальных по убыванию (уже отсортировано в запросе)
+        return b.display_order - a.display_order;
+      }
+      return a.section_key.localeCompare(b.section_key);
+    });
+
+    return NextResponse.json({ success: true, materials: sortedMaterials });
   } catch (error) {
     console.error('Error fetching materials:', error);
     return NextResponse.json(

@@ -60,14 +60,18 @@ export async function GET(request: Request) {
         created_at
       `)
       .in('id', paginatedIds)
-      .eq('is_active', true)
-      .order('display_order', { ascending: true });
+      .eq('is_active', true);
 
     if (materialsError) {
       throw materialsError;
     }
 
-    return NextResponse.json(materials || []);
+    // Сортируем материалы в порядке, в котором они были добавлены в избранное
+    const sortedMaterials = paginatedIds
+      .map(id => materials?.find(m => m.id === id))
+      .filter(m => m !== undefined);
+
+    return NextResponse.json(sortedMaterials || []);
   } catch (error) {
     console.error('Error fetching favorites:', error);
     return NextResponse.json({ error: 'Failed to fetch favorites' }, { status: 500 });
