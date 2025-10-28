@@ -219,23 +219,42 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
         setLoading(false);
         return;
       }
-      
+
       setLoading(true);
       setPage(0);
       setHasMore(true);
-      
+
       // Загружаем данные параллельно
       await Promise.all([
         loadMaterials(0, selectedTag, false),
         loadFavorites(),
         loadAllTags()
       ]);
-      
+
       setLoading(false);
     };
 
     initializeData();
   }, [resolvedParams.category, categoryConfig]);
+
+  // Скроллим к последнему просмотренному материалу после загрузки
+  useEffect(() => {
+    if (loading || materials.length === 0) return;
+
+    const lastMaterialId = sessionStorage.getItem('lastClickedMaterialId');
+    if (lastMaterialId) {
+      // Ждем немного чтобы DOM обновился
+      setTimeout(() => {
+        const element = document.querySelector(`[data-material-id="${lastMaterialId}"]`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'auto', block: 'center' });
+          console.log('[Scroll] Scrolled to material:', lastMaterialId);
+        }
+        // Очищаем после использования
+        sessionStorage.removeItem('lastClickedMaterialId');
+      }, 100);
+    }
+  }, [loading, materials]);
 
   const toggleFavorite = async (materialId: number) => {
     const telegramId = user?.id?.toString() || getTelegramId();
@@ -280,8 +299,9 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   };
 
   const handleMaterialClick = (material: Material) => {
-    // Используем router.push для SPA навигации
-    // Next.js автоматически сохранит и восстановит позицию скролла
+    // Сохраняем ID материала для скролла к нему при возврате
+    sessionStorage.setItem('lastClickedMaterialId', String(material.id));
+
     router.push(`/materials/${material.id}`);
   };
 
@@ -404,8 +424,9 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
         <div className={styles.materialsSection}>
                     {materials.length > 0 ? (
             materials.map((material) => (
-              <div 
+              <div
                 key={material.id}
+                data-material-id={material.id}
                 className={material.pic_url ? styles.materialCard : styles.materialCardCompact}
                 onClick={() => handleMaterialClick(material)}
               >
