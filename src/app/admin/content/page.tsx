@@ -359,14 +359,21 @@ export default function AdminContent() {
   const groupedMaterials = sectionOptions.reduce((acc, section) => {
     const sectionMaterials = materials
       .filter(material => material.section_key === section.value)
-      .sort((a, b) => a.display_order - b.display_order);
-    
+      .sort((a, b) => {
+        // Для мини-курсов (materials) - сортировка по возрастанию
+        // Для остальных разделов - по убыванию (новые сначала)
+        if (section.value === 'materials') {
+          return a.display_order - b.display_order;
+        }
+        return b.display_order - a.display_order;
+      });
+
     acc[section.value] = {
       section,
       materials: sectionMaterials,
       total: sectionMaterials.length
     };
-    
+
     return acc;
   }, {} as Record<string, { section: typeof sectionOptions[0], materials: Material[], total: number }>);
 
