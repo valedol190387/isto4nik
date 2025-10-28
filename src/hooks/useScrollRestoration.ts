@@ -9,8 +9,8 @@ import { usePathname } from 'next/navigation';
  */
 export function useScrollRestoration() {
   const pathname = usePathname();
-  const scrollPositions = useRef<{ [key: string]: number }>({});
   const isRestoringRef = useRef(false);
+  const hasRestoredRef = useRef(false);
 
   useEffect(() => {
     // Проверяем, что мы на странице с материалами
@@ -25,29 +25,52 @@ export function useScrollRestoration() {
 
     // Восстанавливаем позицию скролла при монтировании компонента
     const restoreScroll = () => {
+      if (hasRestoredRef.current) return;
+
       const savedPosition = sessionStorage.getItem(`scroll:${pathname}`);
 
       if (savedPosition && !isRestoringRef.current) {
         isRestoringRef.current = true;
         const position = parseInt(savedPosition, 10);
 
-        // Используем requestAnimationFrame для гарантии, что DOM отрендерился
-        requestAnimationFrame(() => {
-          window.scrollTo(0, position);
-          isRestoringRef.current = false;
-        });
+        // Множественные попытки восстановления для надежности
+        const attemptRestore = (attempt = 0) => {
+          if (attempt > 5) {
+            isRestoringRef.current = false;
+            hasRestoredRef.current = true;
+            return;
+          }
+
+          requestAnimationFrame(() => {
+            window.scrollTo(0, position);
+
+            // Проверяем, удалось ли прокрутить
+            setTimeout(() => {
+              if (Math.abs(window.scrollY - position) > 10 && attempt < 5) {
+                attemptRestore(attempt + 1);
+              } else {
+                isRestoringRef.current = false;
+                hasRestoredRef.current = true;
+              }
+            }, 50);
+          });
+        };
+
+        attemptRestore();
       }
     };
 
-    // Пытаемся восстановить скролл сразу и после небольшой задержки
-    // (на случай если контент еще загружается)
+    // Множественные попытки восстановления
     restoreScroll();
-    const timeoutId = setTimeout(restoreScroll, 100);
+    const timeoutIds = [
+      setTimeout(restoreScroll, 100),
+      setTimeout(restoreScroll, 300),
+      setTimeout(restoreScroll, 500)
+    ];
 
-    // Сохраняем позицию скролла при уходе со страницы
+    // Сохраняем позицию скролла
     const saveScroll = () => {
       if (!isRestoringRef.current) {
-        scrollPositions.current[pathname] = window.scrollY;
         sessionStorage.setItem(`scroll:${pathname}`, String(window.scrollY));
       }
     };
@@ -55,8 +78,10 @@ export function useScrollRestoration() {
     // Сохраняем позицию при скролле (с дебаунсом)
     let scrollTimeout: NodeJS.Timeout;
     const handleScroll = () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(saveScroll, 50);
+      if (!isRestoringRef.current) {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(saveScroll, 100);
+      }
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -68,29 +93,16 @@ export function useScrollRestoration() {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
 
-    // Сохраняем при переходе по ссылке (для TMA)
-    const handleClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      const link = target.closest('a');
-
-      if (link && link.href.includes('/materials/')) {
-        saveScroll();
-      }
-    };
-
-    document.addEventListener('click', handleClick, true);
-
     return () => {
-      clearTimeout(timeoutId);
+      timeoutIds.forEach(id => clearTimeout(id));
       clearTimeout(scrollTimeout);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('beforeunload', handleBeforeUnload);
-      document.removeEventListener('click', handleClick, true);
-
-      // Возвращаем автоматическое восстановление скролла для других страниц
-      if ('scrollRestoration' in window.history) {
-        window.history.scrollRestoration = 'auto';
-      }
     };
+  }, [pathname]);
+
+  // Сбрасываем флаг при смене роута
+  useEffect(() => {
+    hasRestoredRef.current = false;
   }, [pathname]);
 }

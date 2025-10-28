@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, use, useRef, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { Page } from '@/components/Page';
 import { Star, ExternalLink, Loader2, FileText, Filter } from 'lucide-react';
 import { Material } from '@/types/database';
@@ -52,6 +52,9 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   // Ref для infinite scroll
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const ITEMS_PER_PAGE = 40;
+
+  // Router для навигации
+  const router = useRouter();
 
   // Восстановление позиции скролла при возврате на страницу
   useScrollRestoration();
@@ -281,8 +284,11 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   };
 
   const handleMaterialClick = (material: Material) => {
-    // Всегда переходим на страницу детального просмотра материала
-    window.location.href = `/materials/${material.id}`;
+    // Сохраняем текущую позицию скролла перед переходом
+    sessionStorage.setItem(`scroll:${window.location.pathname}`, String(window.scrollY));
+
+    // Используем router.push вместо window.location для SPA навигации
+    router.push(`/materials/${material.id}`);
   };
 
   // Обработка фильтрации по тегам (серверная)
