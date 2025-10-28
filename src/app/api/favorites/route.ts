@@ -68,7 +68,7 @@ export async function GET(request: Request) {
 
     // Сортируем материалы в порядке, в котором они были добавлены в избранное
     const sortedMaterials = paginatedIds
-      .map(id => materials?.find(m => m.id === id))
+      .map((id: number) => materials?.find(m => m.id === id))
       .filter(m => m !== undefined);
 
     return NextResponse.json(sortedMaterials || []);
