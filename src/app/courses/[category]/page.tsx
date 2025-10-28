@@ -256,9 +256,11 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
           sessionStorage.removeItem('lastClickedMaterialId');
         }
       }, 100);
+    } else if (hasMore && !loadingMore) {
+      // Материала нет - автоматически подгружаем следующую страницу
+      loadMoreMaterials();
     }
-    // Если материала нет - ждем следующей загрузки (пагинация)
-  }, [loading, materials]);
+  }, [loading, materials, hasMore, loadingMore, loadMoreMaterials]);
 
   const toggleFavorite = async (materialId: number) => {
     const telegramId = user?.id?.toString() || getTelegramId();
