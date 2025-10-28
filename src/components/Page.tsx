@@ -28,18 +28,12 @@ export function Page({ children, back = true }: PropsWithChildren<{
     });
   }, [router]);
 
-  // Сброс позиции скролла при загрузке страницы
+  // Сброс скролла для всех страниц кроме /courses/* (там работает восстановление позиции)
   useEffect(() => {
-    // НЕ сбрасываем скролл для страниц с материалами - Next.js сам восстанавливает позицию
-    if (pathname.startsWith('/courses/')) {
-      return;
-    }
+    if (pathname.startsWith('/courses/')) return;
 
-    // Сбрасываем скролл для остальных страниц
     const mobileWrap = document.querySelector('.mobile-wrap');
-    if (mobileWrap) {
-      mobileWrap.scrollTo(0, 0);
-    }
+    if (mobileWrap) mobileWrap.scrollTo(0, 0);
 
     window.scrollTo(0, 0);
     document.documentElement.scrollTo(0, 0);

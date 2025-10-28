@@ -237,31 +237,27 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     initializeData();
   }, [resolvedParams.category, categoryConfig]);
 
-  // Скроллим к последнему просмотренному материалу после загрузки
+  // Восстановление позиции скролла при возврате с детальной страницы
   useEffect(() => {
     if (loading || materials.length === 0) return;
 
     const lastMaterialId = sessionStorage.getItem('lastClickedMaterialId');
     if (!lastMaterialId) return;
 
-    // Проверяем, есть ли этот материал в текущем загруженном списке
+    // Проверяем наличие материала в загруженном списке
     const materialExists = materials.some(m => m.id === parseInt(lastMaterialId));
 
     if (materialExists) {
-      // Материал в списке - скроллим к нему
+      // Материал загружен - выполняем скролл
       setTimeout(() => {
         const element = document.querySelector(`[data-material-id="${lastMaterialId}"]`);
         if (element) {
           element.scrollIntoView({ behavior: 'auto', block: 'center' });
-          console.log('[Scroll] Scrolled to material:', lastMaterialId);
-          // Очищаем только после успешного скролла
           sessionStorage.removeItem('lastClickedMaterialId');
         }
       }, 100);
-    } else {
-      // Материала еще нет в списке - ждем дозагрузки
-      console.log('[Scroll] Material not in list yet, waiting for more items:', lastMaterialId);
     }
+    // Если материала нет - ждем следующей загрузки (пагинация)
   }, [loading, materials]);
 
   const toggleFavorite = async (materialId: number) => {
@@ -307,9 +303,8 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   };
 
   const handleMaterialClick = (material: Material) => {
-    // Сохраняем ID материала для скролла к нему при возврате
+    // Сохраняем ID материала для восстановления позиции при возврате
     sessionStorage.setItem('lastClickedMaterialId', String(material.id));
-
     router.push(`/materials/${material.id}`);
   };
 
