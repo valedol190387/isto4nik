@@ -285,7 +285,15 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
 
   const handleMaterialClick = (material: Material) => {
     // Сохраняем текущую позицию скролла перед переходом
-    sessionStorage.setItem(`scroll:${window.location.pathname}`, String(window.scrollY));
+    const scrollKey = `scroll:${window.location.pathname}`;
+    const scrollPosition = window.scrollY;
+
+    console.log('[MaterialClick] Saving scroll:', scrollPosition, 'for key:', scrollKey);
+    sessionStorage.setItem(scrollKey, String(scrollPosition));
+
+    // Проверяем что сохранилось
+    const saved = sessionStorage.getItem(scrollKey);
+    console.log('[MaterialClick] Verified saved value:', saved);
 
     // Используем router.push вместо window.location для SPA навигации
     router.push(`/materials/${material.id}`);
