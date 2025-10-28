@@ -242,17 +242,25 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
     if (loading || materials.length === 0) return;
 
     const lastMaterialId = sessionStorage.getItem('lastClickedMaterialId');
-    if (lastMaterialId) {
-      // Ждем немного чтобы DOM обновился
+    if (!lastMaterialId) return;
+
+    // Проверяем, есть ли этот материал в текущем загруженном списке
+    const materialExists = materials.some(m => m.id === parseInt(lastMaterialId));
+
+    if (materialExists) {
+      // Материал в списке - скроллим к нему
       setTimeout(() => {
         const element = document.querySelector(`[data-material-id="${lastMaterialId}"]`);
         if (element) {
           element.scrollIntoView({ behavior: 'auto', block: 'center' });
           console.log('[Scroll] Scrolled to material:', lastMaterialId);
+          // Очищаем только после успешного скролла
+          sessionStorage.removeItem('lastClickedMaterialId');
         }
-        // Очищаем после использования
-        sessionStorage.removeItem('lastClickedMaterialId');
       }, 100);
+    } else {
+      // Материала еще нет в списке - ждем дозагрузки
+      console.log('[Scroll] Material not in list yet, waiting for more items:', lastMaterialId);
     }
   }, [loading, materials]);
 
