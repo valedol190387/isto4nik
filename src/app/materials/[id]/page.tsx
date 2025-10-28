@@ -66,17 +66,41 @@ export default function MaterialViewPage() {
     }
   }, [showSwipeHint]);
 
+  // Настройка Telegram BackButton
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg) {
+        // Показываем кнопку "Назад"
+        tg.BackButton.show();
+
+        // Обработчик клика на кнопку "Назад"
+        const handleBackClick = () => {
+          router.back();
+        };
+
+        tg.BackButton.onClick(handleBackClick);
+
+        // Cleanup
+        return () => {
+          tg.BackButton.offClick(handleBackClick);
+          tg.BackButton.hide();
+        };
+      }
+    }
+  }, [router]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const telegramId = user?.id?.toString() || getTelegramId();
-        
+
         // Загружаем материал
         const response = await fetch(`/api/materials/${materialId}`);
         if (!response.ok) {
           throw new Error('Материал не найден');
         }
-        
+
         const materialData: Material = await response.json();
         setMaterial(materialData);
 

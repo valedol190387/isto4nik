@@ -6,11 +6,11 @@ import { usePathname } from 'next/navigation';
 /**
  * Хук для сохранения и восстановления позиции скролла при навигации
  * Работает только для страниц с материалами (courses/[category])
+ * Специально оптимизирован для Telegram Mini App
  */
 export function useScrollRestoration() {
   const pathname = usePathname();
   const isRestoringRef = useRef(false);
-  const hasRestoredRef = useRef(false);
 
   useEffect(() => {
     // Проверяем, что мы на странице с материалами
@@ -23,55 +23,68 @@ export function useScrollRestoration() {
       window.history.scrollRestoration = 'manual';
     }
 
+    // Ключ для сохранения
+    const scrollKey = `scroll:${pathname}`;
+
     // Восстанавливаем позицию скролла при монтировании компонента
     const restoreScroll = () => {
-      if (hasRestoredRef.current) return;
-
-      const savedPosition = sessionStorage.getItem(`scroll:${pathname}`);
+      const savedPosition = sessionStorage.getItem(scrollKey);
 
       if (savedPosition && !isRestoringRef.current) {
         isRestoringRef.current = true;
         const position = parseInt(savedPosition, 10);
 
-        // Множественные попытки восстановления для надежности
-        const attemptRestore = (attempt = 0) => {
-          if (attempt > 5) {
-            isRestoringRef.current = false;
-            hasRestoredRef.current = true;
-            return;
-          }
+        console.log('[ScrollRestore] Restoring scroll to:', position, 'for path:', pathname);
+
+        // Используем несколько попыток восстановления
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        const attemptRestore = () => {
+          attempts++;
 
           requestAnimationFrame(() => {
-            window.scrollTo(0, position);
+            window.scrollTo({
+              top: position,
+              behavior: 'auto'
+            });
 
-            // Проверяем, удалось ли прокрутить
+            // Проверяем успешность через небольшую задержку
             setTimeout(() => {
-              if (Math.abs(window.scrollY - position) > 10 && attempt < 5) {
-                attemptRestore(attempt + 1);
+              const currentScroll = window.scrollY;
+              const diff = Math.abs(currentScroll - position);
+
+              if (diff > 50 && attempts < maxAttempts) {
+                console.log(`[ScrollRestore] Attempt ${attempts}: current=${currentScroll}, target=${position}, diff=${diff}`);
+                attemptRestore();
               } else {
+                console.log('[ScrollRestore] Completed after', attempts, 'attempts. Final position:', window.scrollY);
                 isRestoringRef.current = false;
-                hasRestoredRef.current = true;
               }
-            }, 50);
+            }, 100);
           });
         };
 
         attemptRestore();
+      } else {
+        console.log('[ScrollRestore] No saved position for:', pathname);
       }
     };
 
-    // Множественные попытки восстановления
-    restoreScroll();
-    const timeoutIds = [
+    // Запускаем восстановление с разными задержками для надежности
+    const timeouts = [
+      setTimeout(restoreScroll, 0),
       setTimeout(restoreScroll, 100),
       setTimeout(restoreScroll, 300),
-      setTimeout(restoreScroll, 500)
+      setTimeout(restoreScroll, 500),
+      setTimeout(restoreScroll, 1000)
     ];
 
     // Сохраняем позицию скролла
     const saveScroll = () => {
-      if (!isRestoringRef.current) {
-        sessionStorage.setItem(`scroll:${pathname}`, String(window.scrollY));
+      if (!isRestoringRef.current && window.scrollY > 0) {
+        sessionStorage.setItem(scrollKey, String(window.scrollY));
+        console.log('[ScrollRestore] Saved scroll position:', window.scrollY, 'for path:', pathname);
       }
     };
 
@@ -80,7 +93,7 @@ export function useScrollRestoration() {
     const handleScroll = () => {
       if (!isRestoringRef.current) {
         clearTimeout(scrollTimeout);
-        scrollTimeout = setTimeout(saveScroll, 100);
+        scrollTimeout = setTimeout(saveScroll, 150);
       }
     };
 
@@ -93,16 +106,21 @@ export function useScrollRestoration() {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
 
+    // Сохраняем перед скрытием страницы (важно для TMA)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        saveScroll();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
-      timeoutIds.forEach(id => clearTimeout(id));
+      timeouts.forEach(id => clearTimeout(id));
       clearTimeout(scrollTimeout);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [pathname]);
-
-  // Сбрасываем флаг при смене роута
-  useEffect(() => {
-    hasRestoredRef.current = false;
   }, [pathname]);
 }
