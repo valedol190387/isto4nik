@@ -6,6 +6,7 @@ import { Page } from '@/components/Page';
 import { Star, ExternalLink, Loader2, FileText, Filter } from 'lucide-react';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import styles from './page.module.css';
 
 // Mapping категорий к section_key в таблице materials
@@ -51,6 +52,9 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   // Ref для infinite scroll
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const ITEMS_PER_PAGE = 40;
+
+  // Восстановление позиции скролла при возврате на страницу
+  useScrollRestoration();
 
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
