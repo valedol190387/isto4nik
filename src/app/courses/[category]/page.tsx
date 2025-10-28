@@ -6,7 +6,6 @@ import { Page } from '@/components/Page';
 import { Star, ExternalLink, Loader2, FileText, Filter } from 'lucide-react';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
-import { useScrollRestoration } from '@/hooks/useScrollRestoration';
 import styles from './page.module.css';
 
 // Mapping категорий к section_key в таблице materials
@@ -55,9 +54,6 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
 
   // Router для навигации
   const router = useRouter();
-
-  // Восстановление позиции скролла при возврате на страницу
-  useScrollRestoration();
 
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
@@ -284,18 +280,8 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   };
 
   const handleMaterialClick = (material: Material) => {
-    // Сохраняем текущую позицию скролла перед переходом
-    const scrollKey = `scroll:${window.location.pathname}`;
-    const scrollPosition = window.scrollY;
-
-    console.log('[MaterialClick] Saving scroll:', scrollPosition, 'for key:', scrollKey);
-    sessionStorage.setItem(scrollKey, String(scrollPosition));
-
-    // Проверяем что сохранилось
-    const saved = sessionStorage.getItem(scrollKey);
-    console.log('[MaterialClick] Verified saved value:', saved);
-
-    // Используем router.push вместо window.location для SPA навигации
+    // Используем router.push для SPA навигации
+    // Next.js автоматически сохранит и восстановит позицию скролла
     router.push(`/materials/${material.id}`);
   };
 

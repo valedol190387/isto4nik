@@ -30,25 +30,21 @@ export function Page({ children, back = true }: PropsWithChildren<{
 
   // Сброс позиции скролла при загрузке страницы
   useEffect(() => {
-    // НЕ сбрасываем скролл для страниц с материалами - там работает восстановление позиции
+    // НЕ сбрасываем скролл для страниц с материалами - Next.js сам восстанавливает позицию
     if (pathname.startsWith('/courses/')) {
-      console.log('[Page] Skipping scroll reset for courses page:', pathname);
       return;
     }
 
-    console.log('[Page] Resetting scroll for:', pathname);
-
-    // Сбрасываем скролл в мобильном контейнере Telegram
+    // Сбрасываем скролл для остальных страниц
     const mobileWrap = document.querySelector('.mobile-wrap');
     if (mobileWrap) {
       mobileWrap.scrollTo(0, 0);
     }
 
-    // Также сбрасываем обычный скролл для совместимости
     window.scrollTo(0, 0);
     document.documentElement.scrollTo(0, 0);
     document.body.scrollTo(0, 0);
-  }, [pathname]); // Зависимость от pathname, чтобы реагировать на изменения роута
+  }, [pathname]);
 
   return <>{children}</>;
 }
