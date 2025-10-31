@@ -294,12 +294,12 @@ export default function Home() {
 
   return (
     <Page back={false}>
-      {/* Ежедневный попап */}
-      <DailyPopup
+      {/* Ежедневный попап - ОТКЛЮЧЕН, включить когда будет контент */}
+      {/* <DailyPopup
         title="Добро пожаловать!"
         content="Здесь вы можете изменить текст и настроить попап под свои нужды."
         buttonText="Понятно"
-      />
+      /> */}
 
       <div className={styles.container}>
         {/* Хайлайты */}
