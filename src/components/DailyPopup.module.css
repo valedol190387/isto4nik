@@ -22,13 +22,14 @@
 }
 
 .popup {
-  background: #1a1a1a;
+  background: var(--bg-card, #DEE6E9);
   border-radius: 20px 20px 0 0;
   width: 100%;
+  max-width: 500px;
   max-height: 55vh;
   position: relative;
   animation: slideUp 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  box-shadow: var(--shadow-glow, 0 0 24px #bfcad1);
   display: flex;
   flex-direction: column;
 }
@@ -46,10 +47,10 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(52, 74, 84, 0.1);
   border: none;
   cursor: pointer;
-  color: #fff;
+  color: var(--accent-blue, #344A54);
   padding: 8px;
   border-radius: 50%;
   display: flex;
@@ -60,7 +61,7 @@
 }
 
 .closeButton:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(52, 74, 84, 0.2);
 }
 
 .imageContainer {
@@ -78,35 +79,38 @@
 .content {
   padding: 20px 24px 24px;
   text-align: center;
-  background: #1a1a1a;
+  background: var(--bg-card, #DEE6E9);
 }
 
 .title {
-  font-size: 20px;
-  font-weight: 600;
+  font-family: var(--font-heading, 'Cormorant', serif);
+  font-size: 22px;
+  font-weight: 500;
   margin: 0 0 8px 0;
-  color: #ffffff;
+  color: var(--text-main, #354A54);
   line-height: 1.3;
+  text-transform: uppercase;
 }
 
 .subtitle {
+  font-family: var(--font-body, 'Montserrat', sans-serif);
   font-size: 16px;
   line-height: 1.4;
   margin: 0 0 12px 0;
-  color: #ffffff;
-  opacity: 0.9;
+  color: var(--text-secondary, #5a6a6f);
 }
 
 .price {
+  font-family: var(--font-body, 'Montserrat', sans-serif);
   font-size: 18px;
   font-weight: 600;
   margin: 0 0 20px 0;
-  color: #D4AF37;
+  color: var(--accent-blue, #344A54);
 }
 
 .actionButton {
-  background: #D4AF37;
-  color: #1a1a1a;
+  background: var(--accent-blue, #344A54);
+  color: #EDEDEA;
   border: none;
   border-radius: 12px;
   padding: 14px 32px;
@@ -114,11 +118,13 @@
   font-weight: 600;
   cursor: pointer;
   width: 100%;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
+  font-family: var(--font-body, 'Montserrat', sans-serif);
 }
 
 .actionButton:hover {
   opacity: 0.9;
+  box-shadow: var(--shadow-medium, 0 0 4px rgba(52, 74, 84, 0.3));
 }
 
 .actionButton:active {
