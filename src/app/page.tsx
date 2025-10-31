@@ -295,7 +295,7 @@ export default function Home() {
   return (
     <Page back={false}>
       <DailyPopup
-        title="Онлайн-обучение методу «Терапии Души»"
+        title="Онлайн-обучение методу «Терапия Души»"
         subtitle="28-30 ноября"
         price="Скидка 20.000 ₽ за раннее бронирование"
         buttonText="Подробнее"
