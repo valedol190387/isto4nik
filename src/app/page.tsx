@@ -294,12 +294,14 @@ export default function Home() {
 
   return (
     <Page back={false}>
-      {/* Ежедневный попап - ОТКЛЮЧЕН, включить когда будет контент */}
-      {/* <DailyPopup
-        title="Добро пожаловать!"
-        content="Здесь вы можете изменить текст и настроить попап под свои нужды."
-        buttonText="Понятно"
-      /> */}
+      <DailyPopup
+        title="Онлайн-обучение методу «Терапии Души»"
+        subtitle="28-30 ноября"
+        price="20.000 ₽ за раннее бронирование"
+        buttonText="Подробнее"
+        buttonLink="https://terebenin.com/terapiya_dushi?utm_source=zk_istochnik&utm_medium=app_banner&utm_campaign=price_03/11"
+        imageSrc="/images/Popup.webp"
+      />
 
       <div className={styles.container}>
         {/* Хайлайты */}

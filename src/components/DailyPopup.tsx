@@ -2,20 +2,25 @@
 
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import Image from 'next/image';
 import styles from './DailyPopup.module.css';
 
 interface DailyPopupProps {
-  title?: string;
-  content?: string;
-  buttonText?: string;
-  buttonLink?: string;
+  title: string;
+  subtitle: string;
+  price: string;
+  buttonText: string;
+  buttonLink: string;
+  imageSrc: string;
 }
 
 export function DailyPopup({
-  title = "Добро пожаловать!",
-  content = "Это важное сообщение для вас.",
-  buttonText = "Понятно",
-  buttonLink
+  title,
+  subtitle,
+  price,
+  buttonText,
+  buttonLink,
+  imageSrc
 }: DailyPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -38,9 +43,7 @@ export function DailyPopup({
   };
 
   const handleButtonClick = () => {
-    if (buttonLink) {
-      window.location.href = buttonLink;
-    }
+    window.open(buttonLink, '_blank');
     handleClose();
   };
 
@@ -53,9 +56,20 @@ export function DailyPopup({
           <X size={24} />
         </button>
 
+        <div className={styles.imageContainer}>
+          <Image
+            src={imageSrc}
+            alt={title}
+            fill
+            className={styles.image}
+            priority
+          />
+        </div>
+
         <div className={styles.content}>
           <h2 className={styles.title}>{title}</h2>
-          <p className={styles.text}>{content}</p>
+          <p className={styles.subtitle}>{subtitle}</p>
+          <p className={styles.price}>{price}</p>
 
           <button className={styles.actionButton} onClick={handleButtonClick}>
             {buttonText}
