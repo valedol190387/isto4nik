@@ -18,6 +18,7 @@ import {
   X
 } from 'lucide-react';
 import { SearchModal } from '@/components/SearchModal';
+import { DailyPopup } from '@/components/DailyPopup';
 import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser } from '@/types/database';
@@ -293,6 +294,13 @@ export default function Home() {
 
   return (
     <Page back={false}>
+      {/* Ежедневный попап */}
+      <DailyPopup
+        title="Добро пожаловать!"
+        content="Здесь вы можете изменить текст и настроить попап под свои нужды."
+        buttonText="Понятно"
+      />
+
       <div className={styles.container}>
         {/* Хайлайты */}
         <div className={styles.highlightsSection}>
