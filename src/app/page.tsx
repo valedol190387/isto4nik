@@ -297,7 +297,7 @@ export default function Home() {
       <DailyPopup
         title="Онлайн-обучение методу «Терапия Души»"
         subtitle="28-30 ноября"
-        price="Скидка 20.000 ₽ за раннее бронирование"
+        price="Получите инструменты для работы с психикой человека"
         buttonText="Подробнее"
         buttonLink="https://terebenin.com/terapiya_dushi?utm_source=zk_istochnik&utm_medium=app_banner&utm_campaign=price_03/11"
         imageSrc="/images/Popup.webp"
