@@ -4,50 +4,74 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import styles from './DailyPopup.module.css';
+import { PopupSettings } from '@/types/database';
 
 interface DailyPopupProps {
-  title: string;
-  subtitle: string;
-  price: string;
-  buttonText: string;
-  buttonLink: string;
-  imageSrc: string;
+  popupData?: PopupSettings | null;
 }
 
-export function DailyPopup({
-  title,
-  subtitle,
-  price,
-  buttonText,
-  buttonLink,
-  imageSrc
-}: DailyPopupProps) {
+export function DailyPopup({ popupData }: DailyPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // Проверяем, показывали ли попап сегодня
-    const lastShown = localStorage.getItem('dailyPopupLastShown');
+    // Если нет данных или попап неактивен, не показываем
+    if (!popupData || !popupData.is_active || popupData.frequency === 'disabled') {
+      return;
+    }
+
+    const storageKey = `popup_${popupData.id}_shown`;
+    const lastShown = localStorage.getItem(storageKey);
     const today = new Date().toDateString();
 
-    if (lastShown !== today) {
+    let shouldShow = false;
+
+    switch (popupData.frequency) {
+      case 'always':
+        // Показываем всегда
+        shouldShow = true;
+        break;
+
+      case 'daily':
+        // Показываем раз в день
+        shouldShow = lastShown !== today;
+        break;
+
+      case 'once':
+        // Показываем один раз за все время
+        shouldShow = !lastShown;
+        break;
+
+      default:
+        shouldShow = false;
+    }
+
+    if (shouldShow) {
       // Показываем попап через небольшую задержку для плавности
       setTimeout(() => {
         setIsVisible(true);
-        localStorage.setItem('dailyPopupLastShown', today);
+
+        // Сохраняем время показа
+        if (popupData.frequency === 'daily') {
+          localStorage.setItem(storageKey, today);
+        } else if (popupData.frequency === 'once') {
+          localStorage.setItem(storageKey, 'shown');
+        }
       }, 500);
     }
-  }, []);
+  }, [popupData]);
 
   const handleClose = () => {
     setIsVisible(false);
   };
 
   const handleButtonClick = () => {
-    window.open(buttonLink, '_blank');
-    handleClose();
+    if (popupData?.button_link) {
+      window.open(popupData.button_link, '_blank');
+      handleClose();
+    }
   };
 
-  if (!isVisible) return null;
+  if (!isVisible || !popupData) return null;
 
   return (
     <div className={styles.overlay} onClick={handleClose}>
@@ -58,8 +82,8 @@ export function DailyPopup({
 
         <div className={styles.imageContainer}>
           <Image
-            src={imageSrc}
-            alt={title}
+            src={popupData.image_url}
+            alt={popupData.title}
             fill
             className={styles.image}
             priority
@@ -67,12 +91,14 @@ export function DailyPopup({
         </div>
 
         <div className={styles.content}>
-          <h2 className={styles.title}>{title}</h2>
-          <p className={styles.subtitle}>{subtitle}</p>
-          <p className={styles.price}>{price}</p>
+          <h2 className={styles.title}>{popupData.title}</h2>
+          {popupData.subtitle && (
+            <p className={styles.subtitle}>{popupData.subtitle}</p>
+          )}
+          <p className={styles.price}>{popupData.price_text}</p>
 
           <button className={styles.actionButton} onClick={handleButtonClick}>
-            {buttonText}
+            {popupData.button_text}
           </button>
         </div>
       </div>

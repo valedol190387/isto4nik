@@ -139,6 +139,20 @@ export interface FAQ {
   updated_at: string;
 }
 
+export interface PopupSettings {
+  id: number;
+  title: string;
+  subtitle: string | null;
+  price_text: string;
+  button_text: string;
+  button_link: string;
+  image_url: string;
+  frequency: 'daily' | 'once' | 'always' | 'disabled';
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -176,6 +190,11 @@ export type Database = {
         Row: FAQ;
         Insert: Omit<FAQ, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<FAQ, 'id'>>;
+      };
+      popup_settings: {
+        Row: PopupSettings;
+        Insert: Omit<PopupSettings, 'id' | 'created_at' | 'updated_at'>;
+        Update: Partial<Omit<PopupSettings, 'id'>>;
       };
     };
   };

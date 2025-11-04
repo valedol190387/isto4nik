@@ -21,7 +21,7 @@ import { SearchModal } from '@/components/SearchModal';
 import { DailyPopup } from '@/components/DailyPopup';
 import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
-import { User as DbUser } from '@/types/database';
+import { User as DbUser, PopupSettings } from '@/types/database';
 import { checkDeepLink, getStartParam, parseUtmFromStartParam } from '@/lib/deepLinks';
 
 import styles from './page.module.css';
@@ -76,6 +76,7 @@ export default function Home() {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [chatLink, setChatLink] = useState<string | null>(null);
   const [channelLink, setChannelLink] = useState<string | null>(null);
+  const [popupData, setPopupData] = useState<PopupSettings | null>(null);
   const router = useRouter();
 
 
@@ -241,7 +242,7 @@ export default function Home() {
     if (isSubscriptionActive) {
       try {
         const response = await fetch('/api/env-links');
-        
+
         if (response.ok) {
           const data = await response.json();
           setChatLink(data.chatLink);
@@ -258,6 +259,22 @@ export default function Home() {
     }
   };
 
+  // Функция для загрузки настроек попапа
+  const loadPopupSettings = async () => {
+    try {
+      const response = await fetch('/api/popup');
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.popup) {
+          setPopupData(data.popup);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading popup settings:', error);
+    }
+  };
+
 
 
   // Вызываем загрузку данных пользователя при монтировании
@@ -271,6 +288,11 @@ export default function Home() {
   useEffect(() => {
     loadLinks();
   }, [isSubscriptionActive, user?.id]);
+
+  // Загружаем настройки попапа при монтировании
+  useEffect(() => {
+    loadPopupSettings();
+  }, []);
   
   const scrollToPosition = (dotIndex: number) => {
     setCurrentDot(dotIndex);
@@ -294,14 +316,7 @@ export default function Home() {
 
   return (
     <Page back={false}>
-      <DailyPopup
-        title="Онлайн-обучение методу «Терапия Души»"
-        subtitle="28-30 ноября"
-        price="Получите инструменты для работы с психикой человека"
-        buttonText="Подробнее"
-        buttonLink="https://terebenin.com/terapiya_dushi?utm_source=zk_istochnik&utm_medium=app_banner&utm_campaign=price_03/11"
-        imageSrc="/images/Popup.webp"
-      />
+      <DailyPopup popupData={popupData} />
 
       <div className={styles.container}>
         {/* Хайлайты */}

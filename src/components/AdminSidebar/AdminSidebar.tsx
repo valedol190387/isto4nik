@@ -2,7 +2,7 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { 
+import {
   LayoutDashboard,
   Calendar,
   Users,
@@ -13,7 +13,8 @@ import {
   Settings,
   ChevronLeft,
   ChevronRight,
-  ExternalLink
+  ExternalLink,
+  Bell
 } from 'lucide-react';
 import { useState } from 'react';
 import styles from './AdminSidebar.module.css';
@@ -62,6 +63,12 @@ const sidebarItems: SidebarItem[] = [
     title: 'FAQ',
     icon: <MessageCircle size={20} />,
     path: '/admin/faq'
+  },
+  {
+    id: 'popup',
+    title: 'Попап',
+    icon: <Bell size={20} />,
+    path: '/admin/popup'
   },
   {
     id: 'utm-generator',
