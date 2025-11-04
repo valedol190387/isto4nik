@@ -28,6 +28,18 @@ export async function POST(request: Request) {
   try {
     const popupData = await request.json();
 
+    // Если новый попап активен, деактивируем все остальные
+    if (popupData.is_active) {
+      const { error: deactivateError } = await supabase
+        .from('popup_settings')
+        .update({ is_active: false })
+        .eq('is_active', true);
+
+      if (deactivateError) {
+        throw deactivateError;
+      }
+    }
+
     // Добавляем временные метки
     popupData.created_at = new Date().toISOString();
     popupData.updated_at = new Date().toISOString();
@@ -62,6 +74,19 @@ export async function PUT(request: Request) {
         { success: false, message: 'Popup ID is required' },
         { status: 400 }
       );
+    }
+
+    // Если попап активируется, деактивируем все остальные
+    if (popupData.is_active) {
+      const { error: deactivateError } = await supabase
+        .from('popup_settings')
+        .update({ is_active: false })
+        .eq('is_active', true)
+        .neq('id', id); // Не трогаем текущий попап
+
+      if (deactivateError) {
+        throw deactivateError;
+      }
     }
 
     // Добавляем временную метку обновления
