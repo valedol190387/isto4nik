@@ -42,6 +42,7 @@ export default function AdminPopup() {
   const [editingPopup, setEditingPopup] = useState<PopupSettings | null>(null);
   const [form, setForm] = useState<PopupForm>(initialForm);
   const [saving, setSaving] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     loadPopups();
@@ -65,6 +66,12 @@ export default function AdminPopup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Проверяем наличие изображения
+    if (!form.image_url) {
+      alert('Пожалуйста, загрузите изображение для попапа');
+      return;
+    }
 
     try {
       setSaving(true);
@@ -146,6 +153,36 @@ export default function AdminPopup() {
     setEditingPopup(null);
     setForm(initialForm);
     setShowForm(true);
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('popupImage', file);
+
+      const response = await fetch('/api/upload/popup', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setForm({ ...form, image_url: data.imageUrl });
+      } else {
+        alert(`Ошибка загрузки: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error uploading popup image:', error);
+      alert('Ошибка загрузки файла');
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const formatDate = (dateString: string) => {
@@ -340,18 +377,27 @@ export default function AdminPopup() {
 
               <div className={styles.formGroup}>
                 <label className={styles.label}>
-                  URL изображения *
+                  Изображение попапа *
                 </label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={form.image_url}
-                  onChange={(e) => setForm({...form, image_url: e.target.value})}
-                  required
-                  placeholder="/images/Popup.webp"
-                />
+                <div className={styles.imageUploadContainer}>
+                  {form.image_url && (
+                    <div className={styles.imagePreview}>
+                      <img src={form.image_url} alt="Превью попапа" />
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/jpg,image/png,image/webp"
+                    onChange={handleImageUpload}
+                    disabled={uploadingImage}
+                    className={styles.fileInput}
+                  />
+                  {uploadingImage && (
+                    <p className={styles.uploadingText}>Загрузка изображения...</p>
+                  )}
+                </div>
                 <small className={styles.hint}>
-                  Загрузите изображение в /public/images/ и укажите путь
+                  Загрузите изображение для попапа. Форматы: JPEG, PNG, WebP. Максимум 5MB.
                 </small>
               </div>
 

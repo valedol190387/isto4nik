@@ -22,6 +22,7 @@ const s3Client = hasS3Config ? new S3Client({
 const BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 const AVATARS_FOLDER = 'avatars';
 const PROMOPIC_FOLDER = 'promopic';
+const POPUP_FOLDER = 'popup';
 
 // Разрешенные типы файлов для аватаров
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
@@ -176,4 +177,74 @@ export function isValidPromoImageUrl(url: string): boolean {
 export function isValidAvatarUrl(url: string): boolean {
   return url.startsWith(`${process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud'}/${BUCKET_NAME}/${AVATARS_FOLDER}/`) ||
          url.startsWith(`https://s3.ru1.storage.beget.cloud/57698b39f785-thoughtful-ansel/avatars/`); // Совместимость со старыми URL
+}
+
+// Функция для загрузки изображения попапа
+export async function uploadPopupImage(file: File): Promise<string> {
+  if (!s3Client) {
+    throw new Error('S3 не настроен');
+  }
+
+  // Валидация типа файла
+  if (!ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    throw new Error('Недопустимый тип файла. Разрешены только: JPEG, PNG, WebP');
+  }
+
+  // Валидация размера файла
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error('Файл слишком большой. Максимальный размер: 5MB');
+  }
+
+  // Генерируем уникальное имя файла
+  const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const fileName = `popup-${Date.now()}-${uuidv4()}.${fileExtension}`;
+  const key = `${POPUP_FOLDER}/${fileName}`;
+
+  try {
+    // Конвертируем File в Buffer для загрузки
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Команда для загрузки файла
+    const command = new PutObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type,
+      ACL: 'public-read', // Делаем файл публично доступным
+    });
+
+    // Загружаем файл
+    await s3Client.send(command);
+
+    // Возвращаем публичный URL файла
+    const publicUrl = `${process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud'}/${BUCKET_NAME}/${key}`;
+    return publicUrl;
+  } catch (error) {
+    console.error('Error uploading popup image to S3:', error);
+    throw new Error('Ошибка загрузки изображения попапа. Попробуйте еще раз.');
+  }
+}
+
+// Функция для удаления изображения попапа
+export async function deletePopupImage(imageUrl: string): Promise<void> {
+  if (!s3Client) return;
+
+  try {
+    // Извлекаем ключ из URL
+    const urlParts = imageUrl.split('/');
+    const key = urlParts.slice(-2).join('/'); // Получаем "popup/filename.jpg"
+
+    // Команда для удаления файла
+    const command = new DeleteObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    });
+
+    // Удаляем файл
+    await s3Client.send(command);
+  } catch (error) {
+    console.error('Error deleting popup image from S3:', error);
+    // Не бросаем ошибку, чтобы не блокировать удаление записи из БД
+  }
 } 
