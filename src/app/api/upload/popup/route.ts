@@ -27,27 +27,36 @@ export async function POST(request: NextRequest) {
     } else {
       // Fallback: сохраняем локально в /public/images/popup/
       console.log('S3 не настроен, сохраняю локально');
+      console.log('File name:', file.name);
+      console.log('File type:', file.type);
+      console.log('File size:', file.size);
 
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
+      console.log('Buffer length:', buffer.length);
 
       // Создаём уникальное имя файла
       const timestamp = Date.now();
       const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'jpg';
       const fileName = `popup-${timestamp}.${fileExtension}`;
+      console.log('Generated filename:', fileName);
 
       // Путь к папке public/images/popup
       const publicDir = path.join(process.cwd(), 'public', 'images', 'popup');
+      console.log('Public dir:', publicDir);
 
       // Создаём директорию если её нет
       await mkdir(publicDir, { recursive: true });
 
       // Сохраняем файл
       const filePath = path.join(publicDir, fileName);
+      console.log('Full file path:', filePath);
       await writeFile(filePath, buffer);
+      console.log('File saved successfully!');
 
       // Возвращаем относительный URL
       imageUrl = `/images/popup/${fileName}`;
+      console.log('Image URL:', imageUrl);
     }
 
     return NextResponse.json({
