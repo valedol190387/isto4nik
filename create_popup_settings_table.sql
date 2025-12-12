@@ -7,7 +7,7 @@ CREATE TABLE IF NOT EXISTS popup_settings (
   button_text VARCHAR(100) NOT NULL,
   button_link TEXT NOT NULL,
   image_url TEXT NOT NULL,
-  frequency VARCHAR(20) NOT NULL DEFAULT 'daily' CHECK (frequency IN ('daily', 'once', 'always', 'disabled')),
+  frequency VARCHAR(20) NOT NULL DEFAULT 'daily' CHECK (frequency IN ('daily', 'weekly', 'once', 'always', 'disabled')),
   is_active BOOLEAN NOT NULL DEFAULT true,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
@@ -49,5 +49,5 @@ COMMENT ON COLUMN popup_settings.price_text IS 'Триггерный текст 
 COMMENT ON COLUMN popup_settings.button_text IS 'Текст на кнопке';
 COMMENT ON COLUMN popup_settings.button_link IS 'Ссылка на которую ведет кнопка';
 COMMENT ON COLUMN popup_settings.image_url IS 'URL изображения попапа';
-COMMENT ON COLUMN popup_settings.frequency IS 'Частота показа: daily (раз в день), once (один раз за все время), always (всегда), disabled (отключен)';
+COMMENT ON COLUMN popup_settings.frequency IS 'Частота показа: daily (раз в день), weekly (раз в неделю), once (один раз за все время), always (всегда), disabled (отключен)';
 COMMENT ON COLUMN popup_settings.is_active IS 'Активен ли попап';
