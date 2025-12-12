@@ -147,7 +147,7 @@ export interface PopupSettings {
   button_text: string;
   button_link: string;
   image_url: string;
-  frequency: 'daily' | 'once' | 'always' | 'disabled';
+  frequency: 'daily' | 'weekly' | 'once' | 'always' | 'disabled';
   is_active: boolean;
   created_at: string;
   updated_at: string;

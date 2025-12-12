@@ -117,7 +117,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   display: grid;
-  grid-template-columns: 200px 1fr auto;
+  grid-template-columns: 400px 1fr auto;
   gap: 24px;
   transition: all 0.2s ease;
 }
@@ -128,7 +128,7 @@
 }
 
 .popupImage {
-  width: 200px;
+  width: 400px;
   height: 200px;
   background: #f1f5f9;
   display: flex;

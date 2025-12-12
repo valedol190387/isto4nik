@@ -13,7 +13,7 @@ interface PopupForm {
   button_text: string;
   button_link: string;
   image_url: string;
-  frequency: 'daily' | 'once' | 'always' | 'disabled';
+  frequency: 'daily' | 'weekly' | 'once' | 'always' | 'disabled';
   is_active: boolean;
 }
 
@@ -30,6 +30,7 @@ const initialForm: PopupForm = {
 
 const frequencyOptions = [
   { value: 'daily', label: 'Раз в день' },
+  { value: 'weekly', label: 'Раз в неделю' },
   { value: 'once', label: 'Один раз за всё время' },
   { value: 'always', label: 'Всегда' },
   { value: 'disabled', label: 'Отключен' }

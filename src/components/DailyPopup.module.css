@@ -47,33 +47,36 @@
   position: absolute;
   top: 16px;
   right: 16px;
-  background: rgba(52, 74, 84, 0.1);
+  background: white;
   border: none;
   cursor: pointer;
-  color: var(--accent-blue, #344A54);
+  color: #3b82f6;
   padding: 8px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
+  transition: all 0.2s;
   z-index: 10;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .closeButton:hover {
-  background: rgba(52, 74, 84, 0.2);
+  background: #f0f9ff;
+  transform: scale(1.05);
 }
 
 .imageContainer {
   position: relative;
   width: 100%;
-  height: 200px;
+  aspect-ratio: 2 / 1;
   border-radius: 20px 20px 0 0;
   overflow: hidden;
 }
 
 .image {
   object-fit: cover;
+  object-position: center;
 }
 
 .content {

@@ -13,6 +13,16 @@ interface DailyPopupProps {
 export function DailyPopup({ popupData }: DailyPopupProps) {
   const [isVisible, setIsVisible] = useState(false);
 
+  // Функция для получения номера недели в году
+  const getWeekNumber = (date: Date): string => {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+    return `${d.getUTCFullYear()}-W${weekNo}`;
+  };
+
   useEffect(() => {
     // Если нет данных или попап неактивен, не показываем
     if (!popupData || !popupData.is_active || popupData.frequency === 'disabled') {
@@ -22,6 +32,7 @@ export function DailyPopup({ popupData }: DailyPopupProps) {
     const storageKey = `popup_${popupData.id}_shown`;
     const lastShown = localStorage.getItem(storageKey);
     const today = new Date().toDateString();
+    const currentWeek = getWeekNumber(new Date());
 
     let shouldShow = false;
 
@@ -34,6 +45,11 @@ export function DailyPopup({ popupData }: DailyPopupProps) {
       case 'daily':
         // Показываем раз в день
         shouldShow = lastShown !== today;
+        break;
+
+      case 'weekly':
+        // Показываем раз в неделю
+        shouldShow = lastShown !== currentWeek;
         break;
 
       case 'once':
@@ -53,6 +69,8 @@ export function DailyPopup({ popupData }: DailyPopupProps) {
         // Сохраняем время показа
         if (popupData.frequency === 'daily') {
           localStorage.setItem(storageKey, today);
+        } else if (popupData.frequency === 'weekly') {
+          localStorage.setItem(storageKey, currentWeek);
         } else if (popupData.frequency === 'once') {
           localStorage.setItem(storageKey, 'shown');
         }
