@@ -26,12 +26,13 @@
   border-radius: 20px 20px 0 0;
   width: 100%;
   max-width: 500px;
-  max-height: 55vh;
+  max-height: 90vh;
   position: relative;
   animation: slideUp 0.4s cubic-bezier(0.32, 0.72, 0, 1);
   box-shadow: var(--shadow-glow, 0 0 24px #bfcad1);
   display: flex;
   flex-direction: column;
+  overflow-y: auto;
 }
 
 @keyframes slideUp {
@@ -82,7 +83,7 @@
 }
 
 .content {
-  padding: 20px 24px 24px;
+  padding: 20px 24px calc(24px + env(safe-area-inset-bottom, 0px));
   text-align: center;
   background: var(--bg-card, #DEE6E9);
 }
