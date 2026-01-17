@@ -23,6 +23,12 @@ export interface Event {
   tags: string[] | null;
 }
 
+// Интерфейс для видео в материале
+export interface MaterialVideo {
+  title: string;                       // Название видео (например "Часть 1")
+  embed_code: string;                  // HTML код для встраивания видео
+}
+
 export interface Material {
   id: number;
   title: string;
@@ -34,10 +40,11 @@ export interface Material {
   is_favorite: boolean;
   display_order: number;
   is_active: boolean;
-  is_embedded_video: boolean;          // Новое поле: галочка "встроенное видео"
-  video_embed_code: string | null;     // Новое поле: код для вставки видео из Kinescope
-  pic_url: string | null;              // Новое поле: URL изображения для превью
-  share_uuid?: string;                 // UUID для безопасных ссылок (добавлено через миграцию)
+  is_embedded_video: boolean;          // Галочка "встроенное видео"
+  video_embed_code: string | null;     // Устаревшее: код для вставки видео (для обратной совместимости)
+  videos: MaterialVideo[];             // Новое: массив видео [{title, embed_code}]
+  pic_url: string | null;              // URL изображения для превью
+  share_uuid?: string;                 // UUID для безопасных ссылок
   created_at: string;
   updated_at: string;
 }

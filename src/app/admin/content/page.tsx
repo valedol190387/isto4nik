@@ -7,19 +7,26 @@ import { AdminSidebar } from '@/components/AdminSidebar';
 import { createMaterialShareLink, copyLinkToClipboard } from '@/lib/adminLinks';
 import styles from './page.module.css';
 
+// Интерфейс для видео в материале
+interface VideoItem {
+  title: string;
+  embed_code: string;
+}
+
 interface Material {
   id: string;
   title: string;
   description: string;
   url: string;
-  group: string;                     // Обязательное поле: группа материала  
+  group: string;                     // Обязательное поле: группа материала
   section_key: string;
   tags: string[];
   is_active: boolean;
   display_order: number;
-  is_embedded_video: boolean;        // Новое поле: галочка "встроенное видео"
-  video_embed_code: string | null;   // Новое поле: код для вставки видео из Kinescope
-  pic_url: string | null;            // Новое поле: URL изображения для превью
+  is_embedded_video: boolean;        // Галочка "встроенное видео"
+  video_embed_code: string | null;   // Устаревшее (для обратной совместимости)
+  videos: VideoItem[];               // Массив видео [{title, embed_code}]
+  pic_url: string | null;            // URL изображения для превью
   share_uuid?: string;               // UUID для безопасных ссылок
   created_at: string;
   updated_at: string;
@@ -34,9 +41,9 @@ interface MaterialForm {
   tags: string[];
   is_active: boolean;
   display_order: number;
-  is_embedded_video: boolean;        // Новое поле: галочка "встроенное видео"
-  video_embed_code: string;          // Новое поле: код для вставки видео из Kinescope
-  pic_url: string;                   // Новое поле: URL изображения для превью
+  is_embedded_video: boolean;        // Галочка "встроенное видео"
+  videos: VideoItem[];               // Массив видео [{title, embed_code}]
+  pic_url: string;                   // URL изображения для превью
 }
 
 const initialForm: MaterialForm = {
@@ -49,7 +56,7 @@ const initialForm: MaterialForm = {
   is_active: true,
   display_order: 1,
   is_embedded_video: false,          // По умолчанию обычная ссылка
-  video_embed_code: '',              // Пустой код видео
+  videos: [],                        // Пустой массив видео
   pic_url: ''                        // URL изображения для превью
 };
 
@@ -173,7 +180,7 @@ export default function AdminContent() {
       is_active: material.is_active,
       display_order: material.display_order,
       is_embedded_video: material.is_embedded_video,
-      video_embed_code: material.video_embed_code || '',
+      videos: material.videos || [],
       pic_url: material.pic_url || ''
     });
     setShowPreview(false);
@@ -679,17 +686,22 @@ export default function AdminContent() {
                   <input
                     type="checkbox"
                     checked={form.is_embedded_video}
-                    onChange={(e) => setForm({ 
-                      ...form, 
-                      is_embedded_video: e.target.checked,
-                      // Не очищаем поля - позволяем иметь и видео, и ссылку
-                      video_embed_code: e.target.checked ? form.video_embed_code : ''
-                    })}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setForm({
+                        ...form,
+                        is_embedded_video: checked,
+                        // Если включаем и нет видео - добавляем пустое
+                        videos: checked && form.videos.length === 0
+                          ? [{ title: '', embed_code: '' }]
+                          : (checked ? form.videos : [])
+                      });
+                    }}
                   />
                   <span className={styles.checkboxText}>Встроенное видео (Kinescope)</span>
                 </label>
                 <p className={styles.fieldHint}>
-                  Если включено, на странице материала будет отображаться встроенное видео дополнительно к ссылке
+                  Если включено, на странице материала будут отображаться встроенные видео
                 </p>
               </div>
 
@@ -709,22 +721,76 @@ export default function AdminContent() {
                 </div>
               </div>
 
-              {/* Поле для кода видео - показывается только при включенной галочке */}
+              {/* Секция видео - показывается только при включенной галочке */}
               {form.is_embedded_video && (
-                <div className={styles.formRow}>
-                  <div className={styles.formGroup}>
-                    <label>Код видео Kinescope</label>
-                    <textarea
-                      value={form.video_embed_code}
-                      onChange={(e) => setForm({ ...form, video_embed_code: e.target.value })}
-                      placeholder='<div style="position: relative; padding-top: 56.25%; width: 100%"><iframe src="https://kinescope.io/embed/m5TDJj9zPbifV2HQfY8Kxc" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; gyroscope; accelerometer; clipboard-write; screen-wake-lock;" frameborder="0" allowfullscreen style="position: absolute; width: 100%; height: 100%; top: 0; left: 0;"></iframe></div>'
-                      rows={6}
-                      required
-                    />
-                    <p className={styles.fieldHint}>
-                      Вставьте полный HTML код для встраивания видео из Kinescope
-                    </p>
+                <div className={styles.videosSection}>
+                  <div className={styles.videosSectionHeader}>
+                    <label>Видео ({form.videos.length})</label>
+                    <button
+                      type="button"
+                      onClick={() => setForm({
+                        ...form,
+                        videos: [...form.videos, { title: '', embed_code: '' }]
+                      })}
+                      className={styles.addVideoBtn}
+                    >
+                      <Plus size={16} />
+                      Добавить видео
+                    </button>
                   </div>
+
+                  {form.videos.map((video, index) => (
+                    <div key={index} className={styles.videoItemForm}>
+                      <div className={styles.videoItemHeader}>
+                        <span className={styles.videoNumber}>Видео {index + 1}</span>
+                        {form.videos.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => setForm({
+                              ...form,
+                              videos: form.videos.filter((_, i) => i !== index)
+                            })}
+                            className={styles.removeVideoBtn}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Название видео (необязательно)</label>
+                        <input
+                          type="text"
+                          value={video.title}
+                          onChange={(e) => {
+                            const newVideos = [...form.videos];
+                            newVideos[index] = { ...video, title: e.target.value };
+                            setForm({ ...form, videos: newVideos });
+                          }}
+                          placeholder="Например: Часть 1, Введение, и т.д."
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Код видео Kinescope *</label>
+                        <textarea
+                          value={video.embed_code}
+                          onChange={(e) => {
+                            const newVideos = [...form.videos];
+                            newVideos[index] = { ...video, embed_code: e.target.value };
+                            setForm({ ...form, videos: newVideos });
+                          }}
+                          placeholder='<div style="position: relative; padding-top: 56.25%; width: 100%"><iframe src="https://kinescope.io/embed/..." ...></iframe></div>'
+                          rows={4}
+                          required
+                        />
+                      </div>
+                    </div>
+                  ))}
+
+                  <p className={styles.fieldHint}>
+                    Вставьте полный HTML код для встраивания видео из Kinescope. Можно добавить несколько видео.
+                  </p>
                 </div>
               )}
 

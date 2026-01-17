@@ -236,13 +236,20 @@ export default function MaterialViewPage() {
             </div>
           </div>
 
-          {/* Встроенное видео */}
-          {material.video_embed_code && (
+          {/* Встроенные видео */}
+          {material.videos && material.videos.length > 0 && (
             <div className={styles.videoSection}>
-              <div 
-                className={styles.videoContainer}
-                dangerouslySetInnerHTML={{ __html: material.video_embed_code }}
-              />
+              {material.videos.map((video, index) => (
+                <div key={index} className={styles.videoItem}>
+                  {video.title && material.videos.length > 1 && (
+                    <h3 className={styles.videoTitle}>{video.title}</h3>
+                  )}
+                  <div
+                    className={styles.videoContainer}
+                    dangerouslySetInnerHTML={{ __html: video.embed_code }}
+                  />
+                </div>
+              ))}
             </div>
           )}
 
