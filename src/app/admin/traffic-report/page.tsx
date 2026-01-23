@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Download, BarChart3, RefreshCw, ChevronDown, X } from 'lucide-react';
+import { Download, BarChart3, RefreshCw, ChevronDown, X, Search } from 'lucide-react';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import styles from './page.module.css';
 
@@ -43,6 +43,7 @@ export default function TrafficReportPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Column filters
   const [filters, setFilters] = useState<Record<UtmKey, string>>({
@@ -82,11 +83,24 @@ export default function TrafficReportPage() {
     }
   };
 
-  // Filter data based on column filters
+  // Filter data based on column filters and search
   const filteredRows = useMemo(() => {
     if (!data) return [];
 
     return data.rows.filter(row => {
+      // Search filter - check all UTM fields
+      if (searchTerm) {
+        const search = searchTerm.toLowerCase();
+        const matchesSearch =
+          (row.utm_1 || '').toLowerCase().includes(search) ||
+          (row.utm_2 || '').toLowerCase().includes(search) ||
+          (row.utm_3 || '').toLowerCase().includes(search) ||
+          (row.utm_4 || '').toLowerCase().includes(search) ||
+          (row.utm_5 || '').toLowerCase().includes(search);
+        if (!matchesSearch) return false;
+      }
+
+      // Column filters
       if (filters.utm_1 && row.utm_1 !== filters.utm_1) return false;
       if (filters.utm_2 && row.utm_2 !== filters.utm_2) return false;
       if (filters.utm_3 && row.utm_3 !== filters.utm_3) return false;
@@ -94,7 +108,7 @@ export default function TrafficReportPage() {
       if (filters.utm_5 && row.utm_5 !== filters.utm_5) return false;
       return true;
     });
-  }, [data, filters]);
+  }, [data, filters, searchTerm]);
 
   // Calculate totals for filtered data
   const filteredTotals = useMemo(() => {
@@ -244,6 +258,7 @@ export default function TrafficReportPage() {
   const resetFilters = () => {
     setDateFrom('');
     setDateTo('');
+    setSearchTerm('');
     setFilters({
       utm_1: '',
       utm_2: '',
@@ -253,7 +268,7 @@ export default function TrafficReportPage() {
     });
   };
 
-  const hasActiveFilters = Object.values(filters).some(v => v !== '');
+  const hasActiveFilters = Object.values(filters).some(v => v !== '') || searchTerm !== '';
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -375,6 +390,27 @@ export default function TrafficReportPage() {
         <div className={styles.filtersSection}>
           <div className={styles.filtersContent}>
             <div className={styles.filtersRow}>
+              <div className={styles.searchGroup}>
+                <label className={styles.filterLabel}>Поиск по UTM</label>
+                <div className={styles.searchContainer}>
+                  <Search size={16} className={styles.searchIcon} />
+                  <input
+                    type="text"
+                    placeholder="Поиск по всем UTM..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className={styles.searchInput}
+                  />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm('')}
+                      className={styles.clearSearchBtn}
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
+              </div>
               <div className={styles.filterGroup}>
                 <label className={styles.filterLabel}>Дата от</label>
                 <input
