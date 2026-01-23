@@ -181,6 +181,13 @@ export default function TrafficReportPage() {
     }).format(amount);
   };
 
+  const formatNumber = (amount: number) => {
+    return new Intl.NumberFormat('ru-RU', {
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
   const exportToCSV = () => {
     if (!filteredRows.length) return;
 
@@ -193,11 +200,11 @@ export default function TrafficReportPage() {
       'Входов',
       'Зарег.',
       'Оплаты (users)',
-      'Сумма (users)',
+      'Сумма руб (users)',
       'Prodamus чел',
-      'Prodamus сумма',
+      'Prodamus руб',
       'Lava чел',
-      'Lava сумма'
+      'Lava EUR/USD'
     ];
 
     const csvRows = [
@@ -463,8 +470,8 @@ export default function TrafficReportPage() {
             <div className={styles.summarySubtext}>{filteredTotals.prodamus_users} чел.</div>
           </div>
           <div className={`${styles.summaryCard} ${styles.lavaCard}`}>
-            <div className={styles.summaryValue}>{formatCurrency(filteredTotals.lava_revenue)}</div>
-            <div className={styles.summaryLabel}>Lava</div>
+            <div className={styles.summaryValue}>{formatNumber(filteredTotals.lava_revenue)}</div>
+            <div className={styles.summaryLabel}>Lava (EUR/USD)</div>
             <div className={styles.summarySubtext}>{filteredTotals.lava_users} чел.</div>
           </div>
         </div>
@@ -507,7 +514,7 @@ export default function TrafficReportPage() {
                     </th>
                     <th className={`${styles.numericCol} ${styles.lavaColHeader}`}>
                       <div>Lava</div>
-                      <div className={styles.subHeader}>чел / сумма</div>
+                      <div className={styles.subHeader}>чел / EUR·USD</div>
                     </th>
                   </tr>
                 </thead>
@@ -536,7 +543,7 @@ export default function TrafficReportPage() {
                       <td className={`${styles.paymentCell} ${styles.lavaCell}`}>
                         <span className={styles.paymentCount}>{row.lava_users || 0}</span>
                         <span className={styles.paymentDivider}>/</span>
-                        <span className={styles.paymentAmount}>{formatCurrency(row.lava_revenue || 0)}</span>
+                        <span className={styles.paymentAmount}>{formatNumber(row.lava_revenue || 0)}</span>
                       </td>
                     </tr>
                   ))}
@@ -559,7 +566,7 @@ export default function TrafficReportPage() {
                     <td className={`${styles.paymentCell} ${styles.lavaCell}`}>
                       <span className={styles.paymentCount}>{filteredTotals.lava_users}</span>
                       <span className={styles.paymentDivider}>/</span>
-                      <span className={styles.paymentAmount}>{formatCurrency(filteredTotals.lava_revenue)}</span>
+                      <span className={styles.paymentAmount}>{formatNumber(filteredTotals.lava_revenue)}</span>
                     </td>
                   </tr>
                 </tfoot>
