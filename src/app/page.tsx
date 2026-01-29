@@ -35,37 +35,51 @@ const highlights = [
   { id: 5, image: '/images/review.webp', route: '/reviews' },
 ];
 
+// Маппинг id курса на section_key в БД
+const SECTION_KEY_MAP: Record<string, string> = {
+  'mini-courses': 'materials',
+  'questions': 'questions',
+  'speeches': 'speeches',
+  'dialogs': 'dialogs',
+  'opinion': 'opinion',
+};
+
 // Данные курсов с изображениями
 const courses = [
-  { 
-    id: 'mini-courses', 
+  {
+    id: 'mini-courses',
     image: '/images/materials.webp',
     type: 'full-width',
-    route: '/courses/mini-courses'
+    route: '/courses/mini-courses',
+    theme: 'dark' as const,
   },
-  { 
-    id: 'questions', 
+  {
+    id: 'questions',
     image: '/images/questions.webp',
     type: 'square',
-    route: '/courses/questions'
+    route: '/courses/questions',
+    theme: 'light' as const,
   },
-  { 
-    id: 'speeches', 
+  {
+    id: 'speeches',
     image: '/images/speeches.webp',
     type: 'square',
-    route: '/courses/speeches'
+    route: '/courses/speeches',
+    theme: 'light' as const,
   },
-  { 
-    id: 'dialogs', 
+  {
+    id: 'dialogs',
     image: '/images/dialogs.webp',
     type: 'square',
-    route: '/courses/dialogs'
+    route: '/courses/dialogs',
+    theme: 'dark' as const,
   },
-  { 
-    id: 'opinion', 
+  {
+    id: 'opinion',
     image: '/images/opinion.webp',
     type: 'square',
-    route: '/courses/opinion'
+    route: '/courses/opinion',
+    theme: 'dark' as const,
   },
 ];
 
@@ -77,6 +91,7 @@ export default function Home() {
   const [chatLink, setChatLink] = useState<string | null>(null);
   const [channelLink, setChannelLink] = useState<string | null>(null);
   const [popupData, setPopupData] = useState<PopupSettings | null>(null);
+  const [materialCounts, setMaterialCounts] = useState<Record<string, number>>({});
   const router = useRouter();
 
 
@@ -293,7 +308,33 @@ export default function Home() {
   useEffect(() => {
     loadPopupSettings();
   }, []);
-  
+
+  // Загружаем количество материалов по разделам
+  useEffect(() => {
+    const loadMaterialCounts = async () => {
+      try {
+        const sectionKeys = Object.values(SECTION_KEY_MAP);
+        const counts: Record<string, number> = {};
+
+        await Promise.all(
+          sectionKeys.map(async (sectionKey) => {
+            const res = await fetch(`/api/materials?section=${sectionKey}`);
+            if (res.ok) {
+              const data = await res.json();
+              counts[sectionKey] = Array.isArray(data) ? data.length : 0;
+            }
+          })
+        );
+
+        setMaterialCounts(counts);
+      } catch (error) {
+        console.error('Error loading material counts:', error);
+      }
+    };
+
+    loadMaterialCounts();
+  }, []);
+
   const scrollToPosition = (dotIndex: number) => {
     setCurrentDot(dotIndex);
     const container = document.getElementById('highlights-container');
@@ -395,9 +436,11 @@ export default function Home() {
         <div className={styles.coursesSection}>
           {/* Вводная тренировка - полная ширина */}
           {courses.filter(course => course.type === 'full-width').map((course) => {
+            const sectionKey = SECTION_KEY_MAP[course.id];
+            const count = sectionKey ? materialCounts[sectionKey] : undefined;
             return (
-              <a 
-                key={course.id} 
+              <a
+                key={course.id}
                 href="#"
                 className={styles.courseCardFullWidth}
                 onClick={(e) => handleCourseClick(e, course.route)}
@@ -410,6 +453,11 @@ export default function Home() {
                     className={styles.courseImage}
                     sizes="(max-width: 768px) 100vw, 600px"
                   />
+                  {count !== undefined && count > 0 && (
+                    <span className={`${styles.materialCount} ${course.theme === 'dark' ? styles.materialCountOnDark : styles.materialCountOnLight}`}>
+                      {count}
+                    </span>
+                  )}
                   {/* Блокировка при отсутствии подписки */}
                   {!isSubscriptionActive && (
                     <div className={styles.courseGlassOverlay}>
@@ -428,9 +476,11 @@ export default function Home() {
           {/* Сетка для остальных курсов - теперь 2x2 */}
           <div className={styles.coursesGrid}>
             {courses.filter(course => course.type === 'square').map((course) => {
+              const sectionKey = SECTION_KEY_MAP[course.id];
+              const count = sectionKey ? materialCounts[sectionKey] : undefined;
               return (
-                <a 
-                  key={course.id} 
+                <a
+                  key={course.id}
                   href="#"
                   className={styles.courseCardSquare}
                   onClick={(e) => handleCourseClick(e, course.route)}
@@ -443,6 +493,11 @@ export default function Home() {
                       className={styles.courseImage}
                       sizes="(max-width: 768px) 50vw, 200px"
                     />
+                    {count !== undefined && count > 0 && (
+                      <span className={`${styles.materialCount} ${course.theme === 'dark' ? styles.materialCountOnDark : styles.materialCountOnLight}`}>
+                        {count}
+                      </span>
+                    )}
                     {/* Блокировка при отсутствии подписки */}
                     {!isSubscriptionActive && (
                       <div className={styles.courseGlassOverlay}>
