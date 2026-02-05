@@ -28,6 +28,7 @@
   color: var(--text-main);
   font-family: var(--font-body);
   position: relative;
+  overflow-x: hidden;
 }
 
 /* Хайлайты */
@@ -210,6 +211,7 @@
   border-radius: 8px;
   overflow: hidden;
   display: block;
+  width: 100%;
   margin-bottom: 16px;
 }
 
@@ -293,10 +295,11 @@
   min-height: 120px;
 }
 
-/* Для полноширинного курса - увеличиваем высоту как у квадратных */
+/* Для полноширинного курса - пропорциональное масштабирование */
 .courseCardFullWidth .courseContent {
   aspect-ratio: 2.4/1;
-  min-height: 160px;
+  height: auto;
+  min-height: 0;
   justify-content: center;
   align-items: center;
   text-align: center;
