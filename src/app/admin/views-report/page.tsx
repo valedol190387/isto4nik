@@ -37,6 +37,24 @@ interface SummaryByMaterial {
   unique_video_viewers: number;
 }
 
+interface UserMaterialDetail {
+  material_id: number;
+  material_title: string;
+  opens: number;
+  videos_watched: string[];
+}
+
+interface SummaryByUser {
+  telegram_id: number;
+  username: string | null;
+  utm_1: string | null;
+  materials_opened: number;
+  total_opens: number;
+  videos_watched: number;
+  last_activity: string;
+  details: UserMaterialDetail[];
+}
+
 export default function ViewsReportPage() {
   const router = useRouter();
   const [logs, setLogs] = useState<ViewLog[]>([]);
@@ -47,7 +65,8 @@ export default function ViewsReportPage() {
   const [selectedMaterial, setSelectedMaterial] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [eventTypeFilter, setEventTypeFilter] = useState('');
-  const [activeTab, setActiveTab] = useState<'summary' | 'details'>('summary');
+  const [activeTab, setActiveTab] = useState<'summary' | 'users' | 'details'>('summary');
+  const [expandedUser, setExpandedUser] = useState<number | null>(null);
 
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuth');
@@ -138,6 +157,70 @@ export default function ViewsReportPage() {
       video_views: entry.video_views,
       unique_video_viewers: entry.users_video.size,
     })).sort((a, b) => b.unique_users - a.unique_users);
+  }, [filteredLogs]);
+
+  // Сводка по пользователям
+  const summaryByUser = useMemo((): SummaryByUser[] => {
+    const map = new Map<number, {
+      username: string | null;
+      utm_1: string | null;
+      materials: Map<number, { title: string; opens: number; videos: Set<string> }>;
+      total_opens: number;
+      videos_watched: number;
+      last_activity: string;
+    }>();
+
+    filteredLogs.forEach(log => {
+      if (!map.has(log.telegram_id)) {
+        map.set(log.telegram_id, {
+          username: log.username,
+          utm_1: log.utm_1,
+          materials: new Map(),
+          total_opens: 0,
+          videos_watched: 0,
+          last_activity: log.created_at,
+        });
+      }
+      const entry = map.get(log.telegram_id)!;
+
+      if (log.created_at > entry.last_activity) {
+        entry.last_activity = log.created_at;
+      }
+
+      if (!entry.materials.has(log.material_id)) {
+        entry.materials.set(log.material_id, {
+          title: log.material_title || `ID: ${log.material_id}`,
+          opens: 0,
+          videos: new Set(),
+        });
+      }
+      const mat = entry.materials.get(log.material_id)!;
+
+      if (log.event_type === 'lesson_open') {
+        entry.total_opens++;
+        mat.opens++;
+      }
+      if (log.event_type === 'video_view' && log.video_title) {
+        entry.videos_watched++;
+        mat.videos.add(log.video_title);
+      }
+    });
+
+    return Array.from(map.entries()).map(([telegram_id, entry]) => ({
+      telegram_id,
+      username: entry.username,
+      utm_1: entry.utm_1,
+      materials_opened: entry.materials.size,
+      total_opens: entry.total_opens,
+      videos_watched: entry.videos_watched,
+      last_activity: entry.last_activity,
+      details: Array.from(entry.materials.entries()).map(([material_id, mat]) => ({
+        material_id,
+        material_title: mat.title,
+        opens: mat.opens,
+        videos_watched: Array.from(mat.videos),
+      })),
+    })).sort((a, b) => b.total_opens - a.total_opens);
   }, [filteredLogs]);
 
   // Общие итоги
@@ -366,7 +449,13 @@ export default function ViewsReportPage() {
             className={`${styles.tab} ${activeTab === 'summary' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('summary')}
           >
-            Сводка по материалам
+            По материалам
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'users' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('users')}
+          >
+            По пользователям ({summaryByUser.length})
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'details' ? styles.tabActive : ''}`}
@@ -407,6 +496,89 @@ export default function ViewsReportPage() {
                         <td className={styles.numericCell}>{row.video_views}</td>
                         <td className={styles.numericCell}>{row.unique_video_viewers}</td>
                       </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className={styles.emptyState}>
+                <p>Нет данных для отображения</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 'users' && (
+          <div className={styles.tableSection}>
+            <div className={styles.tableSectionHeader}>
+              <h3 className={styles.sectionTitle}>
+                По пользователям ({summaryByUser.length})
+              </h3>
+            </div>
+            {summaryByUser.length > 0 ? (
+              <div className={styles.tableWrapper}>
+                <table className={styles.dataTable}>
+                  <thead>
+                    <tr>
+                      <th>Telegram ID</th>
+                      <th>Username</th>
+                      <th>utm_1</th>
+                      <th className={styles.numericCol}>Материалов</th>
+                      <th className={styles.numericCol}>Открытий</th>
+                      <th className={styles.numericCol}>Видео</th>
+                      <th>Посл. активность</th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {summaryByUser.map((user) => (
+                      <>
+                        <tr
+                          key={user.telegram_id}
+                          className={expandedUser === user.telegram_id ? styles.expandedRow : ''}
+                          onClick={() => setExpandedUser(expandedUser === user.telegram_id ? null : user.telegram_id)}
+                          style={{ cursor: 'pointer' }}
+                        >
+                          <td className={styles.idCell}>{user.telegram_id}</td>
+                          <td className={styles.usernameCell}>{user.username || '—'}</td>
+                          <td className={styles.utmCell}>{user.utm_1 || '—'}</td>
+                          <td className={styles.numericCell}>{user.materials_opened}</td>
+                          <td className={styles.numericCell}>{user.total_opens}</td>
+                          <td className={styles.numericCell}>{user.videos_watched}</td>
+                          <td className={styles.dateCell}>{formatDate(user.last_activity)}</td>
+                          <td className={styles.expandCell}>
+                            <ChevronDown
+                              size={16}
+                              className={expandedUser === user.telegram_id ? styles.expandedIcon : ''}
+                            />
+                          </td>
+                        </tr>
+                        {expandedUser === user.telegram_id && (
+                          <tr key={`${user.telegram_id}-details`}>
+                            <td colSpan={8} className={styles.expandedContent}>
+                              <div className={styles.userDetails}>
+                                {user.details.map((det) => (
+                                  <div key={det.material_id} className={styles.userDetailItem}>
+                                    <div className={styles.userDetailMaterial}>
+                                      <span className={styles.userDetailId}>#{det.material_id}</span>
+                                      <span className={styles.userDetailTitle}>{det.material_title}</span>
+                                      <span className={styles.userDetailOpens}>{det.opens} откр.</span>
+                                    </div>
+                                    {det.videos_watched.length > 0 && (
+                                      <div className={styles.userDetailVideos}>
+                                        {det.videos_watched.map((v, i) => (
+                                          <span key={i} className={styles.videoTag}>{v}</span>
+                                        ))}
+                                      </div>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     ))}
                   </tbody>
                 </table>
