@@ -164,9 +164,16 @@ export interface MaterialViewLog {
   id: number;
   telegram_id: number;
   material_id: number;
+  material_title: string | null;
   video_index: number | null;
   video_title: string | null;
   event_type: 'lesson_open' | 'video_view';
+  username: string | null;
+  utm_1: string | null;
+  utm_2: string | null;
+  utm_3: string | null;
+  utm_4: string | null;
+  utm_5: string | null;
   created_at: string;
 }
 

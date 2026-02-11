@@ -14,14 +14,55 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid event_type' }, { status: 400 });
     }
 
+    // Подтягиваем название материала
+    let materialTitle: string | null = null;
+    const { data: materialData } = await supabase
+      .from('materials')
+      .select('title')
+      .eq('id', Number(material_id))
+      .single();
+    if (materialData) {
+      materialTitle = materialData.title;
+    }
+
+    // Подтягиваем UTM-метки и username пользователя
+    let username: string | null = null;
+    let utm1: string | null = null;
+    let utm2: string | null = null;
+    let utm3: string | null = null;
+    let utm4: string | null = null;
+    let utm5: string | null = null;
+
+    const { data: userData } = await supabase
+      .from('users')
+      .select('username, utm_1, utm_2, utm_3, utm_4, utm_5')
+      .eq('telegram_id', Number(telegram_id))
+      .single();
+
+    if (userData) {
+      username = userData.username || null;
+      utm1 = userData.utm_1 || null;
+      utm2 = userData.utm_2 || null;
+      utm3 = userData.utm_3 || null;
+      utm4 = userData.utm_4 || null;
+      utm5 = userData.utm_5 || null;
+    }
+
     const { error } = await supabase
       .from('material_view_logs')
       .insert([{
         telegram_id: Number(telegram_id),
         material_id: Number(material_id),
+        material_title: materialTitle,
         video_index: video_index != null ? Number(video_index) : null,
         video_title: video_title || null,
         event_type,
+        username,
+        utm_1: utm1,
+        utm_2: utm2,
+        utm_3: utm3,
+        utm_4: utm4,
+        utm_5: utm5,
       }]);
 
     if (error) {

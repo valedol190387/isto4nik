@@ -77,15 +77,19 @@ export default function MaterialViewPage() {
     }
   }, [material, materialId, user?.id, logView]);
 
-  // IntersectionObserver для отслеживания просмотра видео
+  // Отслеживание кликов по iframe видео (blur + activeElement)
+  // Когда пользователь нажимает на iframe (play), окно теряет фокус
   useEffect(() => {
     if (!material?.videos?.length) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const index = Number(entry.target.getAttribute('data-video-index'));
+    const handleBlur = () => {
+      setTimeout(() => {
+        const active = document.activeElement;
+        if (active && active.tagName === 'IFRAME') {
+          // Находим родительский контейнер с data-video-index
+          const videoItem = active.closest('[data-video-index]');
+          if (videoItem) {
+            const index = Number(videoItem.getAttribute('data-video-index'));
             if (!isNaN(index) && !trackedVideosRef.current.has(index)) {
               trackedVideosRef.current.add(index);
               const telegramId = user?.id?.toString() || getTelegramId();
@@ -99,16 +103,12 @@ export default function MaterialViewPage() {
               });
             }
           }
-        });
-      },
-      { threshold: 0.5 }
-    );
+        }
+      }, 0);
+    };
 
-    // Наблюдаем за контейнерами видео
-    const videoElements = document.querySelectorAll('[data-video-index]');
-    videoElements.forEach((el) => observer.observe(el));
-
-    return () => observer.disconnect();
+    window.addEventListener('blur', handleBlur);
+    return () => window.removeEventListener('blur', handleBlur);
   }, [material, materialId, user?.id, logView]);
 
   // Детекция мобильного устройства

@@ -5,9 +5,16 @@ CREATE TABLE IF NOT EXISTS public.material_view_logs (
   id bigserial PRIMARY KEY,
   telegram_id bigint NOT NULL,
   material_id bigint NOT NULL,
-  video_index integer,          -- индекс видео в массиве videos (для event_type = 'video_view')
-  video_title text,             -- название видео (для удобства выборок)
+  material_title text,            -- название материала (денормализовано для удобства)
+  video_index integer,            -- индекс видео в массиве videos (для event_type = 'video_view')
+  video_title text,               -- название видео (для удобства выборок)
   event_type text NOT NULL CHECK (event_type IN ('lesson_open', 'video_view')),
+  username text,                  -- telegram username пользователя
+  utm_1 text,                    -- UTM-метки из таблицы users
+  utm_2 text,
+  utm_3 text,
+  utm_4 text,
+  utm_5 text,
   created_at timestamptz DEFAULT now()
 );
 
