@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { ArrowLeft, ExternalLink, Calendar, Tag, Loader2, Star } from 'lucide-react';
 import { Page } from '@/components/Page';
@@ -17,6 +17,8 @@ export default function MaterialViewPage() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
+  const trackedVideosRef = useRef<Set<number>>(new Set());
+  const lessonOpenLoggedRef = useRef(false);
 
   const materialId = params.id as string;
   
@@ -36,6 +38,78 @@ export default function MaterialViewPage() {
     // Fallback - только для разработки
     return '123456789';
   };
+
+  // Логирование просмотра (отправка на сервер)
+  const logView = useCallback(async (params: {
+    telegramId: string;
+    materialId: string;
+    eventType: 'lesson_open' | 'video_view';
+    videoIndex?: number;
+    videoTitle?: string;
+  }) => {
+    try {
+      await fetch('/api/material-views', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: params.telegramId,
+          material_id: parseInt(params.materialId),
+          event_type: params.eventType,
+          video_index: params.videoIndex ?? null,
+          video_title: params.videoTitle ?? null,
+        }),
+      });
+    } catch (e) {
+      // Не блокируем UI при ошибке логирования
+    }
+  }, []);
+
+  // Логируем открытие урока при загрузке материала
+  useEffect(() => {
+    if (material && !lessonOpenLoggedRef.current) {
+      lessonOpenLoggedRef.current = true;
+      const telegramId = user?.id?.toString() || getTelegramId();
+      logView({
+        telegramId,
+        materialId,
+        eventType: 'lesson_open',
+      });
+    }
+  }, [material, materialId, user?.id, logView]);
+
+  // IntersectionObserver для отслеживания просмотра видео
+  useEffect(() => {
+    if (!material?.videos?.length) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const index = Number(entry.target.getAttribute('data-video-index'));
+            if (!isNaN(index) && !trackedVideosRef.current.has(index)) {
+              trackedVideosRef.current.add(index);
+              const telegramId = user?.id?.toString() || getTelegramId();
+              const video = material.videos[index];
+              logView({
+                telegramId,
+                materialId,
+                eventType: 'video_view',
+                videoIndex: index,
+                videoTitle: video?.title || undefined,
+              });
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    // Наблюдаем за контейнерами видео
+    const videoElements = document.querySelectorAll('[data-video-index]');
+    videoElements.forEach((el) => observer.observe(el));
+
+    return () => observer.disconnect();
+  }, [material, materialId, user?.id, logView]);
 
   // Детекция мобильного устройства
   useEffect(() => {
@@ -240,7 +314,7 @@ export default function MaterialViewPage() {
           {material.videos && material.videos.length > 0 && (
             <div className={styles.videoSection}>
               {material.videos.map((video, index) => (
-                <div key={index} className={styles.videoItem}>
+                <div key={index} className={styles.videoItem} data-video-index={index}>
                   {video.title && material.videos.length > 1 && (
                     <h3 className={styles.videoTitle}>{video.title}</h3>
                   )}

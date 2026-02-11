@@ -160,6 +160,16 @@ export interface PopupSettings {
   updated_at: string;
 }
 
+export interface MaterialViewLog {
+  id: number;
+  telegram_id: number;
+  material_id: number;
+  video_index: number | null;
+  video_title: string | null;
+  event_type: 'lesson_open' | 'video_view';
+  created_at: string;
+}
+
 export type Database = {
   public: {
     Tables: {
@@ -202,6 +212,11 @@ export type Database = {
         Row: PopupSettings;
         Insert: Omit<PopupSettings, 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Omit<PopupSettings, 'id'>>;
+      };
+      material_view_logs: {
+        Row: MaterialViewLog;
+        Insert: Omit<MaterialViewLog, 'id' | 'created_at'>;
+        Update: Partial<Omit<MaterialViewLog, 'id'>>;
       };
     };
   };
