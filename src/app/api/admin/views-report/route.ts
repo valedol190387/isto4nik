@@ -1,12 +1,13 @@
 import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 
+const UMICH_IDS = [47, 48, 58, 61, 69];
+
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const dateFrom = searchParams.get('date_from');
     const dateTo = searchParams.get('date_to');
-    const materialId = searchParams.get('material_id');
 
     let query = supabase
       .from('material_view_logs')
@@ -21,10 +22,6 @@ export async function GET(request: Request) {
       query = query.lte('created_at', `${dateTo}T23:59:59`);
     }
 
-    if (materialId) {
-      query = query.eq('material_id', Number(materialId));
-    }
-
     const { data: logs, error } = await query;
 
     if (error) {
@@ -32,11 +29,18 @@ export async function GET(request: Request) {
       return NextResponse.json({ success: false, error: 'Failed to fetch logs' }, { status: 500 });
     }
 
-    // Получаем список всех материалов для фильтра
+    // Список всех материалов для фильтра
     const { data: materials } = await supabase
       .from('materials')
       .select('id, title')
       .eq('is_active', true)
+      .order('display_order', { ascending: true });
+
+    // Материалы курса "Устройство Мира" с видео
+    const { data: umichMaterials } = await supabase
+      .from('materials')
+      .select('id, title, videos')
+      .in('id', UMICH_IDS)
       .order('display_order', { ascending: true });
 
     return NextResponse.json({
@@ -44,6 +48,7 @@ export async function GET(request: Request) {
       data: {
         logs: logs || [],
         materials: materials || [],
+        umich_materials: umichMaterials || [],
       }
     });
   } catch (error) {

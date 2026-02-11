@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { Download, Eye, RefreshCw, Search, X, ChevronDown } from 'lucide-react';
 import { AdminSidebar } from '@/components/AdminSidebar';
@@ -26,6 +26,12 @@ interface ViewLog {
 interface MaterialOption {
   id: number;
   title: string;
+}
+
+interface UmichMaterial {
+  id: number;
+  title: string;
+  videos: { title: string; embed_code: string }[];
 }
 
 interface SummaryByMaterial {
@@ -55,18 +61,35 @@ interface SummaryByUser {
   details: UserMaterialDetail[];
 }
 
+interface UmichModalData {
+  title: string;
+  viewers: { telegram_id: number; username: string | null; utm_1: string | null; created_at: string }[];
+}
+
+const UMICH_IDS = [47, 48, 58, 61, 69];
+
+function getMaterialLabel(title: string | null, id: number): string {
+  if (title) return title;
+  return `Удалён (ID: ${id})`;
+}
+
 export default function ViewsReportPage() {
   const router = useRouter();
   const [logs, setLogs] = useState<ViewLog[]>([]);
   const [materials, setMaterials] = useState<MaterialOption[]>([]);
+  const [umichMaterials, setUmichMaterials] = useState<UmichMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
-  const [selectedMaterial, setSelectedMaterial] = useState('');
+  const [selectedMaterials, setSelectedMaterials] = useState<number[]>([]);
+  const [materialDropdownOpen, setMaterialDropdownOpen] = useState(false);
+  const [materialSearch, setMaterialSearch] = useState('');
+  const materialDropdownRef = useRef<HTMLDivElement>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [eventTypeFilter, setEventTypeFilter] = useState('');
-  const [activeTab, setActiveTab] = useState<'summary' | 'users' | 'details'>('summary');
+  const [activeTab, setActiveTab] = useState<'summary' | 'users' | 'umich' | 'details'>('summary');
   const [expandedUser, setExpandedUser] = useState<number | null>(null);
+  const [umichModal, setUmichModal] = useState<UmichModalData | null>(null);
 
   useEffect(() => {
     const adminAuth = localStorage.getItem('adminAuth');
@@ -75,7 +98,19 @@ export default function ViewsReportPage() {
       return;
     }
     loadData();
-  }, [dateFrom, dateTo, selectedMaterial]);
+  }, [dateFrom, dateTo]);
+
+  // Close material dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (materialDropdownRef.current && !materialDropdownRef.current.contains(e.target as Node)) {
+        setMaterialDropdownOpen(false);
+        setMaterialSearch('');
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
   const loadData = async () => {
     try {
@@ -83,7 +118,6 @@ export default function ViewsReportPage() {
       const params = new URLSearchParams();
       if (dateFrom) params.append('date_from', dateFrom);
       if (dateTo) params.append('date_to', dateTo);
-      if (selectedMaterial) params.append('material_id', selectedMaterial);
 
       const response = await fetch(`/api/admin/views-report?${params}`);
       const result = await response.json();
@@ -91,6 +125,7 @@ export default function ViewsReportPage() {
       if (result.success) {
         setLogs(result.data.logs);
         setMaterials(result.data.materials);
+        setUmichMaterials(result.data.umich_materials || []);
       }
     } catch (error) {
       console.error('Error loading views data:', error);
@@ -99,9 +134,16 @@ export default function ViewsReportPage() {
     }
   };
 
+  const toggleMaterial = (id: number) => {
+    setSelectedMaterials(prev =>
+      prev.includes(id) ? prev.filter(m => m !== id) : [...prev, id]
+    );
+  };
+
   // Фильтрация логов
   const filteredLogs = useMemo(() => {
     return logs.filter(log => {
+      if (selectedMaterials.length > 0 && !selectedMaterials.includes(log.material_id)) return false;
       if (eventTypeFilter && log.event_type !== eventTypeFilter) return false;
       if (searchTerm) {
         const search = searchTerm.toLowerCase();
@@ -116,7 +158,7 @@ export default function ViewsReportPage() {
       }
       return true;
     });
-  }, [logs, eventTypeFilter, searchTerm]);
+  }, [logs, selectedMaterials, eventTypeFilter, searchTerm]);
 
   // Сводка по материалам
   const summaryByMaterial = useMemo((): SummaryByMaterial[] => {
@@ -131,7 +173,7 @@ export default function ViewsReportPage() {
     filteredLogs.forEach(log => {
       if (!map.has(log.material_id)) {
         map.set(log.material_id, {
-          material_title: log.material_title || `ID: ${log.material_id}`,
+          material_title: getMaterialLabel(log.material_title, log.material_id),
           users_open: new Set(),
           total_opens: 0,
           video_views: 0,
@@ -189,7 +231,7 @@ export default function ViewsReportPage() {
 
       if (!entry.materials.has(log.material_id)) {
         entry.materials.set(log.material_id, {
-          title: log.material_title || `ID: ${log.material_id}`,
+          title: getMaterialLabel(log.material_title, log.material_id),
           opens: 0,
           videos: new Set(),
         });
@@ -223,6 +265,38 @@ export default function ViewsReportPage() {
     })).sort((a, b) => b.total_opens - a.total_opens);
   }, [filteredLogs]);
 
+  // Данные для вкладки "Устройство Мира"
+  const umichData = useMemo(() => {
+    // Берём только логи по материалам курса (все, без фильтров выбора материалов)
+    const umichLogs = logs.filter(l => UMICH_IDS.includes(l.material_id));
+
+    return umichMaterials.map(mat => {
+      const matLogs = umichLogs.filter(l => l.material_id === mat.id);
+      const openLogs = matLogs.filter(l => l.event_type === 'lesson_open');
+      const videoLogs = matLogs.filter(l => l.event_type === 'video_view');
+
+      const uniqueUsers = new Set(openLogs.map(l => l.telegram_id)).size;
+      const totalOpens = openLogs.length;
+
+      const videoStats = (mat.videos || []).map((video, idx) => {
+        const views = videoLogs.filter(l => l.video_title === video.title || l.video_index === idx);
+        return {
+          title: video.title,
+          views: views.length,
+          unique_viewers: new Set(views.map(v => v.telegram_id)).size,
+        };
+      });
+
+      return {
+        material_id: mat.id,
+        title: mat.title,
+        unique_users: uniqueUsers,
+        total_opens: totalOpens,
+        videoStats,
+      };
+    });
+  }, [logs, umichMaterials]);
+
   // Общие итоги
   const totals = useMemo(() => {
     const uniqueUsers = new Set(filteredLogs.filter(l => l.event_type === 'lesson_open').map(l => l.telegram_id));
@@ -254,7 +328,7 @@ export default function ViewsReportPage() {
     if (!filteredLogs.length) return;
 
     const headers = [
-      'Дата', 'Telegram ID', 'Username', 'Материал', 'Тип', 'Видео',
+      'Дата', 'Telegram ID', 'Username', 'Mat.ID', 'Материал', 'Тип', 'Видео',
       'utm_1', 'utm_2', 'utm_3', 'utm_4', 'utm_5'
     ];
 
@@ -264,7 +338,8 @@ export default function ViewsReportPage() {
         formatDate(log.created_at),
         log.telegram_id,
         log.username || '',
-        log.material_title || log.material_id,
+        log.material_id,
+        log.material_title || '',
         log.event_type === 'lesson_open' ? 'Открытие урока' : 'Просмотр видео',
         log.video_title || '',
         log.utm_1 || '',
@@ -291,12 +366,43 @@ export default function ViewsReportPage() {
   const resetFilters = () => {
     setDateFrom('');
     setDateTo('');
-    setSelectedMaterial('');
+    setSelectedMaterials([]);
     setSearchTerm('');
     setEventTypeFilter('');
   };
 
-  const hasActiveFilters = dateFrom || dateTo || selectedMaterial || searchTerm || eventTypeFilter;
+  const openUmichModal = (materialId: number, materialTitle: string, type: 'lesson_open' | 'video_view', videoTitle?: string) => {
+    const umichLogs = logs.filter(l =>
+      l.material_id === materialId &&
+      l.event_type === type &&
+      (type === 'lesson_open' || l.video_title === videoTitle)
+    );
+
+    // Группируем по пользователю — берём последний лог каждого уника
+    const userMap = new Map<number, { telegram_id: number; username: string | null; utm_1: string | null; created_at: string }>();
+    umichLogs.forEach(l => {
+      const existing = userMap.get(l.telegram_id);
+      if (!existing || l.created_at > existing.created_at) {
+        userMap.set(l.telegram_id, {
+          telegram_id: l.telegram_id,
+          username: l.username,
+          utm_1: l.utm_1,
+          created_at: l.created_at,
+        });
+      }
+    });
+
+    const label = type === 'lesson_open'
+      ? `Открытие: ${materialTitle}`
+      : `Видео: ${videoTitle}`;
+
+    setUmichModal({
+      title: label,
+      viewers: Array.from(userMap.values()).sort((a, b) => b.created_at.localeCompare(a.created_at)),
+    });
+  };
+
+  const hasActiveFilters = dateFrom || dateTo || selectedMaterials.length > 0 || searchTerm || eventTypeFilter;
 
   if (isLoading) {
     return (
@@ -370,19 +476,72 @@ export default function ViewsReportPage() {
                   )}
                 </div>
               </div>
-              <div className={styles.filterGroup}>
-                <label className={styles.filterLabel}>Материал</label>
-                <select
-                  value={selectedMaterial}
-                  onChange={(e) => setSelectedMaterial(e.target.value)}
-                  className={styles.selectInput}
+
+              {/* Multi-select Materials */}
+              <div className={styles.filterGroup} ref={materialDropdownRef}>
+                <label className={styles.filterLabel}>
+                  Материалы {selectedMaterials.length > 0 && `(${selectedMaterials.length})`}
+                </label>
+                <div
+                  className={`${styles.multiSelect} ${materialDropdownOpen ? styles.multiSelectOpen : ''}`}
+                  onClick={() => setMaterialDropdownOpen(!materialDropdownOpen)}
                 >
-                  <option value="">Все материалы</option>
-                  {materials.map(m => (
-                    <option key={m.id} value={m.id}>{m.title}</option>
-                  ))}
-                </select>
+                  <span className={styles.multiSelectText}>
+                    {selectedMaterials.length === 0
+                      ? 'Все материалы'
+                      : `Выбрано: ${selectedMaterials.length}`}
+                  </span>
+                  <ChevronDown size={14} />
+                </div>
+                {materialDropdownOpen && (
+                  <div className={styles.multiSelectDropdown}>
+                    <div className={styles.multiSelectSearch}>
+                      <Search size={14} className={styles.multiSelectSearchIcon} />
+                      <input
+                        type="text"
+                        placeholder="Найти материал..."
+                        value={materialSearch}
+                        onChange={(e) => setMaterialSearch(e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                        className={styles.multiSelectSearchInput}
+                        autoFocus
+                      />
+                      {materialSearch && (
+                        <button
+                          className={styles.multiSelectSearchClear}
+                          onClick={(e) => { e.stopPropagation(); setMaterialSearch(''); }}
+                        >
+                          <X size={12} />
+                        </button>
+                      )}
+                    </div>
+                    <div className={styles.multiSelectOptions}>
+                      {!materialSearch && (
+                        <div
+                          className={styles.multiSelectOption}
+                          onClick={(e) => { e.stopPropagation(); setSelectedMaterials([]); }}
+                        >
+                          <input type="checkbox" checked={selectedMaterials.length === 0} readOnly />
+                          <span>Все материалы</span>
+                        </div>
+                      )}
+                      {materials
+                        .filter(m => !materialSearch || m.title.toLowerCase().includes(materialSearch.toLowerCase()))
+                        .map(m => (
+                          <div
+                            key={m.id}
+                            className={styles.multiSelectOption}
+                            onClick={(e) => { e.stopPropagation(); toggleMaterial(m.id); }}
+                          >
+                            <input type="checkbox" checked={selectedMaterials.includes(m.id)} readOnly />
+                            <span>{m.title}</span>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
+
               <div className={styles.filterGroup}>
                 <label className={styles.filterLabel}>Тип события</label>
                 <select
@@ -455,13 +614,19 @@ export default function ViewsReportPage() {
             className={`${styles.tab} ${activeTab === 'users' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('users')}
           >
-            По пользователям ({summaryByUser.length})
+            По пользователям
+          </button>
+          <button
+            className={`${styles.tab} ${activeTab === 'umich' ? styles.tabActive : ''}`}
+            onClick={() => setActiveTab('umich')}
+          >
+            Устройство Мира
           </button>
           <button
             className={`${styles.tab} ${activeTab === 'details' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('details')}
           >
-            Детальный лог ({filteredLogs.length})
+            Детальный лог
           </button>
         </div>
 
@@ -480,10 +645,10 @@ export default function ViewsReportPage() {
                     <tr>
                       <th className={styles.numericCol}>ID</th>
                       <th>Материал</th>
-                      <th className={styles.numericCol}>Уник. пользователей</th>
-                      <th className={styles.numericCol}>Всего открытий</th>
-                      <th className={styles.numericCol}>Просмотров видео</th>
-                      <th className={styles.numericCol}>Смотрели видео (чел)</th>
+                      <th className={styles.numericCol}>Уник. польз.</th>
+                      <th className={styles.numericCol}>Открытий</th>
+                      <th className={styles.numericCol}>Видео просм.</th>
+                      <th className={styles.numericCol}>Видео (чел)</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -501,9 +666,7 @@ export default function ViewsReportPage() {
                 </table>
               </div>
             ) : (
-              <div className={styles.emptyState}>
-                <p>Нет данных для отображения</p>
-              </div>
+              <div className={styles.emptyState}><p>Нет данных</p></div>
             )}
           </div>
         )}
@@ -584,8 +747,56 @@ export default function ViewsReportPage() {
                 </table>
               </div>
             ) : (
-              <div className={styles.emptyState}>
-                <p>Нет данных для отображения</p>
+              <div className={styles.emptyState}><p>Нет данных</p></div>
+            )}
+          </div>
+        )}
+
+        {/* Устройство Мира Tab */}
+        {activeTab === 'umich' && (
+          <div className={styles.umichContainer}>
+            {umichData.length > 0 ? umichData.map((lesson) => (
+              <div key={lesson.material_id} className={styles.tableSection}>
+                <div className={styles.tableSectionHeader}>
+                  <h3 className={styles.sectionTitle}>{lesson.title}</h3>
+                  <div className={styles.lessonStats}>
+                    <span
+                      className={`${styles.lessonStat} ${styles.lessonStatClickable}`}
+                      onClick={() => openUmichModal(lesson.material_id, lesson.title, 'lesson_open')}
+                    >
+                      {lesson.unique_users} чел. / {lesson.total_opens} откр.
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.tableWrapper}>
+                  <table className={styles.dataTable}>
+                    <thead>
+                      <tr>
+                        {lesson.videoStats.map((v, i) => (
+                          <th key={i} className={styles.umichVideoCol}>{v.title}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        {lesson.videoStats.map((v, i) => (
+                          <td
+                            key={i}
+                            className={`${styles.umichVideoCell} ${styles.umichClickable}`}
+                            onClick={() => openUmichModal(lesson.material_id, lesson.title, 'video_view', v.title)}
+                          >
+                            <div className={styles.umichViewCount}>{v.views}</div>
+                            <div className={styles.umichViewLabel}>{v.unique_viewers} чел.</div>
+                          </td>
+                        ))}
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )) : (
+              <div className={styles.tableSection}>
+                <div className={styles.emptyState}><p>Нет данных по курсу</p></div>
               </div>
             )}
           </div>
@@ -614,6 +825,8 @@ export default function ViewsReportPage() {
                       <th>utm_1</th>
                       <th>utm_2</th>
                       <th>utm_3</th>
+                      <th>utm_4</th>
+                      <th>utm_5</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -623,7 +836,7 @@ export default function ViewsReportPage() {
                         <td className={styles.idCell}>{log.telegram_id}</td>
                         <td className={styles.usernameCell}>{log.username || '—'}</td>
                         <td className={styles.idCell}>{log.material_id}</td>
-                        <td className={styles.materialCell}>{log.material_title || '—'}</td>
+                        <td className={styles.materialCell}>{getMaterialLabel(log.material_title, log.material_id)}</td>
                         <td>
                           <span className={`${styles.badge} ${log.event_type === 'lesson_open' ? styles.badgeOpen : styles.badgeVideo}`}>
                             {log.event_type === 'lesson_open' ? 'Урок' : 'Видео'}
@@ -633,6 +846,8 @@ export default function ViewsReportPage() {
                         <td className={styles.utmCell}>{log.utm_1 || '—'}</td>
                         <td className={styles.utmCell}>{log.utm_2 || '—'}</td>
                         <td className={styles.utmCell}>{log.utm_3 || '—'}</td>
+                        <td className={styles.utmCell}>{log.utm_4 || '—'}</td>
+                        <td className={styles.utmCell}>{log.utm_5 || '—'}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -645,13 +860,56 @@ export default function ViewsReportPage() {
               </div>
             ) : (
               <div className={styles.emptyState}>
-                <p>Нет данных для отображения</p>
+                <p>Нет данных</p>
                 <p className={styles.emptyHint}>Попробуйте изменить фильтры</p>
               </div>
             )}
           </div>
         )}
       </main>
+
+      {/* Modal — список просмотревших */}
+      {umichModal && (
+        <div className={styles.modalOverlay} onClick={() => setUmichModal(null)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>{umichModal.title}</h3>
+              <button className={styles.modalClose} onClick={() => setUmichModal(null)}>
+                <X size={20} />
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              {umichModal.viewers.length > 0 ? (
+                <table className={styles.dataTable}>
+                  <thead>
+                    <tr>
+                      <th>Telegram ID</th>
+                      <th>Username</th>
+                      <th>utm_1</th>
+                      <th>Дата</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {umichModal.viewers.map((v) => (
+                      <tr key={v.telegram_id}>
+                        <td className={styles.idCell}>{v.telegram_id}</td>
+                        <td className={styles.usernameCell}>{v.username || '—'}</td>
+                        <td className={styles.utmCell}>{v.utm_1 || '—'}</td>
+                        <td className={styles.dateCell}>{formatDate(v.created_at)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className={styles.emptyState}><p>Нет просмотров</p></div>
+              )}
+            </div>
+            <div className={styles.modalFooter}>
+              {umichModal.viewers.length} уник. пользователей
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
