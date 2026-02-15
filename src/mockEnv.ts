@@ -10,6 +10,42 @@ function isMaxApp(): boolean {
 }
 
 /**
+ * Проверяет, есть ли признаки Telegram в URL (hash или query)
+ */
+function hasTelegramParams(): boolean {
+  if (typeof window === 'undefined') return false;
+  const hash = window.location.hash;
+  const search = window.location.search;
+  return hash.includes('tgWebAppPlatform') || search.includes('tgWebAppPlatform');
+}
+
+/**
+ * Ждёт появления Max SDK (window.WebApp) с таймаутом
+ */
+function waitForMaxSdk(timeoutMs = 2000): Promise<boolean> {
+  return new Promise((resolve) => {
+    // Уже есть
+    if (isMaxApp()) {
+      resolve(true);
+      return;
+    }
+
+    const startTime = Date.now();
+    const interval = setInterval(() => {
+      if (isMaxApp()) {
+        clearInterval(interval);
+        resolve(true);
+        return;
+      }
+      if (Date.now() - startTime > timeoutMs) {
+        clearInterval(interval);
+        resolve(false);
+      }
+    }, 50);
+  });
+}
+
+/**
  * Мокает Telegram-окружение данными из Max WebApp
  * Это позволяет Telegram SDK работать внутри Max без изменений
  */
@@ -83,6 +119,15 @@ export async function mockEnv(): Promise<void> {
   if (isMaxApp()) {
     mockTelegramFromMax();
     return;
+  }
+
+  // Если нет Telegram-параметров в URL — возможно мы в Max, ждём загрузку Max SDK
+  if (!hasTelegramParams()) {
+    const maxReady = await waitForMaxSdk(2000);
+    if (maxReady) {
+      mockTelegramFromMax();
+      return;
+    }
   }
 
   // Для не-Max: мокаем только в development
