@@ -23,6 +23,7 @@ import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser, PopupSettings } from '@/types/database';
 import { checkDeepLink, getStartParam, parseUtmFromStartParam } from '@/lib/deepLinks';
+import { getMessengerId, getMessengerData } from '@/lib/platform';
 
 import styles from './page.module.css';
 
@@ -103,34 +104,32 @@ export default function Home() {
   // 3 точки для навигации (4 хайлайта)
   const dotsCount = 3;
 
-  // Получаем Telegram ID пользователя
-  const getTelegramId = () => {
-    // Пробуем получить из Telegram WebApp API
-    if (typeof window !== 'undefined') {
-      const tg = (window as any).Telegram?.WebApp;
-      
-      if (tg?.initDataUnsafe?.user?.id) {
-        const telegramId = tg.initDataUnsafe.user.id.toString();
-        return telegramId;
-      }
-    }
-    
-    // Fallback - только для разработки
-    return '123456789';
+  // Получаем ID пользователя из мессенджера (Telegram или Max)
+  const getUserId = () => {
+    const id = getMessengerId();
+    return id || '123456789'; // Fallback для разработки
   };
 
-  // Функция автоматической регистрации пользователя с UTM параметрами  
-  const autoRegisterUser = async (telegramId: string, startParam: string | null) => {
+  // Функция автоматической регистрации пользователя с UTM параметрами
+  const autoRegisterUser = async (userId: string, startParam: string | null) => {
     try {
       const utmParams = parseUtmFromStartParam(startParam);
-      
-      const registrationData = {
-        telegram_id: telegramId,
-        name_from_ml: user?.first_name || 'Новый пользователь',
-        username: user?.username || null,
+      const messengerData = getMessengerData();
+      const platform = messengerData.platform === 'unknown' ? 'telegram' : messengerData.platform;
+
+      const registrationData: Record<string, any> = {
+        name_from_ml: user?.first_name || messengerData.user?.first_name || 'Новый пользователь',
+        username: user?.username || messengerData.user?.username || null,
         start_param: startParam,
-        ...utmParams
+        platform,
+        ...utmParams,
       };
+
+      if (platform === 'max') {
+        registrationData.max_id = userId;
+      } else {
+        registrationData.telegram_id = userId;
+      }
 
       const response = await fetch('/api/users/auto-register', {
         method: 'POST',
@@ -141,7 +140,7 @@ export default function Home() {
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         return data.user;
       } else {
@@ -157,10 +156,13 @@ export default function Home() {
   // Функция для загрузки данных пользователя из базы данных (с автоматической регистрацией)
   const loadUserData = async () => {
     try {
-      const telegramId = user?.id?.toString() || getTelegramId();
-      
+      const messengerData = getMessengerData();
+      const platform = messengerData.platform === 'unknown' ? 'telegram' : messengerData.platform;
+      const userId = user?.id?.toString() || getUserId();
+
       // Сначала пытаемся загрузить существующего пользователя
-      const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
+      const response = await fetch(`/api/users?${queryParam}`);
       
       if (response.ok) {
         // Пользователь найден
@@ -172,7 +174,7 @@ export default function Home() {
       if (response.status === 404) {
         // Пользователь не найден - автоматически регистрируем
         const startParam = getStartParam();
-        const newUser = await autoRegisterUser(telegramId, startParam);
+        const newUser = await autoRegisterUser(userId, startParam);
         
         if (newUser) {
           setUserData(newUser);

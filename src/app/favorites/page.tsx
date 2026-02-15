@@ -5,6 +5,7 @@ import { Page } from '@/components/Page';
 import { Star, ExternalLink, Loader2, FileText } from 'lucide-react';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { getMessengerId } from '@/lib/platform';
 import styles from './page.module.css';
 
 export default function FavoritesPage() {
@@ -32,18 +33,9 @@ export default function FavoritesPage() {
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
 
-  // Получаем Telegram ID пользователя
-  const getTelegramId = () => {
-    // Пробуем получить из Telegram WebApp API
-    if (typeof window !== 'undefined') {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg?.initDataUnsafe?.user?.id) {
-        return tg.initDataUnsafe.user.id.toString();
-      }
-    }
-    
-    // Fallback - только для разработки
-    return '123456789';
+  // Получаем ID пользователя из мессенджера (Telegram или Max)
+  const getUserId = () => {
+    return getMessengerId() || '123456789';
   };
 
   // Состояние для определения размера экрана
@@ -92,7 +84,7 @@ export default function FavoritesPage() {
   // Функция загрузки избранных материалов с пагинацией
   const fetchFavorites = useCallback(async (pageNumber: number = 0, append: boolean = false) => {
     try {
-      const telegramId = user?.id?.toString() || getTelegramId();
+      const telegramId = user?.id?.toString() || getUserId();
       const response = await fetch(`/api/favorites?telegramId=${telegramId}&page=${pageNumber}&limit=${ITEMS_PER_PAGE}`);
       const data: Material[] = await response.json();
       
@@ -153,7 +145,7 @@ export default function FavoritesPage() {
   }, [handleScroll]);
 
   const toggleFavorite = async (materialId: number) => {
-    const telegramId = user?.id?.toString() || getTelegramId();
+    const telegramId = user?.id?.toString() || getUserId();
     const isFavorite = favorites.has(materialId);
 
     try {

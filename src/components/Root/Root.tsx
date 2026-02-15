@@ -30,19 +30,22 @@ import { AdminRoot } from './AdminRoot';
 
 import './styles.css';
 
+import { getWebApp } from '@/lib/platform';
+
 // Функция проверки мобильной платформы
 function isMobilePlatform() {
-  if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
-    const platform = (window as any).Telegram.WebApp.platform;
+  const webApp = getWebApp();
+  if (webApp) {
+    const platform = webApp.platform;
     return platform === 'ios' || platform === 'android' || platform === 'mobile_web';
   }
-  
+
   // Резервный способ через user agent
   if (typeof navigator !== 'undefined') {
     const userAgent = navigator.userAgent.toLowerCase();
     return /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(userAgent);
   }
-  
+
   return false;
 }
 
@@ -102,9 +105,10 @@ function RootInner({ children }: { children: any }) {
         // Запускаем fullscreen сразу
         setupFullscreen();
 
-        // Уведомляем о готовности
-        if (typeof window !== 'undefined' && (window as any).Telegram?.WebApp) {
-          (window as any).Telegram.WebApp.ready();
+        // Уведомляем о готовности (Telegram или Max)
+        const currentWebApp = getWebApp();
+        if (currentWebApp) {
+          currentWebApp.ready();
         }
       } catch (error) {
         console.error('Ошибка при инициализации TMA features:', error);

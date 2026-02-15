@@ -1,12 +1,95 @@
 import { mockTelegramEnv, isTMA, emitEvent } from '@telegram-apps/sdk-react';
 
-// It is important, to mock the environment only for development purposes. When building the
-// application, the code inside will be tree-shaken, so you will not see it in your final bundle.
+/**
+ * Проверяет, запущено ли приложение внутри Max messenger
+ * Max создаёт window.WebApp (без window.Telegram)
+ */
+function isMaxApp(): boolean {
+  if (typeof window === 'undefined') return false;
+  return !(window as any).Telegram?.WebApp && !!(window as any).WebApp?.initData;
+}
+
+/**
+ * Мокает Telegram-окружение данными из Max WebApp
+ * Это позволяет Telegram SDK работать внутри Max без изменений
+ */
+function mockTelegramFromMax(): void {
+  const maxWebApp = (window as any).WebApp;
+  if (!maxWebApp) return;
+
+  const user = maxWebApp.initDataUnsafe?.user;
+  const themeParams = {
+    accent_text_color: '#6ab2f2',
+    bg_color: '#EDEDEA',
+    button_color: '#5288c1',
+    button_text_color: '#ffffff',
+    destructive_text_color: '#ec3942',
+    header_bg_color: '#EDEDEA',
+    hint_color: '#708499',
+    link_color: '#6ab3f3',
+    secondary_bg_color: '#EDEDEA',
+    section_bg_color: '#EDEDEA',
+    section_header_text_color: '#6ab3f3',
+    subtitle_text_color: '#708499',
+    text_color: '#f5f5f5',
+  } as const;
+  const noInsets = { left: 0, top: 0, bottom: 0, right: 0 } as const;
+
+  // Формируем initData из Max данных
+  const initDataParams = new URLSearchParams([
+    ['auth_date', (maxWebApp.initDataUnsafe?.auth_date || (new Date().getTime() / 1000 | 0)).toString()],
+    ['hash', maxWebApp.initDataUnsafe?.hash || 'max-hash'],
+    ['signature', 'max-signature'],
+    ['user', JSON.stringify(user || { id: 0, first_name: 'Max User' })],
+  ]);
+
+  if (maxWebApp.initDataUnsafe?.start_param) {
+    initDataParams.set('start_param', maxWebApp.initDataUnsafe.start_param);
+  }
+
+  mockTelegramEnv({
+    onEvent(e) {
+      if (e[0] === 'web_app_request_theme') {
+        return emitEvent('theme_changed', { theme_params: themeParams });
+      }
+      if (e[0] === 'web_app_request_viewport') {
+        return emitEvent('viewport_changed', {
+          height: window.innerHeight,
+          width: window.innerWidth,
+          is_expanded: true,
+          is_state_stable: true,
+        });
+      }
+      if (e[0] === 'web_app_request_content_safe_area') {
+        return emitEvent('content_safe_area_changed', noInsets);
+      }
+      if (e[0] === 'web_app_request_safe_area') {
+        return emitEvent('safe_area_changed', noInsets);
+      }
+    },
+    launchParams: new URLSearchParams([
+      ['tgWebAppThemeParams', JSON.stringify(themeParams)],
+      ['tgWebAppData', initDataParams.toString()],
+      ['tgWebAppVersion', '8.4'],
+      ['tgWebAppPlatform', maxWebApp.platform || 'android'],
+    ]),
+  });
+
+  console.info('✅ Max messenger detected — Telegram SDK mocked with Max data');
+}
+
 export async function mockEnv(): Promise<void> {
+  // Если мы в Max — мокаем Telegram SDK данными из Max (в любом окружении, включая production)
+  if (isMaxApp()) {
+    mockTelegramFromMax();
+    return;
+  }
+
+  // Для не-Max: мокаем только в development
   return process.env.NODE_ENV !== 'development'
   ? undefined
   : isTMA('complete').then((isTma) => {
-    if (!isTma){ 
+    if (!isTma){
       const themeParams = {
         accent_text_color: '#6ab2f2',
         bg_color: '#EDEDEA',
@@ -23,10 +106,9 @@ export async function mockEnv(): Promise<void> {
         text_color: '#f5f5f5',
       } as const;
       const noInsets = { left: 0, top: 0, bottom: 0, right: 0 } as const;
-  
+
       mockTelegramEnv({
         onEvent(e) {
-          // Here you can write your own handlers for all known Telegram Mini Apps methods.
           if (e[0] === 'web_app_request_theme') {
             return emitEvent('theme_changed', { theme_params: themeParams });
           }
@@ -46,22 +128,7 @@ export async function mockEnv(): Promise<void> {
           }
         },
         launchParams: new URLSearchParams([
-          // Discover more launch parameters:
-          // https://docs.telegram-mini-apps.com/platform/launch-parameters#parameters-list
           ['tgWebAppThemeParams', JSON.stringify(themeParams)],
-          // Your init data goes here. Learn more about it here:
-          // https://docs.telegram-mini-apps.com/platform/init-data#parameters-list
-          //
-          // Note that to make sure, you are using a valid init data, you must pass it exactly as it
-          // is sent from the Telegram application. The reason is in case you will sort its keys
-          // (auth_date, hash, user, etc.) or values your own way, init data validation will more
-          // likely to fail on your server side. So, to make sure you are working with a valid init
-          // data, it is better to take a real one from your application and paste it here. It should
-          // look something like this (a correctly encoded URL search params):
-          // ```
-          // user=%7B%22id%22%3A279058397%2C%22first_name%22%3A%22Vladislav%22%2C%22last_name%22...
-          // ```
-          // But in case you don't really need a valid init data, use this one:
           ['tgWebAppData', new URLSearchParams([
             ['auth_date', (new Date().getTime() / 1000 | 0).toString()],
             ['hash', 'some-hash'],
@@ -72,7 +139,7 @@ export async function mockEnv(): Promise<void> {
           ['tgWebAppPlatform', 'tdesktop'],
         ]),
       });
-  
+
       console.info(
         '⚠️ As long as the current environment was not considered as the Telegram-based one, it was mocked. Take a note, that you should not do it in production and current behavior is only specific to the development process. Environment mocking is also applied only in development mode. So, after building the application, you will not see this behavior and related warning, leading to crashing the application outside Telegram.',
       );

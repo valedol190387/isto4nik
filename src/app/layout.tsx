@@ -42,6 +42,9 @@ export default async function RootLayout({ children }: PropsWithChildren) {
 
   return (
     <html lang={locale} suppressHydrationWarning>
+      <head>
+        <script src="https://st.max.ru/js/max-web-app.js" defer></script>
+      </head>
       <body className={`${montserrat.variable} ${cormorant.variable}`}>
         <I18nProvider>
           <Root>{children}</Root>

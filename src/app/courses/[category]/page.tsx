@@ -6,6 +6,7 @@ import { Page } from '@/components/Page';
 import { Star, ExternalLink, Loader2, FileText, Filter } from 'lucide-react';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { getMessengerId } from '@/lib/platform';
 import styles from './page.module.css';
 
 // Mapping категорий к section_key в таблице materials
@@ -61,18 +62,9 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   // Получаем конфигурацию текущей категории
   const categoryConfig = CATEGORY_MAPPING[resolvedParams.category];
 
-  // Получаем Telegram ID пользователя
-  const getTelegramId = () => {
-    // Пробуем получить из Telegram WebApp API
-    if (typeof window !== 'undefined') {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg?.initDataUnsafe?.user?.id) {
-        return tg.initDataUnsafe.user.id.toString();
-      }
-    }
-    
-    // Fallback - только для разработки
-    return '123456789';
+  // Получаем ID пользователя из мессенджера (Telegram или Max)
+  const getUserId = () => {
+    return getMessengerId() || '123456789';
   };
 
   // Функция для проверки, нужна ли кнопка "далее"
@@ -181,7 +173,7 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   // Загружаем избранные материалы
   const loadFavorites = useCallback(async () => {
     try {
-      const telegramId = user?.id?.toString() || getTelegramId();
+      const telegramId = user?.id?.toString() || getUserId();
       const favoritesResponse = await fetch(`/api/favorites?telegramId=${telegramId}`);
       if (favoritesResponse.ok) {
         const favoritesData: Material[] = await favoritesResponse.json();
@@ -263,7 +255,7 @@ export default function CourseCategoryPage({ params }: { params: Promise<{ categ
   }, [loading, materials, hasMore, loadingMore, loadMoreMaterials]);
 
   const toggleFavorite = async (materialId: number) => {
-    const telegramId = user?.id?.toString() || getTelegramId();
+    const telegramId = user?.id?.toString() || getUserId();
     const isFavorite = favorites.has(materialId);
 
     try {

@@ -53,6 +53,8 @@ export interface Material {
 export interface User {
   id: number;
   telegram_id: number;
+  max_id: number | null;
+  platform: 'telegram' | 'max';
   salebot_id: string | null;
   username: string | null;
   name_from_ml: string | null;

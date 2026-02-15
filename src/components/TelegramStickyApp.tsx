@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, ReactNode } from 'react';
+import { messengerExpand } from '@/lib/platform';
 
 interface TelegramStickyAppProps {
   children: ReactNode;
@@ -22,8 +23,8 @@ export default function TelegramStickyApp({
       if (!wrapRef.current || !contentRef.current) return;
       
       try {
-        // Раскрываем приложение на весь экран
-        (window as any).Telegram?.WebApp?.expand();
+        // Раскрываем приложение на весь экран (Telegram или Max)
+        messengerExpand();
         
         // Применяем CSS классы для "липкого" приложения
         document.body.classList.add('mobile-body');

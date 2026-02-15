@@ -6,6 +6,7 @@ import { ArrowLeft, ExternalLink, Calendar, Tag, Loader2, Star } from 'lucide-re
 import { Page } from '@/components/Page';
 import { Material } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { getMessengerId } from '@/lib/platform';
 import styles from './page.module.css';
 
 export default function MaterialViewPage() {
@@ -25,18 +26,9 @@ export default function MaterialViewPage() {
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
 
-  // Получаем Telegram ID пользователя
-  const getTelegramId = () => {
-    // Пробуем получить из Telegram WebApp API
-    if (typeof window !== 'undefined') {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg?.initDataUnsafe?.user?.id) {
-        return tg.initDataUnsafe.user.id.toString();
-      }
-    }
-    
-    // Fallback - только для разработки
-    return '123456789';
+  // Получаем ID пользователя из мессенджера (Telegram или Max)
+  const getUserId = () => {
+    return getMessengerId() || '123456789';
   };
 
   // Логирование просмотра (отправка на сервер)
@@ -68,7 +60,7 @@ export default function MaterialViewPage() {
   useEffect(() => {
     if (material && !lessonOpenLoggedRef.current) {
       lessonOpenLoggedRef.current = true;
-      const telegramId = user?.id?.toString() || getTelegramId();
+      const telegramId = user?.id?.toString() || getUserId();
       logView({
         telegramId,
         materialId,
@@ -92,7 +84,7 @@ export default function MaterialViewPage() {
             const index = Number(videoItem.getAttribute('data-video-index'));
             if (!isNaN(index) && !trackedVideosRef.current.has(index)) {
               trackedVideosRef.current.add(index);
-              const telegramId = user?.id?.toString() || getTelegramId();
+              const telegramId = user?.id?.toString() || getUserId();
               const video = material.videos[index];
               logView({
                 telegramId,
@@ -143,7 +135,7 @@ export default function MaterialViewPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const telegramId = user?.id?.toString() || getTelegramId();
+        const telegramId = user?.id?.toString() || getUserId();
 
         // Загружаем материал
         const response = await fetch(`/api/materials/${materialId}`);
@@ -181,7 +173,7 @@ export default function MaterialViewPage() {
   };
 
   const toggleFavorite = async () => {
-    const telegramId = user?.id?.toString() || getTelegramId();
+    const telegramId = user?.id?.toString() || getUserId();
 
     try {
       if (isFavorite) {

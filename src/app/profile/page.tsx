@@ -6,31 +6,24 @@ import { Page } from '@/components/Page';
 import { ScrollSpacer } from '@/components/ScrollSpacer';
 import { Payment, User as DbUser } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { getMessengerId, getMessengerData, getWebApp } from '@/lib/platform';
 import Link from 'next/link';
 import styles from './page.module.css';
 
 export default function ProfilePage() {
 
 
-  // Получаем Telegram ID пользователя
-  const getTelegramId = () => {
-    // Пробуем получить из Telegram WebApp API
-    if (typeof window !== 'undefined') {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg?.initDataUnsafe?.user?.id) {
-        return tg.initDataUnsafe.user.id.toString();
-      }
-    }
-    
-    // Fallback для разработки - используем разные ID для тестирования
-    if (typeof window !== 'undefined') {
-      // В реальной среде этого не будет - только для разработки
-      const testIds = ['123456789', '987654321', '555666777'];
-      const randomId = testIds[Math.floor(Math.random() * testIds.length)];
+  // Получаем ID пользователя из мессенджера (Telegram или Max)
+  const getUserId = () => {
+    const id = getMessengerId();
+    if (id) return id;
 
-      return randomId;
+    // Fallback для разработки
+    if (typeof window !== 'undefined') {
+      const testIds = ['123456789', '987654321', '555666777'];
+      return testIds[Math.floor(Math.random() * testIds.length)];
     }
-    
+
     return '123456789';
   };
 
@@ -63,7 +56,7 @@ export default function ProfilePage() {
     
     setLoadingPayments(true);
     try {
-      const telegramId = user?.id?.toString() || getTelegramId();
+      const telegramId = user?.id?.toString() || getUserId();
 
       const response = await fetch(`/api/payments?telegramId=${telegramId}&limit=10`);
       
@@ -87,9 +80,12 @@ export default function ProfilePage() {
   const loadUserData = async () => {
     setLoadingUserData(true);
     try {
-      const telegramId = user?.id?.toString() || getTelegramId();
-      
-      const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      const messengerInfo = getMessengerData();
+      const platform = messengerInfo.platform === 'unknown' ? 'telegram' : messengerInfo.platform;
+      const userId = user?.id?.toString() || getUserId();
+      const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
+
+      const response = await fetch(`/api/users?${queryParam}`);
       
       if (!response.ok) {
         if (response.status === 404) {
@@ -219,7 +215,7 @@ export default function ProfilePage() {
     
     setIsSending(true);
     try {
-      const telegramId = user?.id?.toString() || getTelegramId();
+      const telegramId = user?.id?.toString() || getUserId();
       const userInfo = user ? `${user.first_name} ${user.last_name || ''}`.trim() : 'Неизвестный пользователь';
       
       // Отправляем сообщение на webhook
@@ -253,7 +249,7 @@ export default function ProfilePage() {
   };
 
   const getDetailedSystemInfo = () => {
-    const tg = (window as any).Telegram?.WebApp;
+    const tg = getWebApp();
     const nav = navigator;
     const screen = window.screen;
     const connection = (nav as any).connection;
@@ -442,7 +438,7 @@ IP-адрес: ${locationData?.ip || 'Определяется...'}
                 {user.first_name} {user.last_name || ''}
               </h2>
               <div className={styles.userId}>
-                <p className={styles.userIdText}>Telegram ID: {user.id}</p>
+                <p className={styles.userIdText}>{getMessengerData().platform === 'max' ? 'Max' : 'Telegram'} ID: {user.id}</p>
                 <button 
                   className={`${styles.copyIdButton} ${copiedId ? styles.copied : ''}`}
                   onClick={() => {

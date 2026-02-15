@@ -1,21 +1,26 @@
 import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
 
-// Получить пользователя по telegram_id
+// Получить пользователя по telegram_id или max_id
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
     const telegramId = searchParams.get('telegramId');
+    const maxId = searchParams.get('maxId');
 
-    if (!telegramId) {
-      return NextResponse.json({ error: 'Telegram ID is required' }, { status: 400 });
+    if (!telegramId && !maxId) {
+      return NextResponse.json({ error: 'Telegram ID or Max ID is required' }, { status: 400 });
     }
 
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('*')
-      .eq('telegram_id', parseInt(telegramId))
-      .single();
+    let query = supabase.from('users').select('*');
+
+    if (maxId) {
+      query = query.eq('max_id', parseInt(maxId));
+    } else {
+      query = query.eq('telegram_id', parseInt(telegramId!));
+    }
+
+    const { data: user, error } = await query.single();
 
     if (error) {
       if (error.code === 'PGRST116') {

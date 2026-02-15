@@ -94,9 +94,9 @@ export function getStartParam(): string | null {
     const startParam = launchParams.tgWebAppStartParam;
     return startParam || null;
   } catch (error) {
-    // Fallback на старый метод
+    // Fallback — пробуем Telegram или Max WebApp
     try {
-      const tg = (window as any).Telegram?.WebApp;
+      const tg = (window as any).Telegram?.WebApp || (window as any).WebApp;
       const fallbackParam = tg?.initDataUnsafe?.start_param;
       return fallbackParam || null;
     } catch (fallbackError) {

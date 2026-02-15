@@ -64,16 +64,16 @@ export function extractTelegramData(): {
   }
 
   try {
-    const tg = (window as any).Telegram?.WebApp;
+    const tg = (window as any).Telegram?.WebApp || (window as any).WebApp;
     if (!tg) {
-      console.log('❌ No Telegram WebApp object detected');
+      console.log('❌ No Telegram/Max WebApp object detected');
       return { user: null, startParam: null };
     }
 
     const user = tg.initDataUnsafe?.user;
     const startParam = tg.initDataUnsafe?.start_param;
 
-    console.log('📱 Telegram data extracted:', {
+    console.log('📱 Messenger data extracted:', {
       userId: user?.id,
       firstName: user?.first_name,
       startParam,

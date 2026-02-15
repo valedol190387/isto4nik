@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Search, X, FileText, MessageSquare, HelpCircle, Home, Loader2, Calendar, Lock } from 'lucide-react';
 import { searchService, type SearchResult } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { getMessengerId, getMessengerData } from '@/lib/platform';
 import { User as DbUser } from '@/types/database';
 import styles from './SearchModal.module.css';
 
@@ -32,27 +33,21 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
   // Получаем реального пользователя из Telegram
   const user = useSignal(initData.user);
 
-  // Получаем Telegram ID пользователя
-  const getTelegramId = () => {
-    // Пробуем получить из Telegram WebApp API
-    if (typeof window !== 'undefined') {
-      const tg = (window as any).Telegram?.WebApp;
-      if (tg?.initDataUnsafe?.user?.id) {
-        return tg.initDataUnsafe.user.id.toString();
-      }
-    }
-    
-    // Fallback - только для разработки
-    return '123456789';
+  // Получаем ID пользователя из мессенджера (Telegram или Max)
+  const getUserId = () => {
+    return getMessengerId() || '123456789';
   };
 
   // Функция для загрузки данных пользователя из базы данных
   const loadUserData = async () => {
     setLoadingUserData(true);
     try {
-      const telegramId = user?.id?.toString() || getTelegramId();
-      
-      const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      const messengerInfo = getMessengerData();
+      const platform = messengerInfo.platform === 'unknown' ? 'telegram' : messengerInfo.platform;
+      const userId = user?.id?.toString() || getUserId();
+      const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
+
+      const response = await fetch(`/api/users?${queryParam}`);
       
       if (!response.ok) {
         if (response.status === 404) {

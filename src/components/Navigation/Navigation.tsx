@@ -13,6 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { getMessengerId, getMessengerData } from '@/lib/platform';
 import { User as DbUser } from '@/types/database';
 import styles from './Navigation.module.css';
 
@@ -28,25 +29,22 @@ export function Navigation() {
   const [loadingUserData, setLoadingUserData] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
-  // Получение telegram_id с приоритетом реального ID
-  const getTelegramId = (): string => {
-    if (typeof window !== 'undefined') {
-      const telegramId = user?.id?.toString();
-      if (telegramId) return telegramId;
-      
-      // Fallback для разработки
-      return Math.floor(Math.random() * 1000000000).toString();
-    }
-    return '123456789';
+  // Получение ID пользователя из мессенджера (Telegram или Max)
+  const getUserId = (): string => {
+    const id = user?.id?.toString() || getMessengerId();
+    return id || Math.floor(Math.random() * 1000000000).toString();
   };
 
   // Функция для загрузки данных пользователя из базы данных (как на главной)
   const loadUserData = async () => {
     setLoadingUserData(true);
     try {
-      const telegramId = user?.id?.toString() || getTelegramId();
-      
-      const response = await fetch(`/api/users?telegramId=${telegramId}`);
+      const messengerInfo = getMessengerData();
+      const platform = messengerInfo.platform === 'unknown' ? 'telegram' : messengerInfo.platform;
+      const userId = getUserId();
+      const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
+
+      const response = await fetch(`/api/users?${queryParam}`);
       
       if (!response.ok) {
         if (response.status === 404) {
