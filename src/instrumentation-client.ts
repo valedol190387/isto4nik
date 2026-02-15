@@ -10,21 +10,22 @@ if (typeof window !== 'undefined' && window.location.pathname.startsWith('/admin
   console.log('Admin route detected - skipping Telegram SDK initialization');
 } else {
   mockEnv().then(() => {
+    let platform = 'android';
+    let debug = process.env.NODE_ENV === 'development';
+
     try {
       const launchParams = retrieveLaunchParams();
-      const { tgWebAppPlatform: platform } = launchParams;
-      const debug =
-        (launchParams.tgWebAppStartParam || '').includes('debug') ||
-        process.env.NODE_ENV === 'development';
-
-      // Configure all application dependencies.
-      init({
-        debug,
-        eruda: debug && ['ios', 'android'].includes(platform),
-        mockForMacOS: platform === 'macos',
-      });
+      platform = launchParams.tgWebAppPlatform || 'android';
+      debug = debug || (launchParams.tgWebAppStartParam || '').includes('debug');
     } catch (e) {
-      console.log(e);
+      console.log('Launch params not available:', e);
     }
+
+    // Configure all application dependencies.
+    init({
+      debug,
+      eruda: debug && ['ios', 'android'].includes(platform),
+      mockForMacOS: platform === 'macos',
+    });
   });
 }

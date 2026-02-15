@@ -50,7 +50,12 @@ function isMobilePlatform() {
 }
 
 function RootInner({ children }: { children: any }) {
-  const lp = useLaunchParams();
+  let lp: any = null;
+  try {
+    lp = useLaunchParams();
+  } catch {
+    // Вне Telegram/Max — useLaunchParams может упасть, работаем без него
+  }
   const isDark = useSignal(miniApp.isDark);
   const initDataUser = useSignal(initData.user);
   
@@ -141,7 +146,7 @@ function RootInner({ children }: { children: any }) {
         <AppRoot
           appearance={isDark ? 'dark' : 'light'}
           platform={
-            ['macos', 'ios'].includes(lp.tgWebAppPlatform) ? 'ios' : 'base'
+            lp && ['macos', 'ios'].includes(lp.tgWebAppPlatform) ? 'ios' : 'base'
           }
         >
           {children}
