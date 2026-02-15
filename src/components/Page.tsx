@@ -15,17 +15,21 @@ export function Page({ children, back = true }: PropsWithChildren<{
   const pathname = usePathname();
 
   useEffect(() => {
-    if (back) {
-      backButton.show();
-    } else {
-      backButton.hide();
+    if (backButton.show.isAvailable()) {
+      if (back) {
+        backButton.show();
+      } else {
+        backButton.hide();
+      }
     }
   }, [back]);
 
   useEffect(() => {
-    return backButton.onClick(() => {
-      router.back();
-    });
+    if (backButton.onClick.isAvailable()) {
+      return backButton.onClick(() => {
+        router.back();
+      });
+    }
   }, [router]);
 
   // Сброс скролла для всех страниц кроме /courses/* (там работает восстановление позиции)
