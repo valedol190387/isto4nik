@@ -16,9 +16,11 @@ export function Page({ children, back = true }: PropsWithChildren<{
   const pathname = usePathname();
   const [nativeBackAvailable, setNativeBackAvailable] = useState(true);
 
-  // Проверяем доступность нативной кнопки назад (Telegram)
+  // Проверяем доступность нативной кнопки назад (Telegram или Max)
   useEffect(() => {
-    setNativeBackAvailable(backButton.show.isAvailable());
+    const telegramAvailable = backButton.show.isAvailable();
+    const maxBackButton = (window as any).__MAX_PLATFORM__ && (window as any).WebApp?.BackButton;
+    setNativeBackAvailable(telegramAvailable || !!maxBackButton);
   }, []);
 
   // Telegram native back button
@@ -39,6 +41,26 @@ export function Page({ children, back = true }: PropsWithChildren<{
       });
     }
   }, [router]);
+
+  // Max native back button — window.WebApp.BackButton
+  useEffect(() => {
+    const maxBackButton = (window as any).__MAX_PLATFORM__ && (window as any).WebApp?.BackButton;
+    if (!maxBackButton) return;
+
+    if (back) {
+      maxBackButton.show();
+    } else {
+      maxBackButton.hide();
+    }
+
+    const handler = () => router.back();
+    maxBackButton.onClick(handler);
+
+    return () => {
+      maxBackButton.offClick(handler);
+      maxBackButton.hide();
+    };
+  }, [back, router]);
 
   // Сброс скролла для всех страниц кроме /courses/* (там работает восстановление позиции)
   useEffect(() => {
