@@ -397,9 +397,32 @@ export default function Home() {
     setCurrentDot(currentIndex);
   };
 
+  // DEBUG: временная информация для диагностики Max
+  const [debugInfo, setDebugInfo] = useState<string>('');
+  useEffect(() => {
+    const info = {
+      platform: getPlatform(),
+      userId: user?.id,
+      maxFlag: !!(window as any).__MAX_PLATFORM__,
+      webApp: !!(window as any).WebApp,
+      webAppInitData: (window as any).WebApp?.initData ? `"${(window as any).WebApp.initData.substring(0, 50)}..."` : 'empty/null',
+      webAppUser: (window as any).WebApp?.initDataUnsafe?.user?.id || 'none',
+      telegram: !!(window as any).Telegram?.WebApp,
+      status: userData?.status || 'not loaded',
+    };
+    setDebugInfo(JSON.stringify(info, null, 1));
+  }, [user?.id, userData]);
+
   return (
     <Page back={false}>
       <DailyPopup popupData={popupData} />
+
+      {/* DEBUG: временный блок — удалить после отладки Max */}
+      {debugInfo && (
+        <div style={{ background: '#1a1a2e', color: '#0f0', padding: '8px', fontSize: '10px', fontFamily: 'monospace', whiteSpace: 'pre-wrap', borderRadius: '8px', margin: '8px 16px', maxHeight: '120px', overflow: 'auto' }}>
+          {debugInfo}
+        </div>
+      )}
 
       <div className={styles.container}>
         {/* Хайлайты */}

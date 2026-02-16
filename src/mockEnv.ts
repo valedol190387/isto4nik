@@ -6,7 +6,14 @@ import { mockTelegramEnv, isTMA, emitEvent } from '@telegram-apps/sdk-react';
  */
 function isMaxApp(): boolean {
   if (typeof window === 'undefined') return false;
-  return !(window as any).Telegram?.WebApp && !!(window as any).WebApp?.initData;
+  // Скрипт max-web-app.js создаёт window.WebApp везде (даже в Telegram),
+  // поэтому нельзя просто проверять window.WebApp.
+  // Проверяем: нет Telegram И есть реальные данные юзера в Max SDK
+  if ((window as any).Telegram?.WebApp) return false;
+  const webApp = (window as any).WebApp;
+  if (!webApp) return false;
+  // initData может быть "" (пустая строка = falsy), поэтому проверяем initDataUnsafe
+  return !!(webApp.initDataUnsafe?.user) || (typeof webApp.initData === 'string' && webApp.initData.length > 0);
 }
 
 /**
