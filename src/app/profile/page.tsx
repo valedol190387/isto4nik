@@ -6,7 +6,7 @@ import { Page } from '@/components/Page';
 import { ScrollSpacer } from '@/components/ScrollSpacer';
 import { Payment, User as DbUser } from '@/types/database';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
-import { getMessengerId, getMessengerData, getWebApp } from '@/lib/platform';
+import { getMessengerId, getMessengerData, getWebApp, getPlatform } from '@/lib/platform';
 import Link from 'next/link';
 import styles from './page.module.css';
 
@@ -144,7 +144,11 @@ export default function ProfilePage() {
 
   // Вызываем загрузку данных пользователя при монтировании
   useEffect(() => {
-    if (user?.id) {
+    const platform = getPlatform();
+    if (platform === 'unknown') {
+      // Вне мессенджера (fallback) — не грузим данные, убираем спиннер
+      setLoadingUserData(false);
+    } else if (user?.id) {
       loadUserData();
     }
     // Загружаем геоданные при загрузке компонента

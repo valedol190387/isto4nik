@@ -56,3 +56,29 @@ h1, h2, h3, h4, h5, h6 {
 body {
   -ms-overflow-style: none;
 }
+
+/* UI Back button — показывается только вне Telegram (Max, браузер) */
+.ui-back-button {
+  position: fixed;
+  top: calc(12px + var(--safe-area-inset-top, 0px));
+  left: calc(12px + var(--safe-area-inset-left, 0px));
+  z-index: 999;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-light);
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-main);
+  padding: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: transform 0.15s ease;
+}
+
+.ui-back-button:active {
+  transform: scale(0.9);
+}

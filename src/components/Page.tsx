@@ -1,8 +1,9 @@
 'use client';
 
 import { backButton } from '@telegram-apps/sdk-react';
-import { PropsWithChildren, useEffect } from 'react';
+import { PropsWithChildren, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
+import { ArrowLeft } from 'lucide-react';
 
 export function Page({ children, back = true }: PropsWithChildren<{
   /**
@@ -13,7 +14,14 @@ export function Page({ children, back = true }: PropsWithChildren<{
 }>) {
   const router = useRouter();
   const pathname = usePathname();
+  const [nativeBackAvailable, setNativeBackAvailable] = useState(true);
 
+  // Проверяем доступность нативной кнопки назад (Telegram)
+  useEffect(() => {
+    setNativeBackAvailable(backButton.show.isAvailable());
+  }, []);
+
+  // Telegram native back button
   useEffect(() => {
     if (backButton.show.isAvailable()) {
       if (back) {
@@ -44,5 +52,20 @@ export function Page({ children, back = true }: PropsWithChildren<{
     document.body.scrollTo(0, 0);
   }, [pathname]);
 
-  return <>{children}</>;
+  const showUiBackButton = back && !nativeBackAvailable;
+
+  return (
+    <>
+      {showUiBackButton && (
+        <button
+          onClick={() => router.back()}
+          className="ui-back-button"
+          aria-label="Назад"
+        >
+          <ArrowLeft size={22} strokeWidth={2} />
+        </button>
+      )}
+      {children}
+    </>
+  );
 }

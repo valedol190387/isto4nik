@@ -23,7 +23,7 @@ import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser, PopupSettings } from '@/types/database';
 import { checkDeepLink, getStartParam, parseUtmFromStartParam } from '@/lib/deepLinks';
-import { getMessengerId, getMessengerData } from '@/lib/platform';
+import { getMessengerId, getMessengerData, getPlatform } from '@/lib/platform';
 
 import styles from './page.module.css';
 
@@ -295,8 +295,9 @@ export default function Home() {
 
 
   // Вызываем загрузку данных пользователя при монтировании
+  // В unknown-платформе (fallback mock с id=0) не грузим — предотвращает фантомных юзеров
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && getPlatform() !== 'unknown') {
       loadUserData();
     }
   }, [user?.id]);

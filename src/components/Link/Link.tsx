@@ -41,7 +41,11 @@ export const Link: FC<LinkProps> = ({
 
       if (isExternal) {
         e.preventDefault();
-        openLink(targetUrl.toString());
+        if (openLink.isAvailable()) {
+          openLink(targetUrl.toString());
+        } else {
+          window.open(targetUrl.toString(), '_blank');
+        }
       }
     },
     [href, propsOnClick],

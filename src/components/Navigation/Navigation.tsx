@@ -13,7 +13,7 @@ import {
   X
 } from 'lucide-react';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
-import { getMessengerId, getMessengerData } from '@/lib/platform';
+import { getMessengerId, getMessengerData, getPlatform } from '@/lib/platform';
 import { User as DbUser } from '@/types/database';
 import styles from './Navigation.module.css';
 
@@ -66,7 +66,7 @@ export function Navigation() {
   };
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && getPlatform() !== 'unknown') {
       loadUserData();
     }
   }, [user?.id]);
