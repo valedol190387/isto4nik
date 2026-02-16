@@ -181,7 +181,15 @@ export async function mockEnv(): Promise<void> {
   }
 
   // 2. В Telegram — ничего не делаем, SDK работает нативно
+  // hasTelegramParams() проверяет URL (первый запуск)
+  // isTMA('complete') проверяет ВСЕ источники: URL, performance entries, localStorage
+  // (важно для перезагрузки страницы — URL-параметры теряются, но данные в localStorage остаются)
   if (hasTelegramParams()) {
+    return;
+  }
+
+  const isTelegramApp = await isTMA('complete');
+  if (isTelegramApp) {
     return;
   }
 
