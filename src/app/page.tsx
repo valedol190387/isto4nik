@@ -162,6 +162,7 @@ export default function Home() {
 
       // Сначала пытаемся загрузить существующего пользователя
       const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
+      console.log('[loadUserData]', { platform, userId, queryParam, signalId: user?.id, webApp: !!(window as any).WebApp, telegram: !!(window as any).Telegram?.WebApp });
       const response = await fetch(`/api/users?${queryParam}`);
       
       if (response.ok) {

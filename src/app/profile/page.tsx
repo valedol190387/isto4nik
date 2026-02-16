@@ -89,6 +89,7 @@ export default function ProfilePage() {
       const platform = messengerInfo.platform === 'unknown' ? 'telegram' : messengerInfo.platform;
       const userId = user?.id?.toString() || getUserId();
       const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
+      console.log('[profile loadUserData]', { platform, userId, queryParam, signalId: user?.id, webApp: !!(window as any).WebApp, telegram: !!(window as any).Telegram?.WebApp });
 
       const response = await fetch(`/api/users?${queryParam}`);
       
@@ -573,34 +574,57 @@ IP-адрес: ${locationData?.ip || 'Определяется...'}
               <h3 className={styles.sectionTitle}>Привязать Max аккаунт</h3>
             </div>
             <div className={styles.giftContent}>
-              <p className={styles.giftText}>
-                Получите доступ к приложению в Max мессенджере. Сгенерируйте ссылку и откройте её в Max — ваша подписка перенесётся автоматически.
-              </p>
-              {!maxLinkCode ? (
-                <button
-                  onClick={generateMaxLink}
-                  disabled={loadingMaxLink}
-                  className={styles.botButton}
-                >
-                  {loadingMaxLink ? 'Генерация...' : 'Получить ссылку'}
-                </button>
+              {userData?.max_id ? (
+                <p className={styles.giftText} style={{ color: 'var(--accent-color, #5288c1)' }}>
+                  Max аккаунт привязан (ID: {userData.max_id})
+                </p>
               ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <div style={{
-                    padding: '10px 12px',
-                    background: 'rgba(52, 74, 84, 0.06)',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    wordBreak: 'break-all',
-                    color: 'var(--text-secondary)',
-                    fontFamily: 'monospace',
-                  }}>
-                    {maxLinkUrl}
-                  </div>
-                  <button onClick={copyMaxLink} className={styles.botButton}>
-                    {copiedMaxLink ? '✓ Скопировано!' : 'Скопировать ссылку'}
-                  </button>
-                </div>
+                <>
+                  <p className={styles.giftText}>
+                    Получите доступ к приложению в Max мессенджере. Сгенерируйте ссылку и откройте её в Max — ваша подписка перенесётся автоматически.
+                  </p>
+                  {!maxLinkCode ? (
+                    <button
+                      onClick={generateMaxLink}
+                      disabled={loadingMaxLink}
+                      className={styles.botButton}
+                    >
+                      {loadingMaxLink ? 'Генерация...' : 'Получить ссылку'}
+                    </button>
+                  ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <a
+                        href={maxLinkUrl || '#'}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{
+                          display: 'block',
+                          padding: '10px 12px',
+                          background: 'rgba(52, 74, 84, 0.06)',
+                          borderRadius: '8px',
+                          fontSize: '12px',
+                          wordBreak: 'break-all',
+                          color: 'var(--link-color, #6ab3f3)',
+                          fontFamily: 'monospace',
+                          textDecoration: 'underline',
+                        }}
+                      >
+                        {maxLinkUrl}
+                      </a>
+                      <button onClick={copyMaxLink} className={styles.botButton}>
+                        {copiedMaxLink ? '✓ Скопировано!' : 'Скопировать ссылку'}
+                      </button>
+                      <p style={{
+                        fontSize: '11px',
+                        color: '#ec3942',
+                        margin: '4px 0 0',
+                        lineHeight: '1.4',
+                      }}>
+                        Ссылка уникальная и привязана к вашему аккаунту. Не передавайте её другим людям — иначе ваша подписка навсегда привяжется к чужому аккаунту.
+                      </p>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
