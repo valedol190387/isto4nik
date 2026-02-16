@@ -173,10 +173,18 @@ export default function Home() {
       }
       
       if (response.status === 404) {
-        // Пользователь не найден - автоматически регистрируем
         const startParam = getStartParam();
+
+        // В Max с link_ параметром — НЕ авторегистрируем (привязка обработает)
+        if (platform === 'max' && startParam?.startsWith('link_')) {
+          console.log('[loadUserData] Skipping auto-register — pending Max link');
+          setUserData(null);
+          return;
+        }
+
+        // Пользователь не найден - автоматически регистрируем
         const newUser = await autoRegisterUser(userId, startParam);
-        
+
         if (newUser) {
           setUserData(newUser);
         } else {
@@ -338,12 +346,6 @@ export default function Home() {
   // В Max: Telegram SDK сигнал не заполняется, но __MAX_PLATFORM__ установлен
   const isMax = typeof window !== 'undefined' && !!(window as any).__MAX_PLATFORM__;
   useEffect(() => {
-    // Если в Max есть pending link (startapp=link_*) — НЕ грузим данные,
-    // чтобы авторегистрация не создала нового юзера до привязки
-    const startParam = isMax ? getStartParam() : null;
-    const pendingMaxLink = isMax && startParam?.startsWith('link_') && !sessionStorage.getItem('maxLinkProcessed');
-    if (pendingMaxLink) return;
-
     if (user?.id || isMax) {
       loadUserData();
     }
