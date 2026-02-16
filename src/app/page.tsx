@@ -338,6 +338,12 @@ export default function Home() {
   // В Max: Telegram SDK сигнал не заполняется, но __MAX_PLATFORM__ установлен
   const isMax = typeof window !== 'undefined' && !!(window as any).__MAX_PLATFORM__;
   useEffect(() => {
+    // Если в Max есть pending link (startapp=link_*) — НЕ грузим данные,
+    // чтобы авторегистрация не создала нового юзера до привязки
+    const startParam = isMax ? getStartParam() : null;
+    const pendingMaxLink = isMax && startParam?.startsWith('link_') && !sessionStorage.getItem('maxLinkProcessed');
+    if (pendingMaxLink) return;
+
     if (user?.id || isMax) {
       loadUserData();
     }
