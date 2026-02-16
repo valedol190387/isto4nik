@@ -43,8 +43,18 @@ export default function ProfilePage() {
     city?: string;
   } | null>(null);
   
-  // Получаем пользователя из Telegram
+  // Получаем пользователя из Telegram SDK
   const user = useSignal(initData.user);
+
+  // В Max: Telegram SDK сигнал пустой, берём данные из Max SDK напрямую
+  const maxUser = typeof window !== 'undefined' ? (window as any).WebApp?.initDataUnsafe?.user : null;
+  const displayUser = user || (maxUser ? {
+    id: maxUser.id,
+    first_name: maxUser.first_name,
+    last_name: maxUser.last_name,
+    username: maxUser.username,
+    photo_url: maxUser.photo_url,
+  } : null);
 
   // Добавляем состояние для данных пользователя из базы данных
   const [userData, setUserData] = useState<DbUser | null>(null);
@@ -464,32 +474,32 @@ IP-адрес: ${locationData?.ip || 'Определяется...'}
         </div>
 
         {/* Информация о пользователе */}
-        {user && (
+        {displayUser && (
           <div className={styles.userCard}>
             <div className={styles.userAvatar}>
-              {user.photo_url ? (
-                <img src={user.photo_url} alt="Аватар" className={styles.avatarImage} />
+              {displayUser.photo_url ? (
+                <img src={displayUser.photo_url} alt="Аватар" className={styles.avatarImage} />
               ) : (
                 <LucideUser className={styles.avatarIcon} />
               )}
             </div>
             <div className={styles.userInfo}>
               <h2 className={styles.userName}>
-                {user.first_name} {user.last_name || ''}
+                {displayUser.first_name} {displayUser.last_name || ''}
               </h2>
               <div className={styles.userId}>
-                <p className={styles.userIdText}>{getMessengerData().platform === 'max' ? 'Max' : 'Telegram'} ID: {user.id}</p>
-                <button 
+                <p className={styles.userIdText}>{getPlatform() === 'max' ? 'Max' : 'Telegram'} ID: {displayUser.id}</p>
+                <button
                   className={`${styles.copyIdButton} ${copiedId ? styles.copied : ''}`}
                   onClick={() => {
-                    copyToClipboard(user.id?.toString() || '', setCopiedId);
+                    copyToClipboard(displayUser.id?.toString() || '', setCopiedId);
                   }}
                 >
                   {copiedId ? <Check size={16} /> : <Copy size={16} />}
                 </button>
               </div>
-              {user.username && (
-                <p className={styles.userDetails}>@{user.username}</p>
+              {displayUser.username && (
+                <p className={styles.userDetails}>@{displayUser.username}</p>
               )}
             </div>
           </div>
