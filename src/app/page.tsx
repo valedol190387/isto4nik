@@ -173,16 +173,8 @@ export default function Home() {
       }
       
       if (response.status === 404) {
-        const startParam = getStartParam();
-
-        // В Max с link_ параметром — НЕ авторегистрируем (привязка обработает)
-        if (platform === 'max' && startParam?.startsWith('link_')) {
-          console.log('[loadUserData] Skipping auto-register — pending Max link');
-          setUserData(null);
-          return;
-        }
-
         // Пользователь не найден - автоматически регистрируем
+        const startParam = getStartParam();
         const newUser = await autoRegisterUser(userId, startParam);
 
         if (newUser) {
@@ -262,43 +254,7 @@ export default function Home() {
 
     handleDeepLink();
 
-    // Обработка привязки Max-аккаунта (startapp=link_UUID)
-    const handleMaxLinking = async () => {
-      const platform = getPlatform();
-      if (platform !== 'max') return; // Только для Max
-
-      const startParam = getStartParam();
-      if (!startParam || !startParam.startsWith('link_')) return;
-
-      const alreadyLinked = sessionStorage.getItem('maxLinkProcessed');
-      if (alreadyLinked) return;
-
-      const linkingCode = startParam.replace('link_', '');
-      const maxId = getMessengerId();
-      if (!maxId) return;
-
-      try {
-        const response = await fetch('/api/users/link-accounts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ linking_code: linkingCode, max_id: parseInt(maxId) }),
-        });
-
-        const data = await response.json();
-        if (data.success) {
-          console.log('✅ Max account linked to telegram_id:', data.telegram_id);
-          sessionStorage.setItem('maxLinkProcessed', 'true');
-          // Перезагружаем данные пользователя чтобы подписка подхватилась
-          window.location.reload();
-        } else {
-          console.error('Max linking failed:', data.error);
-        }
-      } catch (error) {
-        console.error('Max linking error:', error);
-      }
-    };
-
-    handleMaxLinking();
+    // Привязка Max-аккаунта удалена отсюда — теперь в useEffect загрузки данных
   }, [router]);
 
   // Функция для загрузки ссылок из переменных окружения
@@ -342,13 +298,44 @@ export default function Home() {
 
 
   // Вызываем загрузку данных пользователя при монтировании
-  // user?.id falsy для fallback mock (id=0), поэтому фантомные юзеры не создаются
-  // В Max: Telegram SDK сигнал не заполняется, но __MAX_PLATFORM__ установлен
+  // В Max: сначала привязка (если link_*), потом загрузка — ПОСЛЕДОВАТЕЛЬНО
   const isMax = typeof window !== 'undefined' && !!(window as any).__MAX_PLATFORM__;
   useEffect(() => {
-    if (user?.id || isMax) {
-      loadUserData();
-    }
+    if (!user?.id && !isMax) return;
+
+    const init = async () => {
+      // 1. В Max с link_ параметром — сначала привязка
+      if (isMax) {
+        const startParam = getStartParam();
+        if (startParam?.startsWith('link_') && !sessionStorage.getItem('maxLinkProcessed')) {
+          const linkingCode = startParam.replace('link_', '');
+          const maxId = getMessengerId();
+          if (maxId) {
+            try {
+              const res = await fetch('/api/users/link-accounts', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ linking_code: linkingCode, max_id: parseInt(maxId) }),
+              });
+              const data = await res.json();
+              if (data.success) {
+                console.log('✅ Max linked to telegram_id:', data.telegram_id);
+                sessionStorage.setItem('maxLinkProcessed', 'true');
+              } else {
+                console.error('Max linking failed:', data.error);
+              }
+            } catch (err) {
+              console.error('Max linking error:', err);
+            }
+          }
+        }
+      }
+
+      // 2. Теперь загружаем данные (привязка уже записала max_id)
+      await loadUserData();
+    };
+
+    init();
   }, [user?.id]);
 
   // Загружаем ссылки когда статус подписки меняется
