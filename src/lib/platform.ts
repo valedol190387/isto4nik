@@ -28,25 +28,16 @@ interface MessengerData {
 export function getPlatform(): MessengerPlatform {
   if (typeof window === 'undefined') return 'unknown';
 
-  // Telegram — проверяем window.Telegram.WebApp
-  if ((window as any).Telegram?.WebApp?.initDataUnsafe?.user) {
-    return 'telegram';
-  }
-
-  // Max — проверяем window.WebApp (без Telegram)
-  // Важно: проверяем именно отсутствие Telegram, чтобы не спутать
-  if (!(window as any).Telegram?.WebApp && (window as any).WebApp?.initDataUnsafe?.user) {
-    return 'max';
-  }
-
-  // Фоллбэк: если есть Telegram WebApp но без user — всё равно Telegram
-  if ((window as any).Telegram?.WebApp) {
-    return 'telegram';
-  }
-
-  // Фоллбэк: если есть WebApp без Telegram — Max
+  // Max — проверяем window.WebApp (нативный Max SDK) ПЕРВЫМ
+  // Важно: mockTelegramEnv() создаёт window.Telegram.WebApp,
+  // но window.WebApp (без namespace Telegram) существует ТОЛЬКО в Max
   if ((window as any).WebApp?.initData) {
     return 'max';
+  }
+
+  // Telegram — проверяем window.Telegram.WebApp
+  if ((window as any).Telegram?.WebApp) {
+    return 'telegram';
   }
 
   return 'unknown';
