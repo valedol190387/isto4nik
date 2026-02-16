@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check, Loader2, Shield, Gift } from 'lucide-react';
+import { User as LucideUser, MessageCircle, Info, CreditCard, Send, ChevronDown, ChevronUp, Copy, Calendar, ChevronRight, Clock, Check, Loader2, Shield, Gift, LinkIcon } from 'lucide-react';
 import { Page } from '@/components/Page';
 import { ScrollSpacer } from '@/components/ScrollSpacer';
 import { Payment, User as DbUser } from '@/types/database';
@@ -49,6 +49,11 @@ export default function ProfilePage() {
   // Добавляем состояние для данных пользователя из базы данных
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(true);
+
+  // Состояние для привязки Max
+  const [maxLinkCode, setMaxLinkCode] = useState<string | null>(null);
+  const [loadingMaxLink, setLoadingMaxLink] = useState(false);
+  const [copiedMaxLink, setCopiedMaxLink] = useState(false);
 
   // Загрузка истории платежей
   const loadPayments = async () => {
@@ -139,6 +144,35 @@ export default function ProfilePage() {
       } catch (error) {
         console.error('Ошибка получения геоданных из альтернативного API:', error);
       }
+    }
+  };
+
+  // Генерация ссылки для привязки Max
+  const generateMaxLink = async () => {
+    setLoadingMaxLink(true);
+    try {
+      const telegramId = user?.id?.toString() || getUserId();
+      const response = await fetch(`/api/users/generate-link-code?telegramId=${telegramId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setMaxLinkCode(data.linking_code);
+      }
+    } catch (error) {
+      console.error('Error generating Max link:', error);
+    } finally {
+      setLoadingMaxLink(false);
+    }
+  };
+
+  const maxLinkUrl = maxLinkCode
+    ? `https://max.ru/id666202944166_bot/app?startapp=link_${maxLinkCode}`
+    : null;
+
+  const copyMaxLink = () => {
+    if (maxLinkUrl) {
+      navigator.clipboard.writeText(maxLinkUrl);
+      setCopiedMaxLink(true);
+      setTimeout(() => setCopiedMaxLink(false), 2000);
     }
   };
 
@@ -531,6 +565,47 @@ IP-адрес: ${locationData?.ip || 'Определяется...'}
           </div>
         </div>
 
+
+        {/* Привязка Max аккаунта — показываем только в Telegram */}
+        {getPlatform() === 'telegram' && (
+          <div className={styles.giftCard}>
+            <div className={styles.sectionHeader}>
+              <LinkIcon className={styles.sectionIcon} />
+              <h3 className={styles.sectionTitle}>Привязать Max аккаунт</h3>
+            </div>
+            <div className={styles.giftContent}>
+              <p className={styles.giftText}>
+                Получите доступ к приложению в Max мессенджере. Сгенерируйте ссылку и откройте её в Max — ваша подписка перенесётся автоматически.
+              </p>
+              {!maxLinkCode ? (
+                <button
+                  onClick={generateMaxLink}
+                  disabled={loadingMaxLink}
+                  className={styles.botButton}
+                >
+                  {loadingMaxLink ? 'Генерация...' : 'Получить ссылку'}
+                </button>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{
+                    padding: '10px 12px',
+                    background: 'rgba(52, 74, 84, 0.06)',
+                    borderRadius: '8px',
+                    fontSize: '12px',
+                    wordBreak: 'break-all',
+                    color: 'var(--text-secondary)',
+                    fontFamily: 'monospace',
+                  }}>
+                    {maxLinkUrl}
+                  </div>
+                  <button onClick={copyMaxLink} className={styles.botButton}>
+                    {copiedMaxLink ? '✓ Скопировано!' : 'Скопировать ссылку'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Нужна помощь */}
         <div className={styles.accordion}>

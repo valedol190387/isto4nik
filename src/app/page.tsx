@@ -252,6 +252,44 @@ export default function Home() {
     };
 
     handleDeepLink();
+
+    // Обработка привязки Max-аккаунта (startapp=link_UUID)
+    const handleMaxLinking = async () => {
+      const platform = getPlatform();
+      if (platform !== 'max') return; // Только для Max
+
+      const startParam = getStartParam();
+      if (!startParam || !startParam.startsWith('link_')) return;
+
+      const alreadyLinked = sessionStorage.getItem('maxLinkProcessed');
+      if (alreadyLinked) return;
+
+      const linkingCode = startParam.replace('link_', '');
+      const maxId = getMessengerId();
+      if (!maxId) return;
+
+      try {
+        const response = await fetch('/api/users/link-accounts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ linking_code: linkingCode, max_id: parseInt(maxId) }),
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          console.log('✅ Max account linked to telegram_id:', data.telegram_id);
+          sessionStorage.setItem('maxLinkProcessed', 'true');
+          // Перезагружаем данные пользователя чтобы подписка подхватилась
+          window.location.reload();
+        } else {
+          console.error('Max linking failed:', data.error);
+        }
+      } catch (error) {
+        console.error('Max linking error:', error);
+      }
+    };
+
+    handleMaxLinking();
   }, [router]);
 
   // Функция для загрузки ссылок из переменных окружения
