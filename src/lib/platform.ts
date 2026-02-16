@@ -28,12 +28,10 @@ interface MessengerData {
 export function getPlatform(): MessengerPlatform {
   if (typeof window === 'undefined') return 'unknown';
 
-  // Max — проверяем window.WebApp (нативный Max SDK) ПЕРВЫМ
-  // В Telegram SDK объект живёт в window.Telegram.WebApp
-  // В Max SDK объект живёт в window.WebApp (без namespace)
-  // Важно: initData может быть пустой строкой "", поэтому проверяем initDataUnsafe (объект)
-  const maxWebApp = (window as any).WebApp;
-  if (maxWebApp && typeof maxWebApp === 'object' && 'initDataUnsafe' in maxWebApp) {
+  // Max — флаг ставится в mockTelegramFromMax() (mockEnv.ts)
+  // Это единственный надёжный способ: скрипт max-web-app.js создаёт
+  // window.WebApp везде (даже в Telegram), поэтому проверять его нельзя
+  if ((window as any).__MAX_PLATFORM__) {
     return 'max';
   }
 

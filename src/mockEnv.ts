@@ -53,6 +53,9 @@ function mockTelegramFromMax(): void {
   const maxWebApp = (window as any).WebApp;
   if (!maxWebApp) return;
 
+  // Ставим флаг — используется в getPlatform() для определения Max
+  (window as any).__MAX_PLATFORM__ = true;
+
   const user = maxWebApp.initDataUnsafe?.user;
   const themeParams = {
     accent_text_color: '#6ab2f2',
