@@ -165,7 +165,7 @@ export default function ProfilePage() {
   };
 
   const maxLinkUrl = maxLinkCode
-    ? `https://max.ru/id666202944166_bot/app?startapp=link_${maxLinkCode}`
+    ? `https://max.ru/id666202944166_bot?startapp=link_${maxLinkCode}`
     : null;
 
   const copyMaxLink = () => {
