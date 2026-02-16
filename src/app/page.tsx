@@ -335,8 +335,10 @@ export default function Home() {
 
   // Вызываем загрузку данных пользователя при монтировании
   // user?.id falsy для fallback mock (id=0), поэтому фантомные юзеры не создаются
+  // В Max: Telegram SDK сигнал не заполняется, но __MAX_PLATFORM__ установлен
+  const isMax = typeof window !== 'undefined' && !!(window as any).__MAX_PLATFORM__;
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id || isMax) {
       loadUserData();
     }
   }, [user?.id]);
@@ -397,18 +399,17 @@ export default function Home() {
     setCurrentDot(currentIndex);
   };
 
-  // DEBUG: временная информация для диагностики Max
+  // DEBUG: временная информация для диагностики Max (только в Max)
   const [debugInfo, setDebugInfo] = useState<string>('');
   useEffect(() => {
+    if (!(window as any).__MAX_PLATFORM__) return;
     const info = {
       platform: getPlatform(),
       userId: user?.id,
-      maxFlag: !!(window as any).__MAX_PLATFORM__,
-      webApp: !!(window as any).WebApp,
-      webAppInitData: (window as any).WebApp?.initData ? `"${(window as any).WebApp.initData.substring(0, 50)}..."` : 'empty/null',
+      maxFlag: true,
       webAppUser: (window as any).WebApp?.initDataUnsafe?.user?.id || 'none',
-      telegram: !!(window as any).Telegram?.WebApp,
       status: userData?.status || 'not loaded',
+      maxId: userData?.max_id || 'none',
     };
     setDebugInfo(JSON.stringify(info, null, 1));
   }, [user?.id, userData]);

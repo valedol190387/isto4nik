@@ -65,8 +65,10 @@ export function Navigation() {
     }
   };
 
+  // В Max: Telegram SDK сигнал не заполняется, но __MAX_PLATFORM__ установлен
+  const isMax = typeof window !== 'undefined' && !!(window as any).__MAX_PLATFORM__;
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id || isMax) {
       loadUserData();
     }
   }, [user?.id]);
