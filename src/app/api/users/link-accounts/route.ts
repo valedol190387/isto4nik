@@ -40,17 +40,46 @@ export async function POST(request: Request) {
     }
 
     // Проверяем не привязан ли этот max_id к другому аккаунту
+    const maxIdInt = parseInt(max_id.toString());
     const { data: existing } = await supabase
       .from('users')
-      .select('id, telegram_id')
-      .eq('max_id', parseInt(max_id.toString()))
+      .select('id, telegram_id, platform, status')
+      .eq('max_id', maxIdInt)
       .single();
 
     if (existing && existing.id !== user.id) {
-      return NextResponse.json(
-        { error: 'This Max account is already linked to another user' },
-        { status: 409 }
-      );
+      // Фантом — авто-зарегистрированный из Max (telegram_id == max_id, platform=max)
+      const isPhantom =
+        existing.telegram_id === maxIdInt &&
+        existing.platform === 'max';
+
+      if (isPhantom) {
+        // Удаляем связанные данные фантома (нет FK cascade)
+        const phantomTgId = existing.telegram_id;
+        await supabase.from('user_favorites').delete().eq('telegram_id', phantomTgId);
+        await supabase.from('material_view_logs').delete().eq('telegram_id', phantomTgId);
+
+        // Удаляем фантома — привязка через Telegram приоритетнее
+        const { error: deleteError } = await supabase
+          .from('users')
+          .delete()
+          .eq('id', existing.id);
+
+        if (deleteError) {
+          console.error('Error deleting phantom user:', deleteError);
+          return NextResponse.json(
+            { error: 'Failed to remove phantom user' },
+            { status: 500 }
+          );
+        }
+        console.log(`🗑️ Deleted phantom user id=${existing.id} (telegram_id=${phantomTgId}) to allow linking`);
+      } else {
+        // Реальный пользователь — нельзя перезаписывать
+        return NextResponse.json(
+          { error: 'This Max account is already linked to another user' },
+          { status: 409 }
+        );
+      }
     }
 
     // Привязываем max_id
