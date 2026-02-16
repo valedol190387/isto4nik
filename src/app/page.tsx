@@ -333,9 +333,9 @@ export default function Home() {
 
 
   // Вызываем загрузку данных пользователя при монтировании
-  // В unknown-платформе (fallback mock с id=0) не грузим — предотвращает фантомных юзеров
+  // user?.id falsy для fallback mock (id=0), поэтому фантомные юзеры не создаются
   useEffect(() => {
-    if (user?.id && getPlatform() !== 'unknown') {
+    if (user?.id) {
       loadUserData();
     }
   }, [user?.id]);

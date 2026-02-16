@@ -66,7 +66,7 @@ export function Navigation() {
   };
 
   useEffect(() => {
-    if (user?.id && getPlatform() !== 'unknown') {
+    if (user?.id) {
       loadUserData();
     }
   }, [user?.id]);

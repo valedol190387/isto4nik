@@ -178,12 +178,11 @@ export default function ProfilePage() {
 
   // Вызываем загрузку данных пользователя при монтировании
   useEffect(() => {
-    const platform = getPlatform();
-    if (platform === 'unknown') {
-      // Вне мессенджера (fallback) — не грузим данные, убираем спиннер
-      setLoadingUserData(false);
-    } else if (user?.id) {
+    if (user?.id) {
       loadUserData();
+    } else {
+      // Нет user ID (fallback mock с id=0) — убираем спиннер
+      setLoadingUserData(false);
     }
     // Загружаем геоданные при загрузке компонента
     loadLocationData();
@@ -566,8 +565,8 @@ IP-адрес: ${locationData?.ip || 'Определяется...'}
         </div>
 
 
-        {/* Привязка Max аккаунта — показываем только в Telegram */}
-        {getPlatform() === 'telegram' && (
+        {/* Привязка Max аккаунта — показываем когда есть реальный user ID */}
+        {!!user?.id && (
           <div className={styles.giftCard}>
             <div className={styles.sectionHeader}>
               <LinkIcon className={styles.sectionIcon} />
