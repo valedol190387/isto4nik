@@ -81,27 +81,29 @@ export function parseUtmFromStartParam(startParam: string | null): {
 }
 
 /**
- * Получение startapp параметра из Telegram WebApp SDK
+ * Получение startapp параметра из Telegram WebApp SDK или Max SDK
  */
 export function getStartParam(): string | null {
   if (typeof window === 'undefined') {
     return null;
   }
 
+  // 1. Telegram SDK — retrieveLaunchParams
   try {
-    // Используем retrieveLaunchParams из @telegram-apps/sdk-react
     const launchParams = retrieveLaunchParams();
-    const startParam = launchParams.tgWebAppStartParam;
-    return startParam || null;
-  } catch (error) {
-    // Fallback — пробуем Telegram или Max WebApp
-    try {
-      const tg = (window as any).Telegram?.WebApp || (window as any).WebApp;
-      const fallbackParam = tg?.initDataUnsafe?.start_param;
-      return fallbackParam || null;
-    } catch (fallbackError) {
-      return null;
+    if (launchParams.tgWebAppStartParam) {
+      return launchParams.tgWebAppStartParam;
     }
+  } catch (error) {
+    // SDK не инициализирован — пробуем fallback
+  }
+
+  // 2. Fallback — Max SDK или Telegram WebApp напрямую
+  try {
+    const webApp = (window as any).WebApp || (window as any).Telegram?.WebApp;
+    return webApp?.initDataUnsafe?.start_param || null;
+  } catch {
+    return null;
   }
 }
 

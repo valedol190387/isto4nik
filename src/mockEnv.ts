@@ -118,6 +118,9 @@ function mockTelegramFromMax(): void {
       ['tgWebAppData', initDataParams.toString()],
       ['tgWebAppVersion', '8.4'],
       ['tgWebAppPlatform', maxWebApp.platform || 'android'],
+      ...(maxWebApp.initDataUnsafe?.start_param
+        ? [['tgWebAppStartParam', maxWebApp.initDataUnsafe.start_param]]
+        : []),
     ]),
   });
 
