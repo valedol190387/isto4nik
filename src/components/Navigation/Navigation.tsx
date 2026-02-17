@@ -75,10 +75,6 @@ export function Navigation() {
 
   const isSubscriptionActive = userData?.status === 'Активна';
   
-  // DEBUG: временно показываем статус
-  console.log('Navigation userData:', userData);
-  console.log('Navigation isSubscriptionActive:', isSubscriptionActive);
-
   // Обработчик для заблокированных разделов
   const handleLockedClick = (e: React.MouseEvent) => {
     e.preventDefault();

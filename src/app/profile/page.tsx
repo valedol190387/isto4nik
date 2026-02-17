@@ -99,14 +99,11 @@ export default function ProfilePage() {
       const platform = messengerInfo.platform === 'unknown' ? 'telegram' : messengerInfo.platform;
       const userId = user?.id?.toString() || getUserId();
       const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
-      console.log('[profile loadUserData]', { platform, userId, queryParam, signalId: user?.id, webApp: !!(window as any).WebApp, telegram: !!(window as any).Telegram?.WebApp });
-
       const response = await fetch(`/api/users?${queryParam}`);
       
       if (!response.ok) {
         if (response.status === 404) {
           // Пользователь не найден в базе
-          console.log('Пользователь не найден в базе данных');
           setUserData(null);
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -114,7 +111,6 @@ export default function ProfilePage() {
       } else {
         const data: DbUser = await response.json();
         setUserData(data);
-        console.log('Данные пользователя загружены:', data);
       }
     } catch (error) {
       console.error('Ошибка при загрузке данных пользователя:', error);

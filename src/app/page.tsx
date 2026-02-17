@@ -23,7 +23,7 @@ import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser, PopupSettings } from '@/types/database';
 import { checkDeepLink, getStartParam, parseUtmFromStartParam } from '@/lib/deepLinks';
-import { getMessengerId, getMessengerData, getPlatform } from '@/lib/platform';
+import { getMessengerId, getMessengerData } from '@/lib/platform';
 
 import styles from './page.module.css';
 
@@ -162,7 +162,6 @@ export default function Home() {
 
       // Сначала пытаемся загрузить существующего пользователя
       const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
-      console.log('[loadUserData]', { platform, userId, queryParam, signalId: user?.id, webApp: !!(window as any).WebApp, telegram: !!(window as any).Telegram?.WebApp });
       const response = await fetch(`/api/users?${queryParam}`);
       
       if (response.ok) {
@@ -394,31 +393,9 @@ export default function Home() {
     setCurrentDot(currentIndex);
   };
 
-  // DEBUG: временная информация для диагностики Max (только в Max)
-  const [debugInfo, setDebugInfo] = useState<string>('');
-  useEffect(() => {
-    if (!(window as any).__MAX_PLATFORM__) return;
-    const info = {
-      platform: getPlatform(),
-      userId: user?.id,
-      maxFlag: true,
-      webAppUser: (window as any).WebApp?.initDataUnsafe?.user?.id || 'none',
-      status: userData?.status || 'not loaded',
-      maxId: userData?.max_id || 'none',
-    };
-    setDebugInfo(JSON.stringify(info, null, 1));
-  }, [user?.id, userData]);
-
   return (
     <Page back={false}>
       <DailyPopup popupData={popupData} />
-
-      {/* DEBUG: временный блок — удалить после отладки Max */}
-      {debugInfo && (
-        <div style={{ background: '#1a1a2e', color: '#0f0', padding: '8px', fontSize: '10px', fontFamily: 'monospace', whiteSpace: 'pre-wrap', borderRadius: '8px', margin: '8px 16px', maxHeight: '120px', overflow: 'auto' }}>
-          {debugInfo}
-        </div>
-      )}
 
       <div className={styles.container}>
         {/* Хайлайты */}
