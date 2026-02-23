@@ -238,16 +238,18 @@ export default function Home() {
       const startParam = getStartParam();
       const deepLinkResult = checkDeepLink(startParam);
       
-      if (deepLinkResult.isDeepLink && deepLinkResult.type === 'materials' && deepLinkResult.materialId) {
-        // Deep link navigation to material
-        
-        // Отмечаем что deep link был обработан
+      if (deepLinkResult.isDeepLink) {
         sessionStorage.setItem('deepLinkProcessed', 'true');
-        
-        // Небольшая задержка для полной инициализации Telegram WebApp
-        setTimeout(() => {
-          router.push(`/materials/${deepLinkResult.materialId}`);
-        }, 800);
+
+        if (deepLinkResult.type === 'onboarding') {
+          setTimeout(() => {
+            router.push('/onboarding');
+          }, 800);
+        } else if (deepLinkResult.type === 'materials' && deepLinkResult.materialId) {
+          setTimeout(() => {
+            router.push(`/materials/${deepLinkResult.materialId}`);
+          }, 800);
+        }
       }
     };
 

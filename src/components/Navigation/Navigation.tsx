@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { 
+import {
   Home as HomeIcon,
   Calendar,
   User,
@@ -21,10 +21,6 @@ export function Navigation() {
   const pathname = usePathname();
   const user = useSignal(initData.user);
 
-  // Скрываем навигацию для админских страниц
-  if (pathname.startsWith('/admin')) {
-    return null;
-  }
   const [userData, setUserData] = useState<DbUser | null>(null);
   const [loadingUserData, setLoadingUserData] = useState(false);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
@@ -45,10 +41,9 @@ export function Navigation() {
       const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
 
       const response = await fetch(`/api/users?${queryParam}`);
-      
+
       if (!response.ok) {
         if (response.status === 404) {
-          // Пользователь не найден в базе
           setUserData(null);
         } else {
           throw new Error(`HTTP error! status: ${response.status}`);
@@ -73,8 +68,13 @@ export function Navigation() {
     }
   }, [user?.id]);
 
+  // Скрываем навигацию для админских страниц и онбординга
+  if (pathname.startsWith('/admin') || pathname.startsWith('/onboarding')) {
+    return null;
+  }
+
   const isSubscriptionActive = userData?.status === 'Активна';
-  
+
   // Обработчик для заблокированных разделов
   const handleLockedClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -134,26 +134,26 @@ export function Navigation() {
       {showSubscriptionModal && (
         <div className={styles.modalOverlay}>
           <div className={styles.modalContent}>
-            <button 
+            <button
               className={styles.closeButton}
               onClick={() => setShowSubscriptionModal(false)}
             >
               <X size={24} />
             </button>
-            
+
             <div className={styles.modalHeader}>
               <div className={styles.modalIcon}>
                 <Lock size={32} />
               </div>
               <h2 className={styles.modalTitle}>Требуется подписка</h2>
             </div>
-            
+
             <div className={styles.modalBody}>
               <p className={styles.modalText}>
-                Для доступа к этому разделу необходима активная подписка. 
+                Для доступа к этому разделу необходима активная подписка.
                 Получите доступ ко всем материалам и функциям приложения.
               </p>
-              
+
               <a
                 href="https://t.me/istochnik_clubbot?start=closedclub"
                 target="_blank"
@@ -169,4 +169,4 @@ export function Navigation() {
       )}
     </>
   );
-} 
+}

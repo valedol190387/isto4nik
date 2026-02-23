@@ -7,7 +7,7 @@ import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
 
 export interface DeepLinkResult {
   isDeepLink: boolean;
-  type?: 'materials';
+  type?: 'materials' | 'onboarding';
   materialId?: string;
 }
 
@@ -23,8 +23,13 @@ export function checkDeepLink(startParam: string | null): DeepLinkResult {
     return { isDeepLink: false };
   }
   
+  // Онбординг
+  if (startParam === 'onboarding') {
+    return { isDeepLink: true, type: 'onboarding' };
+  }
+
   const params = startParam.split('_');
-  
+
   if (params[0] === 'materials' && params[1]) {
     // Проверяем UUID формат (8-4-4-4-12)
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
