@@ -93,6 +93,7 @@ export default function Home() {
   const [channelLink, setChannelLink] = useState<string | null>(null);
   const [popupData, setPopupData] = useState<PopupSettings | null>(null);
   const [materialCounts, setMaterialCounts] = useState<Record<string, number>>({});
+  const [showOnboardingBtn, setShowOnboardingBtn] = useState(false);
   const router = useRouter();
 
 
@@ -191,7 +192,8 @@ export default function Home() {
   };
 
   // Проверяем статус подписки
-  const isSubscriptionActive = userData?.status === 'Активна';
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  const isSubscriptionActive = isLocalhost || userData?.status === 'Активна';
 
   // Обработчик клика по кнопке чата (только для заблокированных)
   const handleChatClick = (e: React.MouseEvent) => {
@@ -349,6 +351,18 @@ export default function Home() {
     loadPopupSettings();
   }, []);
 
+  // Проверяем незавершённый онбординг
+  useEffect(() => {
+    try {
+      const step = localStorage.getItem('onboarding_step');
+      const session = localStorage.getItem('onboarding_session_id');
+      // Показываем кнопку если есть сессия и шаг (значит заходили), но ещё не завершили
+      if (step !== null && session) {
+        setShowOnboardingBtn(true);
+      }
+    } catch {}
+  }, []);
+
   // Загружаем количество материалов по разделам
   useEffect(() => {
     const loadMaterialCounts = async () => {
@@ -460,6 +474,15 @@ export default function Home() {
             ))}
           </div>
         </div>
+
+        {/* Кнопка продолжения онбординга */}
+        {showOnboardingBtn && (
+          <Link href="/onboarding" className={styles.onboardingBtn}>
+            <span className={styles.onboardingPulse} />
+            <span className={styles.onboardingText}>Продолжить вводное обучение</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </Link>
+        )}
 
         {/* Поисковая строка */}
         <div className={styles.searchContainer}>

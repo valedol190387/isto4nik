@@ -86,7 +86,7 @@ function mockTelegramFromMax(): void {
     ['auth_date', (maxWebApp.initDataUnsafe?.auth_date || (new Date().getTime() / 1000 | 0)).toString()],
     ['hash', maxWebApp.initDataUnsafe?.hash || 'max-hash'],
     ['signature', 'max-signature'],
-    ['user', JSON.stringify(user || { id: 0, first_name: 'Max User' })],
+    ['user', JSON.stringify(user || { id: 1, first_name: 'Max User' })],
   ]);
 
   if (maxWebApp.initDataUnsafe?.start_param) {
@@ -176,7 +176,7 @@ function mockFallback(): void {
         ['auth_date', (new Date().getTime() / 1000 | 0).toString()],
         ['hash', 'fallback-hash'],
         ['signature', 'fallback-signature'],
-        ['user', JSON.stringify({ id: 0, first_name: 'Guest' })],
+        ['user', JSON.stringify({ id: 1, first_name: 'Guest' })],
       ]).toString()],
       ['tgWebAppVersion', '8.4'],
       ['tgWebAppPlatform', 'android'],

@@ -69,7 +69,8 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
   };
 
   // Проверяем статус подписки
-  const isSubscriptionActive = userData?.status === 'Активна';
+  const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
+  const isSubscriptionActive = isLocalhost || userData?.status === 'Активна';
 
   // Загружаем данные пользователя при открытии модала
   useEffect(() => {

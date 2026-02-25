@@ -1,14 +1,17 @@
 'use client';
 
 import { Page } from '@/components/Page';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
+import { initData, useSignal } from '@telegram-apps/sdk-react';
+import { getMessengerId } from '@/lib/platform';
 import styles from './page.module.css';
 
 // ===== STORAGE =====
 const STORAGE_KEY_STEP = 'onboarding_step';
 const STORAGE_KEY_ANSWERS = 'onboarding_answers';
+const STORAGE_KEY_SESSION = 'onboarding_session_id';
 
 // ===== QUIZ =====
 const questions = [
@@ -245,7 +248,7 @@ const commonLessons: OnboardingScreen[] = [
       'Время просмотра ~ 2 часа.',
     ],
     buttonText: 'Разговор у Источника 28.01.2026',
-    materialId: -1, // → /courses/speeches
+    materialId: 163,
     doneText: 'Посмотрел',
   },
 ];
@@ -257,7 +260,7 @@ const commonLessons: OnboardingScreen[] = [
 const branchOpera: OnboardingScreen[] = [
   {
     key: 'branch-opora-intro',
-    type: 'links',
+    type: 'material',
     paragraphs: [
       'Итак, вы сделали первые шаги и поняли, как устроен «Источник».',
       'Теперь можно идти глубже — не во всё сразу, а туда, где сейчас ваш реальный запрос.',
@@ -266,13 +269,9 @@ const branchOpera: OnboardingScreen[] = [
       'Информация будет полезна тем, кто хочет быть проявленным, живым и профессионально развиваться.',
       'Курс состоит из 3 частей, общее время просмотра 37 минут.',
     ],
-    links: [
-      // TODO: заменить на реальные material ID — пока ведём на /materials/ID
-      { label: 'Изоляция — 1 часть', url: '/materials/0' },
-      { label: 'Изоляция — 2 часть', url: '/materials/0' },
-      { label: 'Изоляция — 3 часть', url: '/materials/0' },
-    ],
-    doneText: 'Изучил',
+    buttonText: 'Изоляция',
+    materialId: 11,
+    doneText: 'Посмотрел',
   },
 ];
 
@@ -291,15 +290,14 @@ const branchMoney: OnboardingScreen[] = [
       'Курс состоит из 8 частей, общее время просмотра ~ 13 часов.',
     ],
     links: [
-      // TODO: заменить на реальные material ID
-      { label: 'Анатомия сливов — 1 часть', url: '/materials/0' },
-      { label: 'Анатомия сливов — 2 часть', url: '/materials/0' },
-      { label: 'Анатомия сливов — 3 часть', url: '/materials/0' },
-      { label: 'Анатомия сливов — 4 часть', url: '/materials/0' },
-      { label: 'Анатомия сливов — 5 часть', url: '/materials/0' },
-      { label: 'Анатомия сливов — 6 часть', url: '/materials/0' },
-      { label: 'Анатомия сливов — 7 часть', url: '/materials/0' },
-      { label: 'Анатомия сливов — 8 часть', url: '/materials/0' },
+      { label: 'Анатомия сливов — 1 часть', url: '/materials/109' },
+      { label: 'Анатомия сливов — 2 часть', url: '/materials/121' },
+      { label: 'Анатомия сливов — 3 часть', url: '/materials/122' },
+      { label: 'Анатомия сливов — 4 часть', url: '/materials/123' },
+      { label: 'Анатомия сливов — 5 часть', url: '/materials/128' },
+      { label: 'Анатомия сливов — 6 часть', url: '/materials/129' },
+      { label: 'Анатомия сливов — 7 часть', url: '/materials/130' },
+      { label: 'Анатомия сливов — 8 часть', url: '/materials/134' },
     ],
     doneText: 'Изучил',
   },
@@ -319,14 +317,13 @@ const branchRelations: OnboardingScreen[] = [
       'Курс состоит из 7 частей, общее время просмотра ~ 7 часов.',
     ],
     links: [
-      // TODO: заменить на реальные material ID
-      { label: 'Родовая система — 1 часть', url: '/materials/0' },
-      { label: 'Родовая система — 2 часть', url: '/materials/0' },
-      { label: 'Родовая система — 3 часть', url: '/materials/0' },
-      { label: 'Родовая система — 4 часть', url: '/materials/0' },
-      { label: 'Родовая система — 5 часть', url: '/materials/0' },
-      { label: 'Родовая система — 6 часть', url: '/materials/0' },
-      { label: 'Родовая система — 7 часть', url: '/materials/0' },
+      { label: 'Родовая система — 1 часть', url: '/materials/83' },
+      { label: 'Родовая система — 2 часть', url: '/materials/84' },
+      { label: 'Родовая система — 3 часть', url: '/materials/86' },
+      { label: 'Родовая система — 4 часть', url: '/materials/93' },
+      { label: 'Родовая система — 5 часть', url: '/materials/94' },
+      { label: 'Родовая система — 6 часть', url: '/materials/97' },
+      { label: 'Родовая система — 7 часть', url: '/materials/102' },
     ],
     doneText: 'Изучил',
   },
@@ -393,6 +390,24 @@ const slideVariants = {
   }),
 };
 
+// Хелпер для рендера motion-обёртки (вынесен из компонента, чтобы React не пересоздавал)
+function MotionScreen({ children, direction, className, onDone }: { children: React.ReactNode; direction: number; className: string; onDone?: () => void }) {
+  return (
+    <motion.div
+      custom={direction}
+      variants={slideVariants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={{ duration: 0.35, ease: 'easeInOut' }}
+      className={className}
+      onAnimationComplete={(def) => { if (def === 'center' && onDone) onDone(); }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 // Рендер текста с **жирным** и \n
 function renderText(text: string) {
   const parts = text.split(/(\*\*[^*]+\*\*)/g);
@@ -417,15 +432,56 @@ function renderText(text: string) {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const user = useSignal(initData.user);
   const [step, setStep] = useState<number | null>(null);
   const [direction, setDirection] = useState(1);
   const [answers, setAnswers] = useState<Record<number, number>>({});
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showSkipModal, setShowSkipModal] = useState(false);
+  const sessionIdRef = useRef<string | null>(null);
+
+  const getTelegramId = (): number => {
+    const id = user?.id || parseInt(getMessengerId() || '0', 10);
+    return id || 0;
+  };
+
+  // Отправка прогресса на сервер
+  const syncProgress = useCallback(async (newStep: number, newAnswers: Record<number, number>, isCompleted = false, isSkipped = false) => {
+    const telegramId = user?.id || parseInt(getMessengerId() || '0', 10) || 0;
+    if (!telegramId) return;
+
+    try {
+      const maxStep = Math.max(newStep, parseInt(localStorage.getItem(STORAGE_KEY_STEP) || '0', 10));
+      const res = await fetch('/api/onboarding', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          telegram_id: telegramId,
+          session_id: sessionIdRef.current,
+          current_step: newStep,
+          max_step: maxStep,
+          answers: newAnswers,
+          completed: isCompleted,
+          skipped: isSkipped,
+        }),
+      });
+      const data = await res.json();
+      if (data.session_id && !sessionIdRef.current) {
+        sessionIdRef.current = data.session_id;
+        try { localStorage.setItem(STORAGE_KEY_SESSION, data.session_id); } catch {}
+      }
+    } catch (err) {
+      console.error('Failed to sync onboarding progress:', err);
+    }
+  }, [user?.id]);
 
   // Загрузка прогресса
   useEffect(() => {
     try {
       const savedStep = localStorage.getItem(STORAGE_KEY_STEP);
       const savedAnswers = localStorage.getItem(STORAGE_KEY_ANSWERS);
+      const savedSession = localStorage.getItem(STORAGE_KEY_SESSION);
+      if (savedSession) sessionIdRef.current = savedSession;
       if (savedAnswers) setAnswers(JSON.parse(savedAnswers));
       setStep(savedStep !== null ? parseInt(savedStep, 10) : STEP_WELCOME);
     } catch {
@@ -440,15 +496,20 @@ export default function OnboardingPage() {
     } catch {}
   }, []);
 
-  const goTo = useCallback((newStep: number) => {
+  const goTo = useCallback((newStep: number, currentAnswers?: Record<number, number>) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
     setDirection(1);
     setStep(newStep);
     saveProgress(newStep);
-  }, [saveProgress]);
+    syncProgress(newStep, currentAnswers || answers);
+  }, [saveProgress, syncProgress, isAnimating, answers]);
 
   const goNext = () => goTo((step ?? 0) + 1);
 
   const selectAnswer = (questionIdx: number, optionIdx: number) => {
+    if (isAnimating) return;
+    setIsAnimating(true);
     const newAnswers = { ...answers, [questionIdx]: optionIdx };
     setAnswers(newAnswers);
     setTimeout(() => {
@@ -458,6 +519,7 @@ export default function OnboardingPage() {
         : STEP_DONE;
       setStep(newStep);
       saveProgress(newStep, newAnswers);
+      syncProgress(newStep, newAnswers);
     }, 300);
   };
 
@@ -466,10 +528,21 @@ export default function OnboardingPage() {
   };
 
   const finishOnboarding = () => {
-    // Очистка прогресса и переход на главную
+    syncProgress(step ?? 0, answers, true);
     try {
       localStorage.removeItem(STORAGE_KEY_STEP);
       localStorage.removeItem(STORAGE_KEY_ANSWERS);
+      localStorage.removeItem(STORAGE_KEY_SESSION);
+    } catch {}
+    router.push('/');
+  };
+
+  const skipOnboarding = () => {
+    syncProgress(step ?? 0, answers, false, true);
+    try {
+      localStorage.removeItem(STORAGE_KEY_STEP);
+      localStorage.removeItem(STORAGE_KEY_ANSWERS);
+      localStorage.removeItem(STORAGE_KEY_SESSION);
     } catch {}
     router.push('/');
   };
@@ -480,29 +553,13 @@ export default function OnboardingPage() {
   const personal = personalTexts[firstAnswer];
   const lessonPath = buildLessonPath(firstAnswer);
 
-  // Хелпер для рендера motion-обёртки
-  const MotionScreen = ({ k, children }: { k: string; children: React.ReactNode }) => (
-    <motion.div
-      key={k}
-      custom={direction}
-      variants={slideVariants}
-      initial="enter"
-      animate="center"
-      exit="exit"
-      transition={{ duration: 0.35, ease: 'easeInOut' }}
-      className={styles.screen}
-    >
-      {children}
-    </motion.div>
-  );
-
   return (
     <Page back={false}>
       <div className={styles.container}>
         <AnimatePresence mode="wait" custom={direction}>
           {/* ===== WELCOME ===== */}
           {step === STEP_WELCOME && (
-            <MotionScreen k="welcome">
+            <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key="welcome">
               <div className={styles.welcomeContent}>
                 <h1 className={styles.welcomeTitle}>Вы внутри «Источника»</h1>
                 <p className={styles.welcomeText}>
@@ -532,12 +589,13 @@ export default function OnboardingPage() {
                 </p>
               </div>
               <button className={styles.primaryBtn} onClick={goNext}>Хорошо</button>
+              <button className={styles.skipBtn} onClick={() => setShowSkipModal(true)}>Пропустить обучение</button>
             </MotionScreen>
           )}
 
           {/* ===== INTRO ===== */}
           {step === STEP_INTRO && (
-            <MotionScreen k="intro">
+            <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key="intro">
               <div className={styles.introContent}>
                 <div className={styles.introIcon}>✦</div>
                 <p className={styles.introText}>Первое время я буду вашим <strong>проводником</strong>.</p>
@@ -551,7 +609,7 @@ export default function OnboardingPage() {
           {/* ===== QUIZ ===== */}
           {questions.map((q, qIdx) =>
             step === qIdx + STEP_QUESTIONS_START ? (
-              <MotionScreen k={`q-${qIdx}`}>
+              <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key={`q-${qIdx}`}>
                 <div className={styles.questionContent}>
                   <div className={styles.progressBar}>
                     <div className={styles.progressFill} style={{ width: `${((qIdx + 1) / questions.length) * 100}%` }} />
@@ -577,7 +635,7 @@ export default function OnboardingPage() {
 
           {/* ===== DONE (Спасибо) ===== */}
           {step === STEP_DONE && (
-            <MotionScreen k="done">
+            <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key="done">
               <div className={styles.doneContent}>
                 <div className={styles.doneIcon}>✦</div>
                 <h2 className={styles.doneTitle}>Спасибо.</h2>
@@ -591,7 +649,7 @@ export default function OnboardingPage() {
 
           {/* ===== PERSONAL ===== */}
           {step === STEP_PERSONAL && (
-            <MotionScreen k="personal">
+            <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key="personal">
               <div className={styles.personalContent}>
                 {personal.paragraphs.map((text, i) => (
                   <p key={i} className={styles.personalText}>{renderText(text)}</p>
@@ -609,7 +667,7 @@ export default function OnboardingPage() {
             // Финальный экран
             if (screen.type === 'final') {
               return (
-                <MotionScreen k={screen.key}>
+                <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key={screen.key}>
                   <div className={styles.personalContent}>
                     {screen.paragraphs.map((text, i) => (
                       <p key={i} className={styles.lessonText}>{renderText(text)}</p>
@@ -625,7 +683,7 @@ export default function OnboardingPage() {
             // Экран с материалом
             if (screen.type === 'material') {
               return (
-                <MotionScreen k={screen.key}>
+                <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key={screen.key}>
                   <div className={styles.lessonContent}>
                     {screen.paragraphs.map((text, i) => (
                       <p key={i} className={styles.lessonText}>{renderText(text)}</p>
@@ -634,13 +692,7 @@ export default function OnboardingPage() {
                   <div className={styles.lessonButtons}>
                     <button
                       className={styles.primaryBtn}
-                      onClick={() => {
-                        if (screen.materialId === -1) {
-                          navigateTo('/courses/speeches');
-                        } else {
-                          navigateTo(`/materials/${screen.materialId}`);
-                        }
-                      }}
+                      onClick={() => navigateTo(`/materials/${screen.materialId}`)}
                     >
                       {screen.buttonText}
                     </button>
@@ -655,7 +707,7 @@ export default function OnboardingPage() {
             // Экран со ссылками
             if (screen.type === 'links') {
               return (
-                <MotionScreen k={screen.key}>
+                <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key={screen.key}>
                   <div className={styles.lessonContent}>
                     {screen.paragraphs.map((text, i) => (
                       <p key={i} className={styles.lessonText}>{renderText(text)}</p>
@@ -688,6 +740,20 @@ export default function OnboardingPage() {
           })}
         </AnimatePresence>
       </div>
+
+      {/* Модалка подтверждения пропуска */}
+      {showSkipModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowSkipModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <p className={styles.modalText}>Вы уверены, что хотите пропустить вводное обучение?</p>
+            <p className={styles.modalSubtext}>Вы сможете изучить материалы самостоятельно в каталоге.</p>
+            <div className={styles.modalButtons}>
+              <button className={styles.modalConfirm} onClick={skipOnboarding}>Да, пропустить</button>
+              <button className={styles.modalCancel} onClick={() => setShowSkipModal(false)}>Остаться</button>
+            </div>
+          </div>
+        </div>
+      )}
     </Page>
   );
 }

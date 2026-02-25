@@ -525,6 +525,106 @@
   opacity: 0.7;
 }
 
+/* ===== SKIP BUTTON ===== */
+
+.skipBtn {
+  width: 100%;
+  padding: 16px;
+  margin-top: 10px;
+  background: transparent;
+  color: rgba(8, 36, 69, 0.6);
+  border: 1px solid rgba(8, 36, 69, 0.2);
+  border-radius: 14px;
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.skipBtn:active {
+  transform: scale(0.97);
+  border-color: rgba(8, 36, 69, 0.4);
+}
+
+/* ===== SKIP MODAL ===== */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.modalContent {
+  background: #f4f1ef;
+  border-radius: 16px;
+  padding: 28px 24px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+}
+
+.modalText {
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 17px;
+  color: #082445;
+  margin: 0 0 8px;
+  line-height: 1.4;
+}
+
+.modalSubtext {
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 14px;
+  color: rgba(8, 36, 69, 0.5);
+  margin: 0 0 24px;
+  line-height: 1.4;
+}
+
+.modalButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.modalConfirm {
+  width: 100%;
+  padding: 16px;
+  background: transparent;
+  color: #082445;
+  border: 1px solid rgba(8, 36, 69, 0.2);
+  border-radius: 14px;
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalConfirm:active {
+  transform: scale(0.97);
+}
+
+.modalCancel {
+  width: 100%;
+  padding: 16px;
+  background: #082445;
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalCancel:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
 /* ===== MOBILE ===== */
 
 @media (max-width: 480px) {

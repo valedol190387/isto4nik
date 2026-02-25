@@ -15,7 +15,8 @@ import {
   ChevronRight,
   ExternalLink,
   Bell,
-  Eye
+  Eye,
+  ClipboardList
 } from 'lucide-react';
 import { useState } from 'react';
 import styles from './AdminSidebar.module.css';
@@ -76,6 +77,12 @@ const sidebarItems: SidebarItem[] = [
     title: 'Просмотры',
     icon: <Eye size={20} />,
     path: '/admin/views-report'
+  },
+  {
+    id: 'onboarding-report',
+    title: 'Онбординг',
+    icon: <ClipboardList size={20} />,
+    path: '/admin/onboarding-report'
   },
   {
     id: 'utm-generator',

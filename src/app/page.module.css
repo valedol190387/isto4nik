@@ -150,6 +150,50 @@
   box-shadow: var(--shadow-light);
 }
 
+/* Кнопка продолжения онбординга */
+.onboardingBtn {
+  display: flex;
+  align-items: center;
+  padding: 18px 20px;
+  background: transparent;
+  color: var(--text-main);
+  border: 1.5px solid var(--accent-blue);
+  border-radius: 8px;
+  text-decoration: none;
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 15px;
+  position: relative;
+  margin-bottom: 12px;
+  animation: onboardingPulseAnim 2s ease-in-out infinite;
+}
+
+.onboardingBtn:active {
+  transform: scale(0.97);
+}
+
+.onboardingText {
+  flex: 1;
+}
+
+.onboardingPulse {
+  display: none;
+}
+
+@keyframes onboardingPulseAnim {
+  0% {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 0 rgba(52, 74, 84, 0.3);
+  }
+  50% {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 12px 4px rgba(52, 74, 84, 0.25);
+  }
+  100% {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 0 rgba(52, 74, 84, 0.3);
+  }
+}
+
 /* Поисковая строка */
 .searchContainer {
   margin-bottom: 16px;
