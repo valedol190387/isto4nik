@@ -1,7 +1,7 @@
 'use client';
 
 import { Page } from '@/components/Page';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
@@ -11,7 +11,6 @@ import styles from './page.module.css';
 // ===== STORAGE =====
 const STORAGE_KEY_STEP = 'onboarding_step';
 const STORAGE_KEY_ANSWERS = 'onboarding_answers';
-const STORAGE_KEY_SESSION = 'onboarding_session_id';
 
 // ===== QUIZ =====
 const questions = [
@@ -119,6 +118,7 @@ type ScreenMaterial = {
   buttonText: string;
   materialId: number;
   doneText?: string;
+  image?: string;
 };
 
 type ScreenLinks = {
@@ -127,6 +127,7 @@ type ScreenLinks = {
   paragraphs: string[];
   links: { label: string; url: string }[];
   doneText?: string;
+  image?: string;
 };
 
 type ScreenFinal = {
@@ -134,6 +135,7 @@ type ScreenFinal = {
   type: 'final';
   paragraphs: string[];
   buttonText: string;
+  image?: string;
 };
 
 type OnboardingScreen = ScreenMaterial | ScreenLinks | ScreenFinal;
@@ -153,6 +155,7 @@ const commonLessons: OnboardingScreen[] = [
     buttonText: 'Устройство Мира и Человека — 1 часть',
     materialId: 47,
     doneText: 'Посмотрел',
+    image: '/images/onboarding/photo_4_2026-02-26_10-04-11.jpg',
   },
   {
     key: 'lesson-umich-2',
@@ -183,6 +186,7 @@ const commonLessons: OnboardingScreen[] = [
       { label: 'Не усваивается информация', url: 'https://t.me/c/2580260729/383' },
     ],
     doneText: 'Изучил',
+    image: '/images/onboarding/photo_5_2026-02-26_10-04-11.jpg',
   },
   {
     key: 'lesson-umich-3',
@@ -210,6 +214,7 @@ const commonLessons: OnboardingScreen[] = [
       { label: '2 часть', url: 'https://t.me/c/2580260729/266' },
     ],
     doneText: 'Изучил',
+    image: '/images/onboarding/photo_7_2026-02-26_10-04-11.jpg',
   },
   {
     key: 'lesson-umich-4',
@@ -333,6 +338,7 @@ const branchRelations: OnboardingScreen[] = [
 const finishScreen: OnboardingScreen = {
   key: 'finish',
   type: 'final',
+  image: '/images/onboarding/photo_2_2026-02-26_10-04-11.jpg',
   paragraphs: [
     'Вы завершили первое знакомство с сообществом и поняли, как оно устроено.',
     'Теперь вы можете сами выбирать, что делать в «Источнике»:\n— заходить в основной канал и смотреть то, что откликается сейчас\n— пользоваться библиотекой и мини-приложением, возвращаясь к нужным темам\n— задавать свои вопросы в чате и слушать ответы Евгения\n— делиться инсайтами, наблюдениями, поддерживать других участников',
@@ -438,26 +444,27 @@ export default function OnboardingPage() {
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [isAnimating, setIsAnimating] = useState(false);
   const [showSkipModal, setShowSkipModal] = useState(false);
-  const sessionIdRef = useRef<string | null>(null);
-
+  const [supportOpen, setSupportOpen] = useState(false);
+  const [supportMessage, setSupportMessage] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [messageSent, setMessageSent] = useState(false);
   const getTelegramId = (): number => {
     const id = user?.id || parseInt(getMessengerId() || '0', 10);
     return id || 0;
   };
 
-  // Отправка прогресса на сервер
+  // Отправка прогресса на сервер (upsert по telegram_id)
   const syncProgress = useCallback(async (newStep: number, newAnswers: Record<number, number>, isCompleted = false, isSkipped = false) => {
     const telegramId = user?.id || parseInt(getMessengerId() || '0', 10) || 0;
     if (!telegramId) return;
 
     try {
       const maxStep = Math.max(newStep, parseInt(localStorage.getItem(STORAGE_KEY_STEP) || '0', 10));
-      const res = await fetch('/api/onboarding', {
+      await fetch('/api/onboarding', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           telegram_id: telegramId,
-          session_id: sessionIdRef.current,
           current_step: newStep,
           max_step: maxStep,
           answers: newAnswers,
@@ -465,11 +472,6 @@ export default function OnboardingPage() {
           skipped: isSkipped,
         }),
       });
-      const data = await res.json();
-      if (data.session_id && !sessionIdRef.current) {
-        sessionIdRef.current = data.session_id;
-        try { localStorage.setItem(STORAGE_KEY_SESSION, data.session_id); } catch {}
-      }
     } catch (err) {
       console.error('Failed to sync onboarding progress:', err);
     }
@@ -480,8 +482,6 @@ export default function OnboardingPage() {
     try {
       const savedStep = localStorage.getItem(STORAGE_KEY_STEP);
       const savedAnswers = localStorage.getItem(STORAGE_KEY_ANSWERS);
-      const savedSession = localStorage.getItem(STORAGE_KEY_SESSION);
-      if (savedSession) sessionIdRef.current = savedSession;
       if (savedAnswers) setAnswers(JSON.parse(savedAnswers));
       setStep(savedStep !== null ? parseInt(savedStep, 10) : STEP_WELCOME);
     } catch {
@@ -532,7 +532,6 @@ export default function OnboardingPage() {
     try {
       localStorage.removeItem(STORAGE_KEY_STEP);
       localStorage.removeItem(STORAGE_KEY_ANSWERS);
-      localStorage.removeItem(STORAGE_KEY_SESSION);
     } catch {}
     router.push('/');
   };
@@ -542,9 +541,38 @@ export default function OnboardingPage() {
     try {
       localStorage.removeItem(STORAGE_KEY_STEP);
       localStorage.removeItem(STORAGE_KEY_ANSWERS);
-      localStorage.removeItem(STORAGE_KEY_SESSION);
     } catch {}
     router.push('/');
+  };
+
+  const handleSendSupport = async () => {
+    if (!supportMessage.trim()) return;
+    setIsSending(true);
+    try {
+      const telegramId = getTelegramId().toString();
+      const userInfo = user ? `${user.first_name} ${user.last_name || ''}`.trim() : 'Онбординг';
+      const res = await fetch('https://n8n.istochnikbackoffice.ru/webhook/zabota', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: supportMessage,
+          raw_message: supportMessage,
+          telegram_id: telegramId,
+          user_name: userInfo,
+          source: 'onboarding',
+          timestamp: new Date().toISOString(),
+        }),
+      });
+      if (res.ok) {
+        setSupportMessage('');
+        setMessageSent(true);
+        setTimeout(() => setMessageSent(false), 2500);
+      }
+    } catch (err) {
+      console.error('Support send error:', err);
+    } finally {
+      setIsSending(false);
+    }
   };
 
   if (step === null) return null;
@@ -561,6 +589,7 @@ export default function OnboardingPage() {
           {step === STEP_WELCOME && (
             <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key="welcome">
               <div className={styles.welcomeContent}>
+                <img src="/images/onboarding/photo_1_2026-02-26_10-04-11.jpg" alt="" className={styles.screenImage} />
                 <h1 className={styles.welcomeTitle}>Вы внутри «Источника»</h1>
                 <p className={styles.welcomeText}>
                   Это <strong>живая система</strong>, которая меняет жизнь <em>изнутри</em>.
@@ -570,7 +599,7 @@ export default function OnboardingPage() {
                 </p>
                 <div className={styles.featureList}>
                   {[
-                    { title: 'Проверенные методики', desc: 'авторские подходы, подтверждённые 14 000+ реальных историй' },
+                    { title: 'Проверенные методики', desc: 'авторские подходы, подтверждённые 15 000+ реальных историй' },
                     { title: 'Среда для роста', desc: 'постоянное развитие без необходимости «заставлять себя»' },
                     { title: 'Систематизация', desc: 'все материалы организованы для вашего удобства' },
                     { title: 'Безопасное пространство', desc: 'можно быть собой, без страха осуждения' },
@@ -637,6 +666,7 @@ export default function OnboardingPage() {
           {step === STEP_DONE && (
             <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key="done">
               <div className={styles.doneContent}>
+                <img src="/images/onboarding/photo_6_2026-02-26_10-04-11.jpg" alt="" className={styles.screenImage} />
                 <div className={styles.doneIcon}>✦</div>
                 <h2 className={styles.doneTitle}>Спасибо.</h2>
                 <p className={styles.doneText}>Я буду ориентироваться на ваши ответы.</p>
@@ -651,6 +681,7 @@ export default function OnboardingPage() {
           {step === STEP_PERSONAL && (
             <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key="personal">
               <div className={styles.personalContent}>
+                <img src="/images/onboarding/photo_3_2026-02-26_10-04-11.jpg" alt="" className={styles.screenImage} />
                 {personal.paragraphs.map((text, i) => (
                   <p key={i} className={styles.personalText}>{renderText(text)}</p>
                 ))}
@@ -669,10 +700,46 @@ export default function OnboardingPage() {
               return (
                 <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key={screen.key}>
                   <div className={styles.personalContent}>
+                    {screen.image && <img src={screen.image} alt="" className={styles.screenImage} />}
                     {screen.paragraphs.map((text, i) => (
                       <p key={i} className={styles.lessonText}>{renderText(text)}</p>
                     ))}
                   </div>
+
+                  {/* Нужна помощь */}
+                  <div className={styles.supportBlock}>
+                    <button
+                      className={styles.supportToggle}
+                      onClick={() => setSupportOpen(!supportOpen)}
+                    >
+                      <span>Остались вопросы?</span>
+                      <svg
+                        width="16" height="16" viewBox="0 0 16 16" fill="none"
+                        style={{ transform: supportOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}
+                      >
+                        <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                    {supportOpen && (
+                      <div className={styles.supportBody}>
+                        <textarea
+                          className={styles.supportTextarea}
+                          placeholder="Опишите вашу проблему или задайте вопрос..."
+                          value={supportMessage}
+                          onChange={(e) => setSupportMessage(e.target.value)}
+                          rows={3}
+                        />
+                        <button
+                          className={`${styles.supportSendBtn} ${messageSent ? styles.supportSent : ''}`}
+                          onClick={handleSendSupport}
+                          disabled={!supportMessage.trim() || isSending || messageSent}
+                        >
+                          {isSending ? 'Отправка...' : messageSent ? '✓ Отправлено' : 'Отправить'}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
                   <button className={styles.primaryBtn} onClick={finishOnboarding}>
                     {screen.buttonText}
                   </button>
@@ -684,6 +751,7 @@ export default function OnboardingPage() {
             if (screen.type === 'material') {
               return (
                 <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key={screen.key}>
+                  {screen.image && <img src={screen.image} alt="" className={styles.screenImage} />}
                   <div className={styles.lessonContent}>
                     {screen.paragraphs.map((text, i) => (
                       <p key={i} className={styles.lessonText}>{renderText(text)}</p>
@@ -708,6 +776,7 @@ export default function OnboardingPage() {
             if (screen.type === 'links') {
               return (
                 <MotionScreen direction={direction} className={styles.screen} onDone={() => setIsAnimating(false)} key={screen.key}>
+                  {screen.image && <img src={screen.image} alt="" className={styles.screenImage} />}
                   <div className={styles.lessonContent}>
                     {screen.paragraphs.map((text, i) => (
                       <p key={i} className={styles.lessonText}>{renderText(text)}</p>

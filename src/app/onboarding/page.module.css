@@ -417,6 +417,14 @@
   font-weight: 500;
 }
 
+.screenImage {
+  width: 100%;
+  object-fit: contain;
+  border-radius: 16px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
 /* ===== LESSON SCREENS ===== */
 
 .lessonContent {
@@ -523,6 +531,88 @@
 .secondaryBtn:active {
   transform: scale(0.97);
   opacity: 0.7;
+}
+
+/* ===== SUPPORT BLOCK (финальный экран) ===== */
+
+.supportBlock {
+  width: 100%;
+  margin-bottom: 16px;
+  border: 1px solid rgba(8, 36, 69, 0.12);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.supportToggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 18px;
+  background: transparent;
+  border: none;
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 15px;
+  color: rgba(8, 36, 69, 0.6);
+  cursor: pointer;
+}
+
+.supportBody {
+  padding: 0 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.supportTextarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(8, 36, 69, 0.12);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.6);
+  font-family: 'GilroyLight', sans-serif;
+  font-size: 14px;
+  color: #082445;
+  resize: none;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.supportTextarea:focus {
+  border-color: rgba(8, 36, 69, 0.3);
+}
+
+.supportTextarea::placeholder {
+  color: rgba(8, 36, 69, 0.3);
+}
+
+.supportSendBtn {
+  width: 100%;
+  padding: 14px;
+  background: #082445;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'RalewayMedium', sans-serif;
+  font-size: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.supportSendBtn:active {
+  transform: scale(0.97);
+  opacity: 0.9;
+}
+
+.supportSendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.supportSent {
+  background: #16a34a !important;
+  opacity: 1 !important;
 }
 
 /* ===== SKIP BUTTON ===== */

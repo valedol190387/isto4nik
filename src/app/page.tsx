@@ -355,9 +355,7 @@ export default function Home() {
   useEffect(() => {
     try {
       const step = localStorage.getItem('onboarding_step');
-      const session = localStorage.getItem('onboarding_session_id');
-      // Показываем кнопку если есть сессия и шаг (значит заходили), но ещё не завершили
-      if (step !== null && session) {
+      if (step !== null) {
         setShowOnboardingBtn(true);
       }
     } catch {}
