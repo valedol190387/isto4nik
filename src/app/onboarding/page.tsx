@@ -170,6 +170,7 @@ const commonLessons: OnboardingScreen[] = [
     buttonText: 'Устройство Мира и Человека — 2 часть',
     materialId: 48,
     doneText: 'Посмотрел',
+    image: '/images/onboarding/photo_7_2026-02-26_10-04-11.jpg',
   },
   {
     key: 'lesson-questions-format',
@@ -214,7 +215,7 @@ const commonLessons: OnboardingScreen[] = [
       { label: '2 часть', url: 'https://t.me/c/2580260729/266' },
     ],
     doneText: 'Изучил',
-    image: '/images/onboarding/photo_7_2026-02-26_10-04-11.jpg',
+    image: '/images/onboarding/838A2106.JPG',
   },
   {
     key: 'lesson-umich-4',
