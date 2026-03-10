@@ -248,6 +248,10 @@ export default function Home() {
           setTimeout(() => {
             router.push('/onboarding');
           }, 800);
+        } else if (deepLinkResult.type === 'newonboarding') {
+          setTimeout(() => {
+            router.push('/start-guide');
+          }, 800);
         } else if (deepLinkResult.type === 'materials' && deepLinkResult.materialId) {
           setTimeout(() => {
             router.push(`/materials/${deepLinkResult.materialId}`);

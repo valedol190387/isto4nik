@@ -7,7 +7,7 @@ import { retrieveLaunchParams } from '@telegram-apps/sdk-react';
 
 export interface DeepLinkResult {
   isDeepLink: boolean;
-  type?: 'materials' | 'onboarding';
+  type?: 'materials' | 'onboarding' | 'newonboarding';
   materialId?: string;
 }
 
@@ -26,6 +26,11 @@ export function checkDeepLink(startParam: string | null): DeepLinkResult {
   // Онбординг
   if (startParam === 'onboarding') {
     return { isDeepLink: true, type: 'onboarding' };
+  }
+
+  // Новый онбординг (воронка start-guide)
+  if (startParam === 'newonboarding') {
+    return { isDeepLink: true, type: 'newonboarding' };
   }
 
   const params = startParam.split('_');
