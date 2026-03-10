@@ -60,6 +60,10 @@
   padding-top: calc(16px + var(--safe-area-inset-top, 0px));
 }
 
+.screenPadded > .title:first-child {
+  margin-top: 0;
+}
+
 /* Фото героя — на всю ширину */
 .heroImageContainer {
   position: relative;
