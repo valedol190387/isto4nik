@@ -85,6 +85,12 @@ const sidebarItems: SidebarItem[] = [
     path: '/admin/onboarding-report'
   },
   {
+    id: 'funnel-report',
+    title: 'Онбординг New',
+    icon: <ClipboardList size={20} />,
+    path: '/admin/funnel-report'
+  },
+  {
     id: 'utm-generator',
     title: 'UTM-генератор',
     icon: <ExternalLink size={20} />,

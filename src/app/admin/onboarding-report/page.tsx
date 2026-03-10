@@ -130,7 +130,14 @@ export default function OnboardingReportPage() {
     const skipped = filteredData.filter(r => r.skipped).length;
     const uniqueUsers = new Set(filteredData.map(r => r.telegram_id)).size;
     const avgMaxStep = total > 0 ? Math.round(filteredData.reduce((s, r) => s + r.max_step, 0) / total * 10) / 10 : 0;
-    return { total, completed, skipped, uniqueUsers, avgMaxStep };
+
+    // Воронка по шагам: сколько юзеров дошли до каждого шага (max_step >= step)
+    const stepCounts: Record<number, number> = {};
+    for (let i = 0; i <= TOTAL_STEPS; i++) {
+      stepCounts[i] = filteredData.filter(r => r.max_step >= i).length;
+    }
+
+    return { total, completed, skipped, uniqueUsers, avgMaxStep, stepCounts };
   }, [filteredData]);
 
   const exportToExcel = () => {
@@ -251,6 +258,29 @@ export default function OnboardingReportPage() {
           <div className={styles.summaryCard}>
             <div className={styles.summaryValue}>{summary.avgMaxStep}</div>
             <div className={styles.summaryLabel}>Ср. макс. шаг</div>
+          </div>
+        </div>
+
+        {/* Воронка по шагам */}
+        <div className={styles.funnelSection}>
+          <div className={styles.funnelTitle}>Воронка по шагам</div>
+          <div className={styles.funnelBars}>
+            {Array.from({ length: TOTAL_STEPS + 1 }, (_, i) => {
+              const count = summary.stepCounts[i] || 0;
+              const pct = summary.total > 0 ? Math.round((count / summary.total) * 100) : 0;
+              return (
+                <div key={i} className={styles.funnelRow}>
+                  <div className={styles.funnelLabel}>{i}. {getStepName(i)}</div>
+                  <div className={styles.funnelBarTrack}>
+                    <div
+                      className={styles.funnelBarFill}
+                      style={{ width: `${pct}%`, background: getProgressColor(pct) }}
+                    />
+                  </div>
+                  <div className={styles.funnelCount}>{count} ({pct}%)</div>
+                </div>
+              );
+            })}
           </div>
         </div>
 

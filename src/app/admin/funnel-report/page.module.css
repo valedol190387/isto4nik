@@ -427,7 +427,7 @@
   text-decoration: underline;
 }
 
-/* Воронка по шагам */
+/* Воронка по экранам */
 .funnelSection {
   background: white;
   border-radius: 12px;
@@ -484,4 +484,59 @@
   color: #64748b;
   text-align: right;
   flex-shrink: 0;
+}
+
+/* Экран badge */
+.screenBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 500;
+  background: #f1f5f9;
+  color: #475569;
+  white-space: nowrap;
+}
+
+/* Точки экранов */
+.screensDotsRow {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.screenDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.screenDotDone {
+  background: #22c55e;
+}
+
+.screenDotPending {
+  background: #e2e8f0;
+}
+
+.screensCountText {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-left: 4px;
+}
+
+/* Видео count */
+.videosCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
 }

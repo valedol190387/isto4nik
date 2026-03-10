@@ -29,11 +29,12 @@ import styles from './page.module.css';
 
 // Данные для хайлайтов с изображениями
 const highlights = [
-  { id: 1, image: '/images/starthere.webp', route: '/start-here' },
-  { id: 2, image: '/images/about.webp', route: '/about' },
-  { id: 3, image: '/images/zabota.webp', route: 'https://t.me/istochnik_clubbot?start=zabota' },
-  { id: 4, image: '/images/faq.webp', route: '/faq' },
-  { id: 5, image: '/images/review.webp', route: '/reviews' },
+  { id: 1, image: '/images/starthere.webp', route: '/start-guide', freeOnly: true },
+  { id: 2, image: '/images/forwhom.webp', route: '/start-here', freeOnly: false },
+  { id: 3, image: '/images/about.webp', route: '/about', freeOnly: false },
+  { id: 4, image: '/images/zabota.webp', route: 'https://t.me/istochnik_clubbot?start=zabota', freeOnly: false },
+  { id: 5, image: '/images/faq.webp', route: '/faq', freeOnly: false },
+  { id: 6, image: '/images/review.webp', route: '/reviews', freeOnly: false },
 ];
 
 // Маппинг id курса на section_key в БД
@@ -419,15 +420,16 @@ export default function Home() {
             className={styles.highlightsContainer}
             onScroll={handleScroll}
           >
-            {highlights.map((highlight) => {
-              // Проверяем, является ли ссылка внешней
+            {highlights
+              .filter(h => !h.freeOnly || !isSubscriptionActive || isLocalhost)
+              .map((highlight) => {
               const isExternalLink = highlight.route.startsWith('http');
-              
+
               if (isExternalLink) {
                 return (
-                  <a 
-                    key={highlight.id} 
-                    href={highlight.route} 
+                  <a
+                    key={highlight.id}
+                    href={highlight.route}
                     className={styles.highlightCard}
                     target="_blank"
                     rel="noopener noreferrer"
