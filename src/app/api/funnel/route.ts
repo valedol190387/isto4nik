@@ -1,6 +1,29 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 
+// GET — загрузить прогресс воронки по telegram_id
+export async function GET(request: NextRequest) {
+  try {
+    const telegramId = request.nextUrl.searchParams.get('telegram_id');
+    if (!telegramId) {
+      return NextResponse.json({ success: true, data: null });
+    }
+
+    const { data, error } = await supabase
+      .from('funnel_progress')
+      .select('videos_watched, screens_visited, current_screen, completed')
+      .eq('telegram_id', telegramId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = not found
+
+    return NextResponse.json({ success: true, data: data || null });
+  } catch (error: any) {
+    console.error('Funnel progress GET error:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
 // POST — создать или обновить прогресс воронки (одна запись на юзера)
 export async function POST(request: NextRequest) {
   try {

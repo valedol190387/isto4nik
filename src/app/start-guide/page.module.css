@@ -53,11 +53,10 @@
   flex-direction: column;
 }
 
-/* Экран с отступом под кнопку назад (без hero-картинки) */
+/* Экран без hero-картинки */
 .screenPadded {
   display: flex;
   flex-direction: column;
-  padding-top: calc(52px + var(--safe-area-inset-top, 0px));
 }
 
 /* Фото героя — на всю ширину */
@@ -443,6 +442,27 @@
   color: rgba(8, 36, 69, 0.4);
   flex-shrink: 0;
 }
+
+/* Галочка просмотренного видео */
+.videoCheckmark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #082445;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.videoTriggerActive .videoCheckmark {
+  background: rgba(255, 255, 255, 0.25);
+}
+
 
 /* === Карточки преимуществ (Про Источник) === */
 .benefitsGrid {

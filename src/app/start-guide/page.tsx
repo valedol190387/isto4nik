@@ -169,23 +169,29 @@ export default function StartGuidePage() {
     };
   }, [screen, router]);
 
-  // Загружаем прогресс из localStorage
+  // Загружаем прогресс из БД
   const [screensVisited, setScreensVisited] = useState<Set<string>>(new Set(['screen-1']));
 
   useEffect(() => {
-    try {
-      const saved = localStorage.getItem('start_guide_watched');
-      if (saved) {
-        setWatchedVideos(new Set(JSON.parse(saved)));
-      }
-      const savedScreens = localStorage.getItem('start_guide_screens');
-      if (savedScreens) {
-        setScreensVisited(new Set(JSON.parse(savedScreens)));
-      }
-    } catch {}
-  }, []);
+    const telegramId = user?.id?.toString() || getMessengerId() || '0';
+    if (telegramId === '0') return;
 
-  // Отправка аналитики в БД
+    fetch(`/api/funnel?telegram_id=${telegramId}`)
+      .then(res => res.json())
+      .then(result => {
+        if (result.success && result.data) {
+          if (result.data.videos_watched?.length) {
+            setWatchedVideos(new Set(result.data.videos_watched));
+          }
+          if (result.data.screens_visited?.length) {
+            setScreensVisited(new Set(result.data.screens_visited));
+          }
+        }
+      })
+      .catch(() => {});
+  }, [user]);
+
+  // Отправка прогресса в БД
   const sendAnalytics = useCallback((currentScreen: string, videos: Set<string>, screens: Set<string>) => {
     const telegramId = user?.id?.toString() || getMessengerId() || '0';
     if (telegramId === '0') return;
@@ -203,29 +209,20 @@ export default function StartGuidePage() {
     }).catch(() => {});
   }, [user]);
 
-  // Сохраняем прогресс
-  const saveProgress = useCallback((newSet: Set<string>) => {
-    setWatchedVideos(newSet);
-    try {
-      localStorage.setItem('start_guide_watched', JSON.stringify([...newSet]));
-    } catch {}
-  }, []);
-
   // Отметить видео просмотренным (по клику)
   const markWatched = useCallback((videoId: string) => {
     setWatchedVideos(prev => {
       if (prev.has(videoId)) return prev;
       const newSet = new Set(prev);
       newSet.add(videoId);
-      saveProgress(newSet);
-      // Отправляем аналитику с обновлённым списком видео
+      // Сохраняем в БД
       const screenKey = typeof screen === 'number' ? `screen-${screen}` : screen as string;
       sendAnalytics(screenKey, newSet, screensVisited);
       return newSet;
     });
-  }, [saveProgress, screen, sendAnalytics, screensVisited]);
+  }, [screen, sendAnalytics, screensVisited]);
 
-  // Переключение видео (аккордеон)
+  // Переключение видео (аккордеон) — отмечаем просмотренным при открытии
   const toggleVideo = useCallback((videoId: string) => {
     markWatched(videoId);
     setOpenVideoId(prev => prev === videoId ? null : videoId);
@@ -285,7 +282,6 @@ export default function StartGuidePage() {
     setScreensVisited(prev => {
       const newSet = new Set(prev);
       newSet.add(screenKey);
-      try { localStorage.setItem('start_guide_screens', JSON.stringify([...newSet])); } catch {}
       // Отправляем аналитику
       sendAnalytics(screenKey, watchedVideos, newSet);
       return newSet;
@@ -604,6 +600,9 @@ export default function StartGuidePage() {
                       className={`${styles.videoTrigger} ${openVideoId === video.id ? styles.videoTriggerActive : ''} ${watchedVideos.has(video.id) ? styles.videoTriggerWatched : ''}`}
                       onClick={() => toggleVideo(video.id)}
                     >
+                      {watchedVideos.has(video.id) && (
+                        <span className={styles.videoCheckmark}>✓</span>
+                      )}
                       <span className={styles.videoTriggerText}>{video.title}</span>
                       <span className={styles.videoTriggerIcon}>
                         {openVideoId === video.id ? '▲' : '▶'}
