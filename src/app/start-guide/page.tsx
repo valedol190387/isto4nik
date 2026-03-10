@@ -129,14 +129,10 @@ export default function StartGuidePage() {
   const user = useSignal(initData.user);
   const router = useRouter();
 
-  // Управление нативной кнопкой «назад» Telegram
+  // Управление нативной кнопкой «назад» Telegram — показываем на всех экранах
   useEffect(() => {
     if (backButton.show.isAvailable()) {
-      if (screen !== 1) {
-        backButton.show();
-      } else {
-        backButton.hide();
-      }
+      backButton.show();
     }
   }, [screen]);
 
@@ -150,6 +146,27 @@ export default function StartGuidePage() {
         }
       });
     }
+  }, [screen, router]);
+
+  // Управление нативной кнопкой «назад» Max мессенджер
+  useEffect(() => {
+    const maxBackButton = (window as any).__MAX_PLATFORM__ && (window as any).WebApp?.BackButton;
+    if (!maxBackButton) return;
+
+    maxBackButton.show();
+
+    const handler = () => {
+      if (screen === 1) {
+        router.back();
+      } else {
+        window.history.back();
+      }
+    };
+    maxBackButton.onClick(handler);
+
+    return () => {
+      maxBackButton.offClick(handler);
+    };
   }, [screen, router]);
 
   // Загружаем прогресс из localStorage
@@ -394,28 +411,8 @@ export default function StartGuidePage() {
       </span>
     ));
 
-  // Показывать кнопку назад на всех экранах кроме первого
-  const showBack = screen !== 1;
-
-  // Обработчик кнопки назад — возвращаемся на предыдущий экран через history
-  const handleBack = useCallback(() => {
-    window.history.back();
-  }, []);
-
   return (
     <Page back={false}>
-      {/* Своя кнопка назад для экранов 2+ */}
-      {showBack && (
-        <button
-          className="ui-back-button"
-          onClick={handleBack}
-          aria-label="Назад"
-        >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M19 12H5M12 19l-7-7 7-7" />
-          </svg>
-        </button>
-      )}
       <div className={styles.container}>
 
         {/* ===== ЭКРАН 1: Вступление ===== */}

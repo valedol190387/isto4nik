@@ -254,6 +254,7 @@
   width: calc(100% + 48px + var(--safe-area-inset-left, 0px) + var(--safe-area-inset-right, 0px));
   margin-left: calc(-24px - var(--safe-area-inset-left, 0px));
   margin-right: calc(-24px - var(--safe-area-inset-right, 0px));
+  margin-top: var(--safe-area-inset-top, 0px);
   aspect-ratio: 3 / 4;
   overflow: hidden;
 }
