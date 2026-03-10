@@ -28,8 +28,8 @@ export function checkDeepLink(startParam: string | null): DeepLinkResult {
     return { isDeepLink: true, type: 'onboarding' };
   }
 
-  // Новый онбординг (воронка start-guide)
-  if (startParam === 'newonboarding') {
+  // Новый онбординг (воронка start-guide) — с возможными UTM после newonboarding_
+  if (startParam === 'newonboarding' || startParam.startsWith('newonboarding_')) {
     return { isDeepLink: true, type: 'newonboarding' };
   }
 
@@ -74,8 +74,16 @@ export function parseUtmFromStartParam(startParam: string | null): {
   
   const params = startParam.split('_');
   
-  // Если это deep link на материал, UTM начинается с 3-го параметра
-  const utmStartIndex = params[0] === 'materials' && params[1] ? 2 : 0;
+  // Если это deep link, UTM начинается после префикса
+  // materials_UUID_utm1_utm2... → skip 2
+  // newonboarding_utm1_utm2... → skip 1
+  // onboarding_utm1_utm2... → skip 1
+  let utmStartIndex = 0;
+  if (params[0] === 'materials' && params[1]) {
+    utmStartIndex = 2;
+  } else if (params[0] === 'newonboarding' || params[0] === 'onboarding') {
+    utmStartIndex = 1;
+  }
   
   const utmParams: any = {};
   

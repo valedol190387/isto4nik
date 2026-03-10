@@ -120,6 +120,10 @@ export default function StartGuidePage() {
   const [watchedVideos, setWatchedVideos] = useState<Set<string>>(new Set());
   const [openVideoId, setOpenVideoId] = useState<string | null>(null);
 
+  // Подсказка «Сверните приложение» (как в материалах)
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
+
   // Форма поддержки
   const [supportOpen, setSupportOpen] = useState(false);
   const [supportMessage, setSupportMessage] = useState('');
@@ -168,6 +172,24 @@ export default function StartGuidePage() {
       maxBackButton.offClick(handler);
     };
   }, [screen, router]);
+
+  // Детекция мобильного устройства
+  useEffect(() => {
+    const detect = () => {
+      setIsMobileDevice('ontouchstart' in window || window.innerWidth < 1024);
+    };
+    detect();
+    window.addEventListener('resize', detect);
+    return () => window.removeEventListener('resize', detect);
+  }, []);
+
+  // Автоскрытие подсказки через 5 секунд
+  useEffect(() => {
+    if (showSwipeHint) {
+      const timer = setTimeout(() => setShowSwipeHint(false), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSwipeHint]);
 
   // Загружаем прогресс из БД
   const [screensVisited, setScreensVisited] = useState<Set<string>>(new Set(['screen-1']));
@@ -339,17 +361,20 @@ export default function StartGuidePage() {
         <div className={allWatched ? styles.offerLabelBonus : styles.offerLabel}>
           {allWatched ? '30 дней за 450 рублей' : '14 дней за 1 800 рублей'}
         </div>
-        <a
-          href={allWatched
-            ? 'https://t.me/istochnik_clubbot?start=fromnewonboardallvideodone'
-            : 'https://t.me/istochnik_clubbot?start=fromnewonboarding'
-          }
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
           className={`${styles.primaryButton} ${allWatched ? styles.primaryButtonBonus : ''}`}
+          onClick={() => {
+            const url = allWatched
+              ? 'https://t.me/istochnik_clubbot?start=fromnewonboardallvideodone'
+              : 'https://t.me/istochnik_clubbot?start=fromnewonboarding';
+            window.open(url, '_blank', 'noopener,noreferrer');
+            if (isMobileDevice) {
+              setTimeout(() => setShowSwipeHint(true), 1000);
+            }
+          }}
         >
           Получить доступ
-        </a>
+        </button>
       </div>
 
       {!options.hideAbout && (
@@ -700,6 +725,84 @@ export default function StartGuidePage() {
       </div>
 
       <ScrollSpacer />
+
+      {/* Подсказка свайпа — 1 в 1 как в материалах */}
+      {showSwipeHint && isMobileDevice && (
+        <>
+          <style>{`
+            @keyframes customBounce {
+              0%, 100% { transform: translateY(0); }
+              50% { transform: translateY(-10px); }
+            }
+          `}</style>
+          <div
+            style={{
+              position: 'fixed',
+              top: 'calc(env(safe-area-inset-top, 0px) + 120px)',
+              left: '16px',
+              right: '16px',
+              backgroundColor: 'rgba(8, 36, 69, 0.95)',
+              padding: '20px 16px',
+              borderRadius: '16px',
+              zIndex: 9999,
+              boxShadow: '0 4px 20px rgba(8,36,69,0.4)',
+              animation: 'customBounce 2s ease-in-out infinite'
+            }}
+            onClick={() => setShowSwipeHint(false)}
+          >
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '12px'
+              }}
+            >
+              <span
+                style={{
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  lineHeight: '1.3',
+                  letterSpacing: '0.5px'
+                }}
+              >
+                НЕ ОТКРЫЛОСЬ?<br/>СВЕРНИ ПРИЛОЖЕНИЕ НАЖАВ НА
+              </span>
+              <svg
+                width="40"
+                height="40"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                style={{ filter: 'drop-shadow(0 2px 8px rgba(255,255,255,0.4))' }}
+              >
+                <path
+                  d="M6 9L12 15L18 9"
+                  stroke="white"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+              <span
+                style={{
+                  color: 'white',
+                  fontSize: '16px',
+                  fontWeight: 'bold',
+                  textAlign: 'center',
+                  lineHeight: '1.3',
+                  letterSpacing: '0.5px'
+                }}
+              >
+                Или потяни вниз за это сообщение
+              </span>
+            </div>
+          </div>
+        </>
+      )}
     </Page>
   );
 }
