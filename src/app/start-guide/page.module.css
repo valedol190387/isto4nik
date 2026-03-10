@@ -53,10 +53,11 @@
   flex-direction: column;
 }
 
-/* Экран без hero-картинки */
+/* Экран без hero-картинки — отступ как на других страницах (favorites и тд) */
 .screenPadded {
   display: flex;
   flex-direction: column;
+  padding-top: calc(16px + var(--safe-area-inset-top, 0px));
 }
 
 /* Фото героя — на всю ширину */
