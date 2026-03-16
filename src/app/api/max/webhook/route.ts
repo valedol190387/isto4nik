@@ -212,10 +212,15 @@ async function handleUserAdded(update: any) {
     // Нет в нашей БД — кикаем
     console.log(`[MAX BOT] Unknown user max_id=${addedUserId} in chat ${chatId}, kicking`);
 
-    await sendMessage({
-      userId: addedUserId,
-      text: '❌ Ваш аккаунт не привязан. Для доступа в канал сначала активируйте бота через ссылку из Telegram.',
-    });
+    // Сообщение может не дойти если юзер не запускал бота — не страшно
+    try {
+      await sendMessage({
+        userId: addedUserId,
+        text: '❌ Ваш аккаунт не привязан. Для доступа в канал сначала активируйте бота через ссылку из Telegram.',
+      });
+    } catch (e) {
+      console.log(`[MAX BOT] Could not send message to ${addedUserId} (probably never started bot)`);
+    }
 
     await removeChatMember(chatId, addedUserId);
     await logEvent('user_kicked', addedUserId, null, chatId, { reason: 'not_in_db' });
@@ -226,10 +231,14 @@ async function handleUserAdded(update: any) {
   if (user.status !== 'Активна') {
     console.log(`[MAX BOT] User max_id=${addedUserId} (tg=${user.telegram_id}) has no active subscription, kicking from chat ${chatId}`);
 
-    await sendMessage({
-      userId: addedUserId,
-      text: '❌ У вас нет активной подписки. Доступ в канал закрыт. Оформите подписку и попробуйте снова.',
-    });
+    try {
+      await sendMessage({
+        userId: addedUserId,
+        text: '❌ У вас нет активной подписки. Доступ в канал закрыт. Оформите подписку и попробуйте снова.',
+      });
+    } catch (e) {
+      console.log(`[MAX BOT] Could not send message to ${addedUserId} (probably never started bot)`);
+    }
 
     await removeChatMember(chatId, addedUserId);
     await logEvent('user_kicked', addedUserId, user.telegram_id, chatId, {
