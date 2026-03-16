@@ -16,7 +16,8 @@ import {
   ExternalLink,
   Bell,
   Eye,
-  ClipboardList
+  ClipboardList,
+  Bot
 } from 'lucide-react';
 import { useState } from 'react';
 import styles from './AdminSidebar.module.css';
@@ -95,6 +96,12 @@ const sidebarItems: SidebarItem[] = [
     title: 'UTM-генератор',
     icon: <ExternalLink size={20} />,
     path: '/admin/utm-generator'
+  },
+  {
+    id: 'max-bot',
+    title: 'Max Бот',
+    icon: <Bot size={20} />,
+    path: '/admin/max-bot'
   }
 ];
 
