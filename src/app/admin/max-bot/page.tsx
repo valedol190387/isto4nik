@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bot, RefreshCw } from 'lucide-react';
+import { Bot, RefreshCw, ShieldOff } from 'lucide-react';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import styles from './page.module.css';
 
@@ -77,6 +77,9 @@ export default function MaxBotPage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [filter, setFilter] = useState('all');
   const [showRaw, setShowRaw] = useState(false);
+  const [unbanId, setUnbanId] = useState('');
+  const [unbanLoading, setUnbanLoading] = useState(false);
+  const [unbanResult, setUnbanResult] = useState<string | null>(null);
 
   const fetchLogs = useCallback(async () => {
     try {
@@ -113,6 +116,32 @@ export default function MaxBotPage() {
     setIsRefreshing(true);
     await fetchLogs();
     setIsRefreshing(false);
+  };
+
+  const handleUnban = async () => {
+    if (!unbanId.trim()) return;
+    setUnbanLoading(true);
+    setUnbanResult(null);
+    try {
+      const res = await fetch('/api/max/unban', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ max_user_id: Number(unbanId.trim()) }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        const ok = data.results.filter((r: any) => r.success).length;
+        setUnbanResult(`Разбанен в ${ok}/${data.results.length} каналах`);
+        setUnbanId('');
+      } else {
+        setUnbanResult(`Ошибка: ${data.error}`);
+      }
+    } catch {
+      setUnbanResult('Ошибка запроса');
+    } finally {
+      setUnbanLoading(false);
+      setTimeout(() => setUnbanResult(null), 4000);
+    }
   };
 
   // Фильтруем raw: события если не включён showRaw
@@ -229,6 +258,32 @@ export default function MaxBotPage() {
               <button className={styles.resetBtn} onClick={() => setFilter('all')}>
                 Сбросить
               </button>
+            )}
+          </div>
+        </div>
+
+        {/* Unban */}
+        <div className={styles.unbanSection}>
+          <div className={styles.unbanRow}>
+            <ShieldOff size={18} className={styles.unbanIcon} />
+            <span className={styles.unbanLabel}>Разбан пользователя</span>
+            <input
+              type="text"
+              className={styles.unbanInput}
+              placeholder="Max User ID"
+              value={unbanId}
+              onChange={(e) => setUnbanId(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleUnban()}
+            />
+            <button
+              className={styles.unbanBtn}
+              onClick={handleUnban}
+              disabled={unbanLoading || !unbanId.trim()}
+            >
+              {unbanLoading ? 'Разбан...' : 'Разбанить'}
+            </button>
+            {unbanResult && (
+              <span className={styles.unbanResult}>{unbanResult}</span>
             )}
           </div>
         </div>
