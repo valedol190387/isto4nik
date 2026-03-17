@@ -85,6 +85,16 @@ export async function getChatMembers(
 }
 
 /**
+ * Добавить пользователя в чат/канал
+ */
+export async function addChatMember(
+  chatId: number,
+  userIds: number[]
+): Promise<{ success: boolean }> {
+  return maxBotFetch('POST', `/chats/${chatId}/members`, { userIds });
+}
+
+/**
  * Удалить участника из чата
  */
 export async function removeChatMember(
