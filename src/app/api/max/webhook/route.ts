@@ -2,6 +2,42 @@ import { supabase } from '@/lib/supabase';
 import { removeChatMember, sendMessage } from '@/lib/max-bot-api';
 import { NextResponse } from 'next/server';
 
+/**
+ * Форматирует информацию о подписке для сообщений
+ */
+function formatSubscriptionInfo(user: {
+  status: string | null;
+  clubtarif: string | null;
+  next_payment_date: string | null;
+  sub_club_stop: string | null;
+}): string {
+  const isActive = user.status === 'Активна';
+  const statusEmoji = isActive ? '🟢' : '🔴';
+  const statusText = isActive ? 'Активна' : (user.status || 'Неактивна');
+
+  let info = `\n\n${statusEmoji} Подписка: ${statusText}`;
+
+  if (user.clubtarif) {
+    info += `\nТариф: ${user.clubtarif}`;
+  }
+
+  if (isActive && user.next_payment_date) {
+    const date = new Date(user.next_payment_date).toLocaleDateString('ru-RU', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+    info += `\nСледующая оплата: ${date}`;
+  }
+
+  if (!isActive && user.sub_club_stop) {
+    const date = new Date(user.sub_club_stop).toLocaleDateString('ru-RU', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+    info += `\nПодписка закончилась: ${date}`;
+  }
+
+  return info;
+}
+
 // POST /api/max/webhook
 // Обрабатывает входящие события от Max Bot API
 export async function POST(request: Request) {
@@ -93,7 +129,7 @@ async function handleBotStarted(update: any) {
   // Ищем пользователя по telegram_id
   const { data: user, error: findError } = await supabase
     .from('users')
-    .select('id, telegram_id, max_id, status')
+    .select('id, telegram_id, max_id, status, clubtarif, next_payment_date, sub_club_stop')
     .eq('telegram_id', telegramId)
     .single();
 
@@ -112,9 +148,10 @@ async function handleBotStarted(update: any) {
   // Если уже привязан к этому юзеру — ок
   if (user.max_id === maxUserId) {
     await logEvent('link_already_exists', maxUserId, telegramId, null, { user_id: user.id });
+    const subInfo = formatSubscriptionInfo(user);
     await sendMessage({
       userId: maxUserId,
-      text: '✅ Ваш аккаунт уже привязан! Можете вступать в канал.',
+      text: `✅ Ваш аккаунт уже привязан! Можете вступать в канал.${subInfo}`,
     });
     return;
   }
@@ -173,9 +210,10 @@ async function handleBotStarted(update: any) {
 
   console.log(`[MAX BOT] Linked max_id=${maxUserId} to telegram_id=${telegramId}`);
 
+  const subInfo = formatSubscriptionInfo(user);
   await sendMessage({
     userId: maxUserId,
-    text: '✅ Аккаунт успешно привязан! Теперь вы можете вступить в канал.',
+    text: `✅ Аккаунт успешно привязан! Теперь вы можете вступить в канал.${subInfo}`,
   });
 }
 
@@ -204,7 +242,7 @@ async function handleUserAdded(update: any) {
   // Ищем пользователя по max_id
   const { data: user, error } = await supabase
     .from('users')
-    .select('id, telegram_id, max_id, status')
+    .select('id, telegram_id, max_id, status, clubtarif, next_payment_date, sub_club_stop')
     .eq('max_id', addedUserId)
     .single();
 
@@ -231,10 +269,11 @@ async function handleUserAdded(update: any) {
   if (user.status !== 'Активна') {
     console.log(`[MAX BOT] User max_id=${addedUserId} (tg=${user.telegram_id}) has no active subscription, kicking from chat ${chatId}`);
 
+    const subInfo = formatSubscriptionInfo(user);
     try {
       await sendMessage({
         userId: addedUserId,
-        text: '❌ У вас нет активной подписки. Доступ в канал закрыт. Оформите подписку и попробуйте снова.',
+        text: `❌ У вас нет активной подписки. Доступ в канал закрыт. Оформите подписку и попробуйте снова.${subInfo}`,
       });
     } catch (e) {
       console.log(`[MAX BOT] Could not send message to ${addedUserId} (probably never started bot)`);
@@ -250,6 +289,15 @@ async function handleUserAdded(update: any) {
 
   // Всё ок — подписка активна
   console.log(`[MAX BOT] User max_id=${addedUserId} (tg=${user.telegram_id}) granted access to chat ${chatId}`);
+  const subInfo = formatSubscriptionInfo(user);
+  try {
+    await sendMessage({
+      userId: addedUserId,
+      text: `✅ Добро пожаловать! Доступ в канал открыт.${subInfo}`,
+    });
+  } catch (e) {
+    // Не страшно если сообщение не дошло
+  }
   await logEvent('access_granted', addedUserId, user.telegram_id, chatId, {
     status: user.status,
   });
