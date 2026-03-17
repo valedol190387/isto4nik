@@ -35,7 +35,6 @@ const EVENT_BADGE_MAP: Record<string, { label: string; style: string }> = {
   'access_granted': { label: 'Доступ дан', style: 'badgeGreen' },
   'phantom_deleted': { label: 'Фантом удалён', style: 'badgeYellow' },
   'message_created': { label: 'Сообщение', style: 'badgeGray' },
-  'auto_added_to_channels': { label: 'Добавлен в каналы', style: 'badgeGreen' },
   'subscription_expired_kick': { label: 'Подписка истекла → кик', style: 'badgeRed' },
   'error': { label: 'Ошибка', style: 'badgeRed' },
 };

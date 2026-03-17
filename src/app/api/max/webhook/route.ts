@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase';
-import { removeChatMember, sendMessage, addChatMember } from '@/lib/max-bot-api';
+import { removeChatMember, sendMessage } from '@/lib/max-bot-api';
 import { NextResponse } from 'next/server';
 
 /**
@@ -31,35 +31,6 @@ function formatSubscriptionInfo(user: {
   }
 
   return info;
-}
-
-/**
- * Добавляет пользователя во все каналы из MAX_CHANNEL_IDS
- * Возвращает массив результатов по каждому каналу
- */
-async function addUserToChannels(maxUserId: number): Promise<{ chatId: number; success: boolean; error?: string }[]> {
-  const channelIdsStr = process.env.MAX_CHANNEL_IDS || '';
-  const channelIds = channelIdsStr
-    .split(',')
-    .map(id => parseInt(id.trim(), 10))
-    .filter(id => !isNaN(id));
-
-  if (channelIds.length === 0) return [];
-
-  const results: { chatId: number; success: boolean; error?: string }[] = [];
-
-  for (const chatId of channelIds) {
-    try {
-      await addChatMember(chatId, [maxUserId]);
-      results.push({ chatId, success: true });
-    } catch (e: any) {
-      // Может быть если уже состоит в канале — это ок
-      console.log(`[MAX BOT] Could not add max_id=${maxUserId} to chat ${chatId}: ${e.message}`);
-      results.push({ chatId, success: false, error: e.message });
-    }
-  }
-
-  return results;
 }
 
 // POST /api/max/webhook
@@ -173,22 +144,10 @@ async function handleBotStarted(update: any) {
   if (user.max_id === maxUserId) {
     await logEvent('link_already_exists', maxUserId, telegramId, null, { user_id: user.id });
     const subInfo = formatSubscriptionInfo(user);
-
-    // Если подписка активна — автоматически добавляем в каналы
-    if (user.status === 'Активна') {
-      const addResults = await addUserToChannels(maxUserId);
-      const added = addResults.filter(r => r.success).length;
-      await sendMessage({
-        userId: maxUserId,
-        text: `✅ Ваш аккаунт уже привязан!${added > 0 ? ' Вы добавлены в каналы.' : ' Можете вступать в канал.'}${subInfo}`,
-      });
-      await logEvent('auto_added_to_channels', maxUserId, telegramId, null, { results: addResults });
-    } else {
-      await sendMessage({
-        userId: maxUserId,
-        text: `✅ Ваш аккаунт привязан, но подписка неактивна. Оформите подписку для доступа в каналы.${subInfo}`,
-      });
-    }
+    await sendMessage({
+      userId: maxUserId,
+      text: `✅ Ваш аккаунт уже привязан! Можете вступать в канал.${subInfo}`,
+    });
     return;
   }
 
@@ -247,22 +206,10 @@ async function handleBotStarted(update: any) {
   console.log(`[MAX BOT] Linked max_id=${maxUserId} to telegram_id=${telegramId}`);
 
   const subInfo = formatSubscriptionInfo(user);
-
-  // Если подписка активна — автоматически добавляем в каналы
-  if (user.status === 'Активна') {
-    const addResults = await addUserToChannels(maxUserId);
-    const added = addResults.filter(r => r.success).length;
-    await sendMessage({
-      userId: maxUserId,
-      text: `✅ Аккаунт успешно привязан!${added > 0 ? ' Вы добавлены в каналы.' : ' Теперь вы можете вступить в канал.'}${subInfo}`,
-    });
-    await logEvent('auto_added_to_channels', maxUserId, telegramId, null, { results: addResults });
-  } else {
-    await sendMessage({
-      userId: maxUserId,
-      text: `✅ Аккаунт привязан, но подписка неактивна. Оформите подписку для доступа в каналы.${subInfo}`,
-    });
-  }
+  await sendMessage({
+    userId: maxUserId,
+    text: `✅ Аккаунт успешно привязан! Теперь вы можете вступить в канал.${subInfo}`,
+  });
 }
 
 /**
