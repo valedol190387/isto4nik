@@ -226,6 +226,31 @@
   aspect-ratio: 16/9;
 }
 
+/* Секция аудио */
+.audioSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.audioItem {
+  width: 100%;
+}
+
+.audioTitle {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-main);
+  margin: 0 0 8px 0;
+  font-family: 'RalewayMedium', sans-serif;
+}
+
+.audioPlayer {
+  width: 100%;
+  border-radius: 12px;
+}
+
 /* Секция описания */
 .descriptionSection {
   text-align: left;

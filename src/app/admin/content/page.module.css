@@ -995,6 +995,20 @@
   font-size: 13px;
 }
 
+.audioPreview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.audioPreview audio {
+  flex: 1;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .mainContent {

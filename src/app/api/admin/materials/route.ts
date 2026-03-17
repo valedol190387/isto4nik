@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabase';
 import { NextResponse } from 'next/server';
-import { deletePromoImage, isValidPromoImageUrl } from '@/lib/s3';
+import { deletePromoImage, isValidPromoImageUrl, deleteAudioFile, isValidAudioUrl } from '@/lib/s3';
 
 // GET - получить все материалы для админки
 export async function GET() {
@@ -92,7 +92,7 @@ export async function POST(request: Request) {
 export async function PUT(request: Request) {
   try {
     const materialData = await request.json();
-    const { id, display_order, section_key, oldPicUrl } = materialData;
+    const { id, display_order, section_key, oldPicUrl, oldAudios } = materialData;
 
     if (!id) {
       return NextResponse.json(
@@ -128,8 +128,19 @@ export async function PUT(request: Request) {
       await deletePromoImage(oldPicUrl);
     }
 
-    // Удаляем oldPicUrl из данных для обновления
+    // Удаляем старые аудио файлы с S3, если они были убраны
+    if (oldAudios && Array.isArray(oldAudios)) {
+      const newAudioUrls = new Set((materialData.audios || []).map((a: { audio_url: string }) => a.audio_url));
+      for (const oldAudio of oldAudios) {
+        if (oldAudio.audio_url && !newAudioUrls.has(oldAudio.audio_url) && isValidAudioUrl(oldAudio.audio_url)) {
+          await deleteAudioFile(oldAudio.audio_url);
+        }
+      }
+    }
+
+    // Удаляем oldPicUrl и oldAudios из данных для обновления
     delete materialData.oldPicUrl;
+    delete materialData.oldAudios;
 
     // Добавляем временную метку обновления
     materialData.updated_at = new Date().toISOString();
@@ -167,10 +178,10 @@ export async function DELETE(request: Request) {
       );
     }
 
-    // Сначала получаем данные материала для удаления промо-картинки
+    // Сначала получаем данные материала для удаления промо-картинки и аудио
     const { data: material, error: fetchError } = await supabase
       .from('materials')
-      .select('pic_url')
+      .select('pic_url, audios')
       .eq('id', id)
       .single();
 
@@ -191,6 +202,15 @@ export async function DELETE(request: Request) {
     // Удаляем промо-картинку из S3, если она есть
     if (material?.pic_url && isValidPromoImageUrl(material.pic_url)) {
       await deletePromoImage(material.pic_url);
+    }
+
+    // Удаляем аудио файлы из S3, если они есть
+    if (material?.audios && Array.isArray(material.audios)) {
+      for (const audio of material.audios) {
+        if (audio.audio_url && isValidAudioUrl(audio.audio_url)) {
+          await deleteAudioFile(audio.audio_url);
+        }
+      }
     }
 
     return NextResponse.json({ success: true });

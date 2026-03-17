@@ -23,10 +23,15 @@ const BUCKET_NAME = process.env.S3_BUCKET_NAME!;
 const AVATARS_FOLDER = 'avatars';
 const PROMOPIC_FOLDER = 'promopic';
 const POPUP_FOLDER = 'popup';
+const AUDIO_FOLDER = 'audio';
 
 // Разрешенные типы файлов для аватаров
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+// Разрешенные типы файлов для аудио
+const ALLOWED_AUDIO_TYPES = ['audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/mp4', 'audio/webm', 'audio/aac'];
+const MAX_AUDIO_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
 // Функция для загрузки аватара
 export async function uploadAvatar(file: File): Promise<string> {
@@ -247,4 +252,68 @@ export async function deletePopupImage(imageUrl: string): Promise<void> {
     console.error('Error deleting popup image from S3:', error);
     // Не бросаем ошибку, чтобы не блокировать удаление записи из БД
   }
+}
+
+// Функция для загрузки аудио файла
+export async function uploadAudioFile(file: File): Promise<string> {
+  if (!s3Client) {
+    throw new Error('S3 не настроен');
+  }
+
+  if (!ALLOWED_AUDIO_TYPES.includes(file.type)) {
+    throw new Error('Недопустимый тип файла. Разрешены только: MP3, WAV, OGG, M4A, WebM, AAC');
+  }
+
+  if (file.size > MAX_AUDIO_FILE_SIZE) {
+    throw new Error('Файл слишком большой. Максимальный размер: 50MB');
+  }
+
+  const fileExtension = file.name.split('.').pop()?.toLowerCase() || 'mp3';
+  const fileName = `audio-${Date.now()}-${uuidv4()}.${fileExtension}`;
+  const key = `${AUDIO_FOLDER}/${fileName}`;
+
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const command = new PutObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+      Body: buffer,
+      ContentType: file.type,
+      ACL: 'public-read',
+    });
+
+    await s3Client.send(command);
+
+    const publicUrl = `${process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud'}/${BUCKET_NAME}/${key}`;
+    return publicUrl;
+  } catch (error) {
+    console.error('Error uploading audio to S3:', error);
+    throw new Error('Ошибка загрузки аудио. Попробуйте еще раз.');
+  }
+}
+
+// Функция для удаления аудио файла
+export async function deleteAudioFile(audioUrl: string): Promise<void> {
+  if (!s3Client) return;
+
+  try {
+    const urlParts = audioUrl.split('/');
+    const key = urlParts.slice(-2).join('/'); // Получаем "audio/filename.mp3"
+
+    const command = new DeleteObjectCommand({
+      Bucket: BUCKET_NAME,
+      Key: key,
+    });
+
+    await s3Client.send(command);
+  } catch (error) {
+    console.error('Error deleting audio from S3:', error);
+  }
+}
+
+// Функция для проверки валидности URL аудио
+export function isValidAudioUrl(url: string): boolean {
+  return url.startsWith(`${process.env.S3_ENDPOINT || 'https://s3.ru1.storage.beget.cloud'}/${BUCKET_NAME}/${AUDIO_FOLDER}/`);
 } 

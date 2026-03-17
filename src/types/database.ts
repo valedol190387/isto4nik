@@ -29,6 +29,12 @@ export interface MaterialVideo {
   embed_code: string;                  // HTML код для встраивания видео
 }
 
+// Интерфейс для аудио в материале
+export interface MaterialAudio {
+  title: string;                       // Название аудио
+  audio_url: string;                   // URL аудио файла на S3
+}
+
 export interface Material {
   id: number;
   title: string;
@@ -43,6 +49,8 @@ export interface Material {
   is_embedded_video: boolean;          // Галочка "встроенное видео"
   video_embed_code: string | null;     // Устаревшее: код для вставки видео (для обратной совместимости)
   videos: MaterialVideo[];             // Новое: массив видео [{title, embed_code}]
+  audios: MaterialAudio[];             // Массив аудио [{title, audio_url}]
+  has_audio: boolean;                  // Галочка "аудио материал"
   pic_url: string | null;              // URL изображения для превью
   share_uuid?: string;                 // UUID для безопасных ссылок
   created_at: string;
@@ -169,7 +177,7 @@ export interface MaterialViewLog {
   material_title: string | null;
   video_index: number | null;
   video_title: string | null;
-  event_type: 'lesson_open' | 'video_view';
+  event_type: 'lesson_open' | 'video_view' | 'audio_listen';
   username: string | null;
   utm_1: string | null;
   utm_2: string | null;

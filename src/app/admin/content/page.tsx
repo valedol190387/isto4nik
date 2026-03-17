@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Plus, Edit, Trash2, X, ExternalLink, Tag, Folder, ChevronDown, ChevronRight, Video, Link, Copy } from 'lucide-react';
+import { Plus, Edit, Trash2, X, ExternalLink, Tag, Folder, ChevronDown, ChevronRight, Video, Link, Copy, Music } from 'lucide-react';
 import { AdminSidebar } from '@/components/AdminSidebar';
 import { createMaterialShareLink, copyLinkToClipboard } from '@/lib/adminLinks';
 import styles from './page.module.css';
@@ -11,6 +11,12 @@ import styles from './page.module.css';
 interface VideoItem {
   title: string;
   embed_code: string;
+}
+
+// Интерфейс для аудио в материале
+interface AudioItem {
+  title: string;
+  audio_url: string;
 }
 
 interface Material {
@@ -26,6 +32,8 @@ interface Material {
   is_embedded_video: boolean;        // Галочка "встроенное видео"
   video_embed_code: string | null;   // Устаревшее (для обратной совместимости)
   videos: VideoItem[];               // Массив видео [{title, embed_code}]
+  has_audio: boolean;                // Галочка "аудио материал"
+  audios: AudioItem[];               // Массив аудио [{title, audio_url}]
   pic_url: string | null;            // URL изображения для превью
   share_uuid?: string;               // UUID для безопасных ссылок
   created_at: string;
@@ -43,6 +51,8 @@ interface MaterialForm {
   display_order: number;
   is_embedded_video: boolean;        // Галочка "встроенное видео"
   videos: VideoItem[];               // Массив видео [{title, embed_code}]
+  has_audio: boolean;                // Галочка "аудио материал"
+  audios: AudioItem[];               // Массив аудио [{title, audio_url}]
   pic_url: string;                   // URL изображения для превью
 }
 
@@ -57,6 +67,8 @@ const initialForm: MaterialForm = {
   display_order: 1,
   is_embedded_video: false,          // По умолчанию обычная ссылка
   videos: [],                        // Пустой массив видео
+  has_audio: false,                  // По умолчанию без аудио
+  audios: [],                        // Пустой массив аудио
   pic_url: ''                        // URL изображения для превью
 };
 
@@ -96,6 +108,7 @@ export default function AdminContent() {
   const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
   const [linkCopiedFor, setLinkCopiedFor] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadingAudio, setUploadingAudio] = useState<number | null>(null);
   const router = useRouter();
 
   const ITEMS_PER_PAGE = 15;
@@ -134,12 +147,13 @@ export default function AdminContent() {
 
     try {
       const method = editingMaterial ? 'PUT' : 'POST';
-      const materialData = editingMaterial 
-        ? { 
-            ...form, 
+      const materialData = editingMaterial
+        ? {
+            ...form,
             id: editingMaterial.id,
-            oldPicUrl: editingMaterial.pic_url // Для удаления старого изображения
-          } 
+            oldPicUrl: editingMaterial.pic_url, // Для удаления старого изображения
+            oldAudios: editingMaterial.audios   // Для удаления старых аудио с S3
+          }
         : form;
 
       const response = await fetch('/api/admin/materials', {
@@ -181,6 +195,8 @@ export default function AdminContent() {
       display_order: material.display_order,
       is_embedded_video: material.is_embedded_video,
       videos: material.videos || [],
+      has_audio: material.has_audio || false,
+      audios: material.audios || [],
       pic_url: material.pic_url || ''
     });
     setShowPreview(false);
@@ -236,6 +252,38 @@ export default function AdminContent() {
       alert('Ошибка загрузки файла');
     } finally {
       setUploadingImage(false);
+    }
+  };
+
+  const handleAudioUpload = async (index: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingAudio(index);
+
+    try {
+      const formData = new FormData();
+      formData.append('audio', file);
+
+      const response = await fetch('/api/upload/audio', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        const newAudios = [...form.audios];
+        newAudios[index] = { ...newAudios[index], audio_url: data.audioUrl };
+        setForm({ ...form, audios: newAudios });
+      } else {
+        alert(`Ошибка загрузки: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('Error uploading audio:', error);
+      alert('Ошибка загрузки аудио файла');
+    } finally {
+      setUploadingAudio(null);
     }
   };
 
@@ -495,12 +543,19 @@ export default function AdminContent() {
                                     <div className={styles.materialDate}>
                                       Добавлено {formatDate(material.created_at)}
                                     </div>
-                                    {material.is_embedded_video ? (
+                                    {material.is_embedded_video && (
                                       <div className={styles.materialType}>
                                         <Video size={14} />
-                                        Встроенное видео
+                                        Видео
                                       </div>
-                                    ) : material.url && (
+                                    )}
+                                    {material.has_audio && (
+                                      <div className={styles.materialType}>
+                                        <Music size={14} />
+                                        Аудио
+                                      </div>
+                                    )}
+                                    {!material.is_embedded_video && !material.has_audio && material.url && (
                                       <a href={material.url} target="_blank" rel="noopener noreferrer" className={styles.materialLink}>
                                         <ExternalLink size={14} />
                                         Внешняя ссылка
@@ -790,6 +845,121 @@ export default function AdminContent() {
 
                   <p className={styles.fieldHint}>
                     Вставьте полный HTML код для встраивания видео из Kinescope. Можно добавить несколько видео.
+                  </p>
+                </div>
+              )}
+
+              {/* Галочка для аудио */}
+              <div className={styles.formGroup}>
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={form.has_audio}
+                    onChange={(e) => {
+                      const checked = e.target.checked;
+                      setForm({
+                        ...form,
+                        has_audio: checked,
+                        audios: checked && form.audios.length === 0
+                          ? [{ title: '', audio_url: '' }]
+                          : (checked ? form.audios : [])
+                      });
+                    }}
+                  />
+                  <span className={styles.checkboxText}>Аудио материал</span>
+                </label>
+                <p className={styles.fieldHint}>
+                  Загрузите аудио файлы для прослушивания на странице материала
+                </p>
+              </div>
+
+              {/* Секция аудио - показывается только при включенной галочке */}
+              {form.has_audio && (
+                <div className={styles.videosSection}>
+                  <div className={styles.videosSectionHeader}>
+                    <label>Аудио ({form.audios.length})</label>
+                    <button
+                      type="button"
+                      onClick={() => setForm({
+                        ...form,
+                        audios: [...form.audios, { title: '', audio_url: '' }]
+                      })}
+                      className={styles.addVideoBtn}
+                    >
+                      <Plus size={16} />
+                      Добавить аудио
+                    </button>
+                  </div>
+
+                  {form.audios.map((audio, index) => (
+                    <div key={index} className={styles.videoItemForm}>
+                      <div className={styles.videoItemHeader}>
+                        <span className={styles.videoNumber}>Аудио {index + 1}</span>
+                        {form.audios.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => setForm({
+                              ...form,
+                              audios: form.audios.filter((_, i) => i !== index)
+                            })}
+                            className={styles.removeVideoBtn}
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        )}
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Название аудио (необязательно)</label>
+                        <input
+                          type="text"
+                          value={audio.title}
+                          onChange={(e) => {
+                            const newAudios = [...form.audios];
+                            newAudios[index] = { ...audio, title: e.target.value };
+                            setForm({ ...form, audios: newAudios });
+                          }}
+                          placeholder="Например: Часть 1, Медитация, и т.д."
+                        />
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label>Аудио файл *</label>
+                        {audio.audio_url ? (
+                          <div className={styles.audioPreview}>
+                            <audio controls preload="metadata" style={{ width: '100%' }}>
+                              <source src={audio.audio_url} />
+                            </audio>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newAudios = [...form.audios];
+                                newAudios[index] = { ...audio, audio_url: '' };
+                                setForm({ ...form, audios: newAudios });
+                              }}
+                              className={styles.removeImageBtn}
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <input
+                            type="file"
+                            accept="audio/*"
+                            onChange={(e) => handleAudioUpload(index, e)}
+                            disabled={uploadingAudio === index}
+                            className={styles.fileInput}
+                          />
+                        )}
+                        {uploadingAudio === index && (
+                          <p className={styles.uploadingText}>Загрузка аудио...</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  <p className={styles.fieldHint}>
+                    Загрузите аудио файлы (MP3, WAV, OGG, M4A). Максимум 50MB на файл.
                   </p>
                 </div>
               )}

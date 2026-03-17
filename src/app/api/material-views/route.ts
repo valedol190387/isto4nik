@@ -10,7 +10,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    if (!['lesson_open', 'video_view'].includes(event_type)) {
+    if (!['lesson_open', 'video_view', 'audio_listen'].includes(event_type)) {
       return NextResponse.json({ error: 'Invalid event_type' }, { status: 400 });
     }
 

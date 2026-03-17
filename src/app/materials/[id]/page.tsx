@@ -19,6 +19,7 @@ export default function MaterialViewPage() {
   const [showSwipeHint, setShowSwipeHint] = useState(false);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
   const trackedVideosRef = useRef<Set<number>>(new Set());
+  const trackedAudiosRef = useRef<Set<number>>(new Set());
   const lessonOpenLoggedRef = useRef(false);
 
   const materialId = params.id as string;
@@ -35,7 +36,7 @@ export default function MaterialViewPage() {
   const logView = useCallback(async (params: {
     telegramId: string;
     materialId: string;
-    eventType: 'lesson_open' | 'video_view';
+    eventType: 'lesson_open' | 'video_view' | 'audio_listen';
     videoIndex?: number;
     videoTitle?: string;
   }) => {
@@ -314,6 +315,39 @@ export default function MaterialViewPage() {
                     className={styles.videoContainer}
                     dangerouslySetInnerHTML={{ __html: video.embed_code }}
                   />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Аудио */}
+          {material.audios && material.audios.length > 0 && (
+            <div className={styles.audioSection}>
+              {material.audios.map((audio, index) => (
+                <div key={index} className={styles.audioItem}>
+                  {audio.title && (
+                    <h3 className={styles.audioTitle}>{audio.title}</h3>
+                  )}
+                  <audio
+                    controls
+                    preload="metadata"
+                    className={styles.audioPlayer}
+                    onPlay={() => {
+                      if (!trackedAudiosRef.current.has(index)) {
+                        trackedAudiosRef.current.add(index);
+                        const telegramId = user?.id?.toString() || getUserId();
+                        logView({
+                          telegramId,
+                          materialId,
+                          eventType: 'audio_listen',
+                          videoIndex: index,
+                          videoTitle: audio.title || undefined,
+                        });
+                      }
+                    }}
+                  >
+                    <source src={audio.audio_url} />
+                  </audio>
                 </div>
               ))}
             </div>
