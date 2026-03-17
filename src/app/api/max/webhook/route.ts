@@ -7,19 +7,14 @@ import { NextResponse } from 'next/server';
  */
 function formatSubscriptionInfo(user: {
   status: string | null;
-  clubtarif: string | null;
   next_payment_date: string | null;
-  sub_club_stop: string | null;
+  leave_date: string | null;
 }): string {
   const isActive = user.status === 'Активна';
   const statusEmoji = isActive ? '🟢' : '🔴';
   const statusText = isActive ? 'Активна' : (user.status || 'Неактивна');
 
   let info = `\n\n${statusEmoji} Подписка: ${statusText}`;
-
-  if (user.clubtarif) {
-    info += `\nТариф: ${user.clubtarif}`;
-  }
 
   if (isActive && user.next_payment_date) {
     const date = new Date(user.next_payment_date).toLocaleDateString('ru-RU', {
@@ -28,8 +23,8 @@ function formatSubscriptionInfo(user: {
     info += `\nСледующая оплата: ${date}`;
   }
 
-  if (!isActive && user.sub_club_stop) {
-    const date = new Date(user.sub_club_stop).toLocaleDateString('ru-RU', {
+  if (!isActive && user.leave_date) {
+    const date = new Date(user.leave_date).toLocaleDateString('ru-RU', {
       day: 'numeric', month: 'long', year: 'numeric'
     });
     info += `\nПодписка закончилась: ${date}`;
@@ -129,7 +124,7 @@ async function handleBotStarted(update: any) {
   // Ищем пользователя по telegram_id
   const { data: user, error: findError } = await supabase
     .from('users')
-    .select('id, telegram_id, max_id, status, clubtarif, next_payment_date, sub_club_stop')
+    .select('id, telegram_id, max_id, status, next_payment_date, leave_date')
     .eq('telegram_id', telegramId)
     .single();
 
@@ -242,7 +237,7 @@ async function handleUserAdded(update: any) {
   // Ищем пользователя по max_id
   const { data: user, error } = await supabase
     .from('users')
-    .select('id, telegram_id, max_id, status, clubtarif, next_payment_date, sub_club_stop')
+    .select('id, telegram_id, max_id, status, next_payment_date, leave_date')
     .eq('max_id', addedUserId)
     .single();
 

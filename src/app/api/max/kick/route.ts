@@ -35,7 +35,7 @@ export async function POST(request: Request) {
     // Находим пользователя
     const { data: user, error: findError } = await supabase
       .from('users')
-      .select('id, telegram_id, max_id, status, clubtarif, next_payment_date, sub_club_stop')
+      .select('id, telegram_id, max_id, status, next_payment_date, leave_date')
       .eq('telegram_id', Number(telegram_id))
       .single();
 
@@ -81,8 +81,8 @@ export async function POST(request: Request) {
     try {
       const statusText = user.status || 'Неактивна';
       let dateInfo = '';
-      if (user.sub_club_stop) {
-        const date = new Date(user.sub_club_stop).toLocaleDateString('ru-RU', {
+      if (user.leave_date) {
+        const date = new Date(user.leave_date).toLocaleDateString('ru-RU', {
           day: 'numeric', month: 'long', year: 'numeric'
         });
         dateInfo = `\nПодписка закончилась: ${date}`;
