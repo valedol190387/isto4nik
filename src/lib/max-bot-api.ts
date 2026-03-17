@@ -91,7 +91,7 @@ export async function addChatMember(
   chatId: number,
   userIds: number[]
 ): Promise<{ success: boolean }> {
-  return maxBotFetch('POST', `/chats/${chatId}/members`, { userIds });
+  return maxBotFetch('POST', `/chats/${chatId}/members`, { user_ids: userIds });
 }
 
 /**
