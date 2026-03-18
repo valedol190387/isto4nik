@@ -19,6 +19,12 @@ interface AudioItem {
   audio_url: string;
 }
 
+// Интерфейс для кнопки-ссылки
+interface ButtonItem {
+  label: string;
+  url: string;
+}
+
 interface Material {
   id: string;
   title: string;
@@ -34,6 +40,7 @@ interface Material {
   videos: VideoItem[];               // Массив видео [{title, embed_code}]
   has_audio: boolean;                // Галочка "аудио материал"
   audios: AudioItem[];               // Массив аудио [{title, audio_url}]
+  buttons: ButtonItem[];             // Массив кнопок-ссылок [{label, url}]
   pic_url: string | null;            // URL изображения для превью
   share_uuid?: string;               // UUID для безопасных ссылок
   created_at: string;
@@ -53,6 +60,7 @@ interface MaterialForm {
   videos: VideoItem[];               // Массив видео [{title, embed_code}]
   has_audio: boolean;                // Галочка "аудио материал"
   audios: AudioItem[];               // Массив аудио [{title, audio_url}]
+  buttons: ButtonItem[];             // Массив кнопок-ссылок [{label, url}]
   pic_url: string;                   // URL изображения для превью
 }
 
@@ -69,6 +77,7 @@ const initialForm: MaterialForm = {
   videos: [],                        // Пустой массив видео
   has_audio: false,                  // По умолчанию без аудио
   audios: [],                        // Пустой массив аудио
+  buttons: [],                       // Пустой массив кнопок
   pic_url: ''                        // URL изображения для превью
 };
 
@@ -147,14 +156,19 @@ export default function AdminContent() {
 
     try {
       const method = editingMaterial ? 'PUT' : 'POST';
+      // Синхронизируем url с первой кнопкой для обратной совместимости
+      const formWithUrl = {
+        ...form,
+        url: form.buttons.length > 0 ? form.buttons[0].url : form.url,
+      };
       const materialData = editingMaterial
         ? {
-            ...form,
+            ...formWithUrl,
             id: editingMaterial.id,
-            oldPicUrl: editingMaterial.pic_url, // Для удаления старого изображения
-            oldAudios: editingMaterial.audios   // Для удаления старых аудио с S3
+            oldPicUrl: editingMaterial.pic_url,
+            oldAudios: editingMaterial.audios
           }
-        : form;
+        : formWithUrl;
 
       const response = await fetch('/api/admin/materials', {
         method,
@@ -197,6 +211,9 @@ export default function AdminContent() {
       videos: material.videos || [],
       has_audio: material.has_audio || false,
       audios: material.audios || [],
+      buttons: (material.buttons && material.buttons.length > 0)
+        ? material.buttons
+        : (material.url ? [{ label: 'Перейти к материалу', url: material.url }] : []),
       pic_url: material.pic_url || ''
     });
     setShowPreview(false);
@@ -760,20 +777,75 @@ export default function AdminContent() {
                 </p>
               </div>
 
-              <div className={styles.formRow}>
-                {/* Поле для ссылки - показывается всегда */}
-                <div className={styles.formGroup}>
-                  <label>Ссылка на материал (необязательно)</label>
-                  <input
-                    type="url"
-                    value={form.url}
-                    onChange={(e) => setForm({ ...form, url: e.target.value })}
-                    placeholder="https://example.com"
-                  />
-                  <p className={styles.fieldHint}>
-                    Ссылка для кнопки "Перейти к материалу". Если не заполнено, кнопка не отображается
-                  </p>
+              {/* Секция кнопок-ссылок */}
+              <div className={styles.videosSection}>
+                <div className={styles.videosSectionHeader}>
+                  <label>Кнопки-ссылки ({form.buttons.length})</label>
+                  <button
+                    type="button"
+                    onClick={() => setForm({
+                      ...form,
+                      buttons: [...form.buttons, { label: '', url: '' }]
+                    })}
+                    className={styles.addVideoBtn}
+                  >
+                    <Plus size={16} />
+                    Добавить кнопку
+                  </button>
                 </div>
+
+                {form.buttons.map((btn, index) => (
+                  <div key={index} className={styles.videoItemForm}>
+                    <div className={styles.videoItemHeader}>
+                      <span className={styles.videoNumber}>Кнопка {index + 1}</span>
+                      <button
+                        type="button"
+                        onClick={() => setForm({
+                          ...form,
+                          buttons: form.buttons.filter((_, i) => i !== index)
+                        })}
+                        className={styles.removeVideoBtn}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Текст кнопки</label>
+                      <input
+                        type="text"
+                        value={btn.label}
+                        onChange={(e) => {
+                          const newButtons = [...form.buttons];
+                          newButtons[index] = { ...btn, label: e.target.value };
+                          setForm({ ...form, buttons: newButtons });
+                        }}
+                        placeholder="Перейти к материалу"
+                      />
+                    </div>
+
+                    <div className={styles.formGroup}>
+                      <label>Ссылка *</label>
+                      <input
+                        type="url"
+                        value={btn.url}
+                        onChange={(e) => {
+                          const newButtons = [...form.buttons];
+                          newButtons[index] = { ...btn, url: e.target.value };
+                          setForm({ ...form, buttons: newButtons });
+                        }}
+                        placeholder="https://example.com"
+                        required
+                      />
+                    </div>
+                  </div>
+                ))}
+
+                {form.buttons.length === 0 && (
+                  <p className={styles.fieldHint}>
+                    Добавьте кнопки-ссылки, которые отобразятся на странице материала
+                  </p>
+                )}
               </div>
 
               {/* Секция видео - показывается только при включенной галочке */}

@@ -35,6 +35,12 @@ export interface MaterialAudio {
   audio_url: string;                   // URL аудио файла на S3
 }
 
+// Интерфейс для кнопки-ссылки в материале
+export interface MaterialButton {
+  label: string;                       // Текст кнопки
+  url: string;                         // URL ссылки
+}
+
 export interface Material {
   id: number;
   title: string;
@@ -51,6 +57,7 @@ export interface Material {
   videos: MaterialVideo[];             // Новое: массив видео [{title, embed_code}]
   audios: MaterialAudio[];             // Массив аудио [{title, audio_url}]
   has_audio: boolean;                  // Галочка "аудио материал"
+  buttons: MaterialButton[];           // Массив кнопок-ссылок [{label, url}]
   pic_url: string | null;              // URL изображения для превью
   share_uuid?: string;                 // UUID для безопасных ссылок
   created_at: string;

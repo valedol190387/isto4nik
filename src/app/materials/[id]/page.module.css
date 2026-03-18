@@ -400,9 +400,11 @@
 /* Секция действий */
 .actionSection {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
   margin-top: 32px;
-  margin-bottom: 24px; /* Дополнительный отступ снизу */
+  margin-bottom: 24px;
 }
 
 .primaryButton {

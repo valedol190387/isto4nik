@@ -363,10 +363,23 @@ export default function MaterialViewPage() {
             </div>
           )}
 
-          {/* Кнопка перехода к материалу */}
-          {material.url && (
+          {/* Кнопки-ссылки */}
+          {material.buttons && material.buttons.length > 0 ? (
             <div className={styles.actionSection}>
-              <button 
+              {material.buttons.map((btn, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleMaterialClick(btn.url)}
+                  className={styles.primaryButton}
+                >
+                  <ExternalLink size={20} />
+                  <span>{btn.label || 'Перейти к материалу'}</span>
+                </button>
+              ))}
+            </div>
+          ) : material.url ? (
+            <div className={styles.actionSection}>
+              <button
                 onClick={() => handleMaterialClick(material.url)}
                 className={styles.primaryButton}
               >
@@ -374,7 +387,7 @@ export default function MaterialViewPage() {
                 <span>Перейти к материалу</span>
               </button>
             </div>
-          )}
+          ) : null}
         </main>
       </div>
       
