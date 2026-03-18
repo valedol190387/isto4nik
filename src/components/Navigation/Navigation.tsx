@@ -22,7 +22,7 @@ export function Navigation() {
   const user = useSignal(initData.user);
 
   const [userData, setUserData] = useState<DbUser | null>(null);
-  const [loadingUserData, setLoadingUserData] = useState(false);
+  const [loadingUserData, setLoadingUserData] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   // Получение ID пользователя из мессенджера (Telegram или Max)
@@ -74,7 +74,7 @@ export function Navigation() {
   }
 
   const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-  const isSubscriptionActive = isLocalhost || userData?.status === 'Активна';
+  const isSubscriptionActive = isLocalhost || loadingUserData || userData?.status === 'Активна';
 
   // Обработчик для заблокированных разделов
   const handleLockedClick = (e: React.MouseEvent) => {

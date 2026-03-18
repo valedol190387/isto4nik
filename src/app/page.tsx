@@ -89,6 +89,7 @@ export default function Home() {
   const [currentDot, setCurrentDot] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [userData, setUserData] = useState<DbUser | null>(null);
+  const [userLoading, setUserLoading] = useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
   const [chatLink, setChatLink] = useState<string | null>(null);
   const [channelLink, setChannelLink] = useState<string | null>(null);
@@ -157,6 +158,7 @@ export default function Home() {
 
   // Функция для загрузки данных пользователя из базы данных (с автоматической регистрацией)
   const loadUserData = async () => {
+    setUserLoading(true);
     try {
       const messengerData = getMessengerData();
       const platform = messengerData.platform === 'unknown' ? 'telegram' : messengerData.platform;
@@ -189,12 +191,14 @@ export default function Home() {
     } catch (error) {
       console.error('Error in loadUserData:', error);
       setUserData(null);
+    } finally {
+      setUserLoading(false);
     }
   };
 
   // Проверяем статус подписки
   const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-  const isSubscriptionActive = isLocalhost || userData?.status === 'Активна';
+  const isSubscriptionActive = isLocalhost || userLoading || userData?.status === 'Активна';
 
   // Обработчик клика по кнопке чата (только для заблокированных)
   const handleChatClick = (e: React.MouseEvent) => {
