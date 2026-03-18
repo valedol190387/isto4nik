@@ -392,6 +392,13 @@
   color: #64748b;
 }
 
+.nameCell {
+  font-size: 13px;
+  color: #1e293b;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .idCell {
   font-family: monospace;
   font-size: 12px;

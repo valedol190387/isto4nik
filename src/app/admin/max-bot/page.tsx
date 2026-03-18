@@ -13,6 +13,7 @@ interface LogEntry {
   telegram_id: number | null;
   chat_id: number | null;
   details: Record<string, unknown> | null;
+  user_name: string | null;
   created_at: string;
 }
 
@@ -305,6 +306,7 @@ export default function MaxBotPage() {
                   <tr>
                     <th>Время</th>
                     <th>Событие</th>
+                    <th>Пользователь</th>
                     <th>Max ID</th>
                     <th>Telegram ID</th>
                     <th>Chat ID</th>
@@ -323,6 +325,9 @@ export default function MaxBotPage() {
                           <span className={`${styles.badge} ${styles[badge.style]}`}>
                             {badge.label}
                           </span>
+                        </td>
+                        <td className={styles.nameCell}>
+                          {log.user_name || '—'}
                         </td>
                         <td className={styles.idCell}>
                           {log.max_user_id || '—'}

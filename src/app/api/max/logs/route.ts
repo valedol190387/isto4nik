@@ -31,9 +31,33 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Failed to fetch logs' }, { status: 500 });
     }
 
+    // Подтягиваем имена пользователей из таблицы users по max_id
+    const logs = data || [];
+    const maxIds = [...new Set(logs.map(l => l.max_user_id).filter(Boolean))];
+
+    let userNames: Record<number, string> = {};
+    if (maxIds.length > 0) {
+      const { data: users } = await supabase
+        .from('users')
+        .select('max_id, name_from_ml, username')
+        .in('max_id', maxIds);
+
+      if (users) {
+        for (const u of users) {
+          userNames[u.max_id] = u.name_from_ml || u.username || '';
+        }
+      }
+    }
+
+    // Добавляем имя к каждому логу
+    const logsWithNames = logs.map(log => ({
+      ...log,
+      user_name: log.max_user_id ? (userNames[log.max_user_id] || null) : null,
+    }));
+
     return NextResponse.json({
-      count: data?.length || 0,
-      logs: data || [],
+      count: logsWithNames.length,
+      logs: logsWithNames,
     });
   } catch (error) {
     console.error('[MAX BOT] Logs error:', error);
