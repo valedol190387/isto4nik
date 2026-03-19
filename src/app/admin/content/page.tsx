@@ -113,8 +113,20 @@ export default function AdminContent() {
   const [saving, setSaving] = useState(false);
   const [newTag, setNewTag] = useState('');
   const [showPreview, setShowPreview] = useState(false);
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(['materials']));
-  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>({});
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('admin_content_expanded');
+      if (saved) return new Set(JSON.parse(saved));
+    }
+    return new Set(['materials']);
+  });
+  const [visibleCounts, setVisibleCounts] = useState<Record<string, number>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('admin_content_visible');
+      if (saved) return JSON.parse(saved);
+    }
+    return {};
+  });
   const [linkCopiedFor, setLinkCopiedFor] = useState<string | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadingAudio, setUploadingAudio] = useState<number | null>(null);
@@ -449,11 +461,17 @@ export default function AdminContent() {
     return acc;
   }, {} as Record<string, { section: typeof sectionOptions[0], materials: Material[], total: number }>);
 
-  // Инициализация видимых элементов
+  // Инициализация видимых элементов (с учётом сохранённых значений)
   useEffect(() => {
+    const saved = sessionStorage.getItem('admin_content_visible');
+    const savedCounts: Record<string, number> = saved ? JSON.parse(saved) : {};
     const initialCounts: Record<string, number> = {};
     Object.keys(groupedMaterials).forEach(sectionKey => {
-      initialCounts[sectionKey] = Math.min(ITEMS_PER_PAGE, groupedMaterials[sectionKey].total);
+      const total = groupedMaterials[sectionKey].total;
+      // Если есть сохранённое значение и оно больше дефолтного — используем его
+      initialCounts[sectionKey] = savedCounts[sectionKey]
+        ? Math.min(savedCounts[sectionKey], total)
+        : Math.min(ITEMS_PER_PAGE, total);
     });
     setVisibleCounts(initialCounts);
   }, [materials]);
@@ -466,13 +484,15 @@ export default function AdminContent() {
       newExpanded.add(sectionKey);
     }
     setExpandedSections(newExpanded);
+    sessionStorage.setItem('admin_content_expanded', JSON.stringify([...newExpanded]));
   };
 
   const showMore = (sectionKey: string) => {
-    setVisibleCounts(prev => ({
-      ...prev,
-      [sectionKey]: prev[sectionKey] + ITEMS_PER_PAGE
-    }));
+    setVisibleCounts(prev => {
+      const updated = { ...prev, [sectionKey]: prev[sectionKey] + ITEMS_PER_PAGE };
+      sessionStorage.setItem('admin_content_visible', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const getTotalMaterials = () => {
