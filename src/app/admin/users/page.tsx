@@ -77,6 +77,8 @@ export default function AdminUsersPage() {
   const [showExportModal, setShowExportModal] = useState(false);
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [isLoadingExport, setIsLoadingExport] = useState(false);
+  const [maxLinks, setMaxLinks] = useState<Record<number, string>>({});
+  const [maxLinkLoading, setMaxLinkLoading] = useState<number | null>(null);
 
   const usersPerPage = 20;
 
@@ -242,6 +244,23 @@ export default function AdminUsersPage() {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const generateMaxLink = async (telegramId: number) => {
+    setMaxLinkLoading(telegramId);
+    try {
+      const response = await fetch(`/api/users/generate-link-code?telegramId=${telegramId}`);
+      const data = await response.json();
+      if (data.linking_code) {
+        const link = `https://max.ru/id666202944166_bot?startapp=link_${data.linking_code}`;
+        setMaxLinks(prev => ({ ...prev, [telegramId]: link }));
+        navigator.clipboard.writeText(link);
+      }
+    } catch (error) {
+      console.error('Error generating MAX link:', error);
+    } finally {
+      setMaxLinkLoading(null);
+    }
   };
 
   if (isLoadingAnalytics) {
@@ -589,6 +608,7 @@ export default function AdminUsersPage() {
                   <tr>
                     <th style={{ textAlign: 'left' }}>Пользователь</th>
                     <th>Telegram ID</th>
+                    <th>MAX</th>
                     <th>Телефон</th>
                     <th>Статус</th>
                     <th>Регистрация</th>
@@ -618,6 +638,46 @@ export default function AdminUsersPage() {
                         </div>
                       </td>
                       <td className={styles.telegramId}>{user.telegram_id}</td>
+                      <td>
+                        {maxLinks[user.telegram_id] ? (
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(maxLinks[user.telegram_id]);
+                            }}
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '11px',
+                              background: '#059669',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                            }}
+                            title={maxLinks[user.telegram_id]}
+                          >
+                            Скопировать
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => generateMaxLink(user.telegram_id)}
+                            disabled={maxLinkLoading === user.telegram_id}
+                            style={{
+                              padding: '4px 8px',
+                              fontSize: '11px',
+                              background: '#082445',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              whiteSpace: 'nowrap',
+                              opacity: maxLinkLoading === user.telegram_id ? 0.5 : 1,
+                            }}
+                          >
+                            {maxLinkLoading === user.telegram_id ? '...' : 'Ссылка'}
+                          </button>
+                        )}
+                      </td>
                       <td className={styles.phoneCell}>{user.phone || '—'}</td>
                       <td>
                         <span className={`${styles.statusBadge} ${
