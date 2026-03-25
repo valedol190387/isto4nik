@@ -23,7 +23,7 @@ import { searchService } from '@/services/searchService';
 import { initData, useSignal } from '@telegram-apps/sdk-react';
 import { User as DbUser, PopupSettings } from '@/types/database';
 import { checkDeepLink, getStartParam, parseUtmFromStartParam } from '@/lib/deepLinks';
-import { getMessengerId, getMessengerData } from '@/lib/platform';
+import { getMessengerId, getMessengerData, getPlatform } from '@/lib/platform';
 
 import styles from './page.module.css';
 
@@ -273,7 +273,8 @@ export default function Home() {
   const loadLinks = async () => {
     if (isSubscriptionActive) {
       try {
-        const response = await fetch('/api/env-links');
+        const platform = getPlatform();
+        const response = await fetch(`/api/env-links?platform=${platform}`);
 
         if (response.ok) {
           const data = await response.json();

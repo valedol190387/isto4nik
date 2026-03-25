@@ -1,10 +1,17 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const chatLink = process.env.CHATLINK || null;
-    const channelLink = process.env.CHANNELLINK || null;
-    
+    const { searchParams } = new URL(request.url);
+    const platform = searchParams.get('platform');
+
+    const chatLink = platform === 'max'
+      ? (process.env.MAX_CHATLINK || null)
+      : (process.env.CHATLINK || null);
+    const channelLink = platform === 'max'
+      ? (process.env.MAX_CHANNELLINK || null)
+      : (process.env.CHANNELLINK || null);
+
     return NextResponse.json({
       chatLink,
       channelLink
