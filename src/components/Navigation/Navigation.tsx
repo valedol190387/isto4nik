@@ -26,9 +26,14 @@ export function Navigation() {
   const [showSubscriptionModal, setShowSubscriptionModal] = useState(false);
 
   // Получение ID пользователя из мессенджера (Telegram или Max)
+  // Приоритет: getMessengerId() (напрямую из SDK) > signal > fallback
+  // В Max signal может быть 0 (из мока), а getMessengerId() читает реальный ID из window.WebApp
   const getUserId = (): string => {
-    const id = user?.id?.toString() || getMessengerId();
-    return id || Math.floor(Math.random() * 1000000000).toString();
+    const messengerId = getMessengerId();
+    if (messengerId && messengerId !== '0') return messengerId;
+    const signalId = user?.id?.toString();
+    if (signalId && signalId !== '0') return signalId;
+    return Math.floor(Math.random() * 1000000000).toString();
   };
 
   // Функция для загрузки данных пользователя из базы данных (как на главной)
@@ -40,7 +45,7 @@ export function Navigation() {
       const userId = getUserId();
 
       // Не загружаем фейковых юзеров (mock fallback)
-      if (userId === '0') {
+      if (!userId || userId === '0') {
         setUserData(null);
         return;
       }
@@ -69,6 +74,8 @@ export function Navigation() {
   // В Max: Telegram SDK сигнал не заполняется, но __MAX_PLATFORM__ установлен
   const isMax = typeof window !== 'undefined' && !!(window as any).__MAX_PLATFORM__;
   const hasMessengerId = !!getMessengerId();
+  const resolvedUserId = getUserId();
+
   useEffect(() => {
     if (user?.id || isMax || hasMessengerId) {
       // Не перезагружаем если данные уже получены
@@ -76,6 +83,17 @@ export function Navigation() {
       loadUserData();
     }
   }, [user?.id]);
+
+  // В Max: если первый useEffect отработал с id=0 (userData=null), ретригерим
+  // когда реальный getMessengerId() станет доступен (Max SDK догрузился)
+  useEffect(() => {
+    if (!userData && !loadingUserData && isMax) {
+      const realId = getMessengerId();
+      if (realId && realId !== '0') {
+        loadUserData();
+      }
+    }
+  }, [resolvedUserId, pathname]);
 
   // Скрываем навигацию для админских страниц и онбординга
   if (pathname.startsWith('/admin') || pathname.startsWith('/onboarding')) {

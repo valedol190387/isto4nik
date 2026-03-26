@@ -44,7 +44,17 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
     try {
       const messengerInfo = getMessengerData();
       const platform = messengerInfo.platform === 'unknown' ? 'telegram' : messengerInfo.platform;
-      const userId = user?.id?.toString() || getUserId();
+      // Приоритет: getMessengerId() (реальный ID из SDK) > signal > fallback
+      const messengerId = getMessengerId();
+      const userId = (messengerId && messengerId !== '0' ? messengerId : null)
+        || (user?.id && user.id !== 0 ? user.id.toString() : null)
+        || getUserId();
+
+      if (!userId || userId === '0') {
+        setUserData(null);
+        setLoadingUserData(false);
+        return;
+      }
       const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
 
       const response = await fetch(`/api/users?${queryParam}`);
@@ -73,8 +83,10 @@ export function SearchModal({ isOpen, onClose, initialQuery = '' }: SearchModalP
   const isSubscriptionActive = isLocalhost || userData?.status === 'Активна';
 
   // Загружаем данные пользователя при открытии модала
+  const isMax = typeof window !== 'undefined' && !!(window as any).__MAX_PLATFORM__;
+  const hasMessengerId = !!getMessengerId();
   useEffect(() => {
-    if (isOpen && user?.id) {
+    if (isOpen && (user?.id || isMax || hasMessengerId)) {
       loadUserData();
     }
   }, [isOpen, user?.id]);

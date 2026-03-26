@@ -365,6 +365,19 @@ export default function Home() {
     init();
   }, [user?.id]);
 
+  // В Max: safety net — если данные не загрузились при первом рендере,
+  // ретригерим через 2с (Max SDK мог ещё не отдать user data)
+  useEffect(() => {
+    if (!isMax) return;
+    const timer = setTimeout(() => {
+      const realId = getMessengerId();
+      if (!userData && realId && realId !== '0') {
+        loadUserData();
+      }
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [isMax]);
+
   // Загружаем ссылки когда статус подписки меняется
   useEffect(() => {
     loadLinks();

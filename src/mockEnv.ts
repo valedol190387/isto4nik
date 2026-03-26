@@ -1,6 +1,33 @@
 import { mockTelegramEnv, isTMA, emitEvent } from '@telegram-apps/sdk-react';
 
 /**
+ * Пытаемся получить user из Max SDK — сначала из initDataUnsafe, потом парсим initData
+ */
+function getMaxUser(): any | null {
+  const webApp = (window as any).WebApp;
+  if (!webApp) return null;
+
+  // 1. Напрямую из initDataUnsafe
+  if (webApp.initDataUnsafe?.user?.id) {
+    return webApp.initDataUnsafe.user;
+  }
+
+  // 2. Парсим из initData строки (Max SDK может заполнить строку раньше объекта)
+  if (typeof webApp.initData === 'string' && webApp.initData.length > 0) {
+    try {
+      const params = new URLSearchParams(webApp.initData);
+      const userStr = params.get('user');
+      if (userStr) {
+        const parsed = JSON.parse(userStr);
+        if (parsed?.id) return parsed;
+      }
+    } catch {}
+  }
+
+  return null;
+}
+
+/**
  * Проверяет, запущено ли приложение внутри Max messenger
  * Max создаёт window.WebApp (без window.Telegram)
  */
@@ -8,12 +35,9 @@ function isMaxApp(): boolean {
   if (typeof window === 'undefined') return false;
   // Скрипт max-web-app.js создаёт window.WebApp везде (даже в Telegram),
   // поэтому нельзя просто проверять window.WebApp.
-  // Проверяем: нет Telegram И есть реальные данные юзера в Max SDK
+  // Проверяем: нет Telegram И есть реальные данные юзера с ID в Max SDK
   if ((window as any).Telegram?.WebApp) return false;
-  const webApp = (window as any).WebApp;
-  if (!webApp) return false;
-  // initData может быть "" (пустая строка = falsy), поэтому проверяем initDataUnsafe
-  return !!(webApp.initDataUnsafe?.user) || (typeof webApp.initData === 'string' && webApp.initData.length > 0);
+  return !!getMaxUser();
 }
 
 /**
@@ -63,7 +87,8 @@ function mockTelegramFromMax(): void {
   // Ставим флаг — используется в getPlatform() для определения Max
   (window as any).__MAX_PLATFORM__ = true;
 
-  const user = maxWebApp.initDataUnsafe?.user;
+  // Берём user из initDataUnsafe или парсим из initData строки
+  const user = getMaxUser();
   const themeParams = {
     accent_text_color: '#6ab2f2',
     bg_color: '#EDEDEA',
