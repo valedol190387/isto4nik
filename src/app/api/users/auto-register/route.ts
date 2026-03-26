@@ -24,6 +24,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Telegram ID or Max ID is required' }, { status: 400 });
     }
 
+    // Отклоняем фейковые/mock ID
+    const FAKE_IDS = ['0', '123456789', '987654321', '555666777'];
+    if (FAKE_IDS.includes(String(telegram_id)) || FAKE_IDS.includes(String(max_id))) {
+      return NextResponse.json({ error: 'Invalid user ID' }, { status: 403 });
+    }
+
     // Проверяем существует ли пользователь
     let existingUser = null;
     let checkError = null;

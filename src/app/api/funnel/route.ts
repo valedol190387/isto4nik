@@ -34,6 +34,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'telegram_id is required' }, { status: 400 });
     }
 
+    // Отклоняем фейковые/mock ID
+    const FAKE_IDS = [0, 123456789, 987654321, 555666777];
+    if (FAKE_IDS.includes(Number(telegram_id))) {
+      return NextResponse.json({ error: 'Invalid user' }, { status: 403 });
+    }
+
     // Вычисляем max_screen — самый «глубокий» экран
     const screenOrder = ['screen-1', 'screen-2', 'screen-3'];
     const allScreens: string[] = screens_visited || [];

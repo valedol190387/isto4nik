@@ -162,7 +162,10 @@ export default function Home() {
     try {
       const messengerData = getMessengerData();
       const platform = messengerData.platform === 'unknown' ? 'telegram' : messengerData.platform;
-      const userId = user?.id?.toString() || getUserId();
+      // Приоритет: getMessengerId() (напрямую из SDK) > signal > fallback
+      // В Max signal может быть нестабильным, а getMessengerId() читает напрямую из window.WebApp
+      const messengerId = getMessengerId();
+      const userId = messengerId || user?.id?.toString() || getUserId();
 
       // Не загружаем и не регистрируем фейковых юзеров (mock fallback)
       if (userId === '0') {
@@ -320,7 +323,12 @@ export default function Home() {
   // В Max: сначала привязка (если link_*), потом загрузка — ПОСЛЕДОВАТЕЛЬНО
   const isMax = typeof window !== 'undefined' && !!(window as any).__MAX_PLATFORM__;
   useEffect(() => {
-    if (!user?.id && !isMax) return;
+    // Для Max: getMessengerId() надёжнее signal, не блокируем на отсутствии user?.id
+    const hasMessengerId = !!getMessengerId();
+    if (!user?.id && !isMax && !hasMessengerId) return;
+
+    // Не перезагружаем если данные уже успешно получены (signal может обновиться повторно)
+    if (userData && !userLoading) return;
 
     const init = async () => {
       // 1. В Max с link_ параметром — сначала привязка

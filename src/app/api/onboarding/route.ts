@@ -11,6 +11,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'telegram_id is required' }, { status: 400 });
     }
 
+    // Отклоняем фейковые/mock ID
+    const FAKE_IDS = [0, 123456789, 987654321, 555666777];
+    if (FAKE_IDS.includes(Number(telegram_id))) {
+      return NextResponse.json({ error: 'Invalid user' }, { status: 403 });
+    }
+
     // Upsert — если запись есть, обновляем; если нет — создаём
     const { data, error } = await supabase
       .from('onboarding_progress')

@@ -40,6 +40,8 @@ export default function MaterialViewPage() {
     videoIndex?: number;
     videoTitle?: string;
   }) => {
+    // Не логируем для неидентифицированных пользователей
+    if (!params.telegramId || params.telegramId === '0' || params.telegramId === '123456789') return;
     try {
       await fetch('/api/material-views', {
         method: 'POST',
