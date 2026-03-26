@@ -38,6 +38,12 @@ export function Navigation() {
       const messengerInfo = getMessengerData();
       const platform = messengerInfo.platform === 'unknown' ? 'telegram' : messengerInfo.platform;
       const userId = getUserId();
+
+      // Не загружаем фейковых юзеров (mock fallback)
+      if (userId === '0') {
+        setUserData(null);
+        return;
+      }
       const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
 
       const response = await fetch(`/api/users?${queryParam}`);
@@ -74,7 +80,7 @@ export function Navigation() {
   }
 
   const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-  const isSubscriptionActive = isLocalhost || loadingUserData || userData?.status === 'Активна';
+  const isSubscriptionActive = isLocalhost || userData?.status === 'Активна';
 
   // Обработчик для заблокированных разделов
   const handleLockedClick = (e: React.MouseEvent) => {

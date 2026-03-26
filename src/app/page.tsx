@@ -164,6 +164,12 @@ export default function Home() {
       const platform = messengerData.platform === 'unknown' ? 'telegram' : messengerData.platform;
       const userId = user?.id?.toString() || getUserId();
 
+      // Не загружаем и не регистрируем фейковых юзеров (mock fallback)
+      if (userId === '0') {
+        setUserData(null);
+        return;
+      }
+
       // Сначала пытаемся загрузить существующего пользователя
       const queryParam = platform === 'max' ? `maxId=${userId}` : `telegramId=${userId}`;
       const response = await fetch(`/api/users?${queryParam}`);
@@ -198,7 +204,7 @@ export default function Home() {
 
   // Проверяем статус подписки
   const isLocalhost = typeof window !== 'undefined' && window.location.hostname === 'localhost';
-  const isSubscriptionActive = isLocalhost || userLoading || userData?.status === 'Активна';
+  const isSubscriptionActive = isLocalhost || userData?.status === 'Активна';
 
   // Обработчик клика по кнопке чата (только для заблокированных)
   const handleChatClick = (e: React.MouseEvent) => {
